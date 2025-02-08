@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require("cors");
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
-
+const sequelize = require("./configs/database");
 
 const app = express();
 app.use(express.json());
@@ -18,4 +18,14 @@ app.get("/status", (req, res) => {
 	res.status(200).json({ status: "Server is running" });
 });
 
+app.use("/api/users", require("./routes/userRoute"));
 
+sequelize
+	.authenticate()
+	.then(() => console.log("✅ Conectado a PostgreSQL"))
+	.catch((err) => console.error("❌ Error de conexión:", err));
+
+	sequelize
+	.sync({ alter: true }) 
+	.then(() => console.log("✅ Modelos sincronizados"))
+	.catch((err) => console.error("❌ Error al sincronizar modelos:", err));
