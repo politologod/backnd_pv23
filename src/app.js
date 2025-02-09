@@ -9,12 +9,12 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
-require("../configs/passport")(passport);
+require("./configs/passport")(passport);
 app.use(passport.initialize()); 
 const PORT = process.env.PORT || 777;
 app.listen(PORT, () => console.log(`🚀 Server Running Successfully on http://localhost:${PORT}`));
 
-
+app.use("/api/auth", require("./routes/auth"));
 
 app.get("/status", (req, res) => {
 	res.status(200).json({ status: "Server is running" });

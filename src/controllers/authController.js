@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 // 🔹 Generar token JWT con más información útil
 const createToken = (user) => {
 	return jwt.sign(
-		{ id: user.id, email: user.email, displayName: user.displayName },
+		{ id: user.id, email: user.email, name: user.name },
 		process.env.JWT_SECRET,
 		{ expiresIn: "7d" }
 	);
@@ -14,10 +14,10 @@ const createToken = (user) => {
 // 🔹 Registro con email y contraseña
 exports.register = async (req, res) => {
 	try {
-		const { displayName, email, password, address, phone } = req.body;
+		const { name, email, password, address, phone } = req.body;
 
 		// 1️⃣ Validar datos
-		if (!email || !password || !displayName) {
+		if (!email || !password || !name) {
 			return res.status(400).json({ message: "Todos los campos son obligatorios." });
 		}
 
@@ -34,7 +34,7 @@ exports.register = async (req, res) => {
 
 		// 4️⃣ Crear usuario
 		const user = await User.create({
-			displayName,
+			name,
 			email,
 			password,
 			address,

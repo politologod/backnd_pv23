@@ -16,10 +16,14 @@ const User = sequelize.define("User", {
 		type: DataTypes.STRING,
 		allowNull: false,
 	},
-
-	email: {
+	googleId: {
 		type: DataTypes.STRING,
 		allowNull: true,
+		unique: true, 
+	},
+	email: {
+		type: DataTypes.STRING,
+		allowNull: true, 
 		unique: true, 
 		validate: {
 			isEmail: true,
@@ -37,6 +41,11 @@ const User = sequelize.define("User", {
 	},
 
 	phone: {
+		type: DataTypes.STRING,
+		allowNull: true,
+	},
+
+	profilePic: {
 		type: DataTypes.STRING,
 		allowNull: true,
 	},

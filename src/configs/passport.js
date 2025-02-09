@@ -25,15 +25,15 @@ module.exports = (passport) => {
 					const [user, created] = await User.findOrCreate({
 						where: { googleId: profile.id },
 						defaults: {
-							displayName: profile.displayName,
+							name: profile.name,
 							email: profile.emails[0].value,
 							profilePic: profile.photos[0].value,
 						},
 					});
 					if (created) {
-						console.log("Nuevo usuario creado:", user.displayName);
+						console.log("Nuevo usuario creado:", user.name);
 					} else {
-						console.log("Usuario existente autenticado:", user.displayName);
+						console.log("Usuario existente autenticado:", user.name);
 					}
 					return done(null, user);
 				} catch (err) {
