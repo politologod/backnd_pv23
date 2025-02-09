@@ -44,9 +44,9 @@ exports.register = async (req, res) => {
 		// 5️⃣ Generar token y enviar como cookie segura
 		const token = createToken(user);
 		res.cookie("token", token, {
-			httpOnly: true, // Evita accesos desde JS en frontend
-			secure: process.env.NODE_ENV === "production", // Solo en HTTPS en prod
-			sameSite: "Strict",
+			httpOnly: true, 
+			secure: true, 
+			sameSite: "none",
 			maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
 		});
 
@@ -82,8 +82,8 @@ exports.login = async (req, res) => {
 		const token = createToken(user);
 		res.cookie("token", token, {
 			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			sameSite: "Strict",
+			secure: true,
+			sameSite: "none",
 			maxAge: 7 * 24 * 60 * 60 * 1000,
 		});
 
