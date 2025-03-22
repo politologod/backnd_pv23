@@ -1,4 +1,4 @@
-const express = require('express');
+	const express = require('express');
 const cors = require("cors");
 const passport = require("passport");
 require("dotenv").config();
@@ -11,28 +11,27 @@ app.use(cookieParser());
 app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 require("./configs/passport")(passport);
 app.use(passport.initialize()); 
-const PORT = process.env.PORT || 777;
-app.listen(PORT, () => console.log(`🚀 Server Running Successfully on http://localhost:${PORT}`));
 
-
-
-
-
-
+// Rutas
 app.use("/api/auth", require("./routes/auth"));
+app.use("/api/users", require("./routes/userRoute"));
+app.use("/api/products", require("./routes/productRoutes"));
+app.use("/api/cards", require("./routes/cardRoutes"));
+app.use("/api/orders", require("./routes/orderRoutes"));
 
 app.get("/status", (req, res) => {
 	res.status(200).json({ status: "Server is running" });
 });
 
-app.use("/api/users", require("./routes/userRoute"));
+const PORT = process.env.PORT || 777;
+app.listen(PORT, () => console.log(`🚀 Server Running Successfully on http://localhost:${PORT}`));
 
 sequelize
 	.authenticate()
 	.then(() => console.log("✅ Conectado a PostgreSQL"))
 	.catch((err) => console.error("❌ Error de conexión:", err));
 
-	sequelize
+sequelize
 	.sync({ alter: true }) 
 	.then(() => console.log("✅ Modelos sincronizados"))
 	.catch((err) => console.error("❌ Error al sincronizar modelos:", err));
