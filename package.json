@@ -23,6 +23,9 @@
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.13.1",
-    "sequelize": "^6.37.5"
+    "sequelize": "^6.37.5",
+    "swagger-ui": "^5.20.1",
+    "swagger-ui-dist": "^5.20.1",
+    "swagger-ui-react": "^5.20.1"
   }
 }
