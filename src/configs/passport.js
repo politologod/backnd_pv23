@@ -1,7 +1,7 @@
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
-const User = require("../models/user");
+const User = require("../models/model_user");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
