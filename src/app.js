@@ -4,6 +4,8 @@ const passport = require("passport");
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const sequelize = require("./configs/database");
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpecs = require('./configs/swagger');
 
 const app = express();
 app.use(express.json());
@@ -11,6 +13,9 @@ app.use(cookieParser());
 app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 require("./configs/passport")(passport);
 app.use(passport.initialize()); 
+
+// Documentación Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 // Rutas
 app.use("/api/auth", require("./routes/auth"));

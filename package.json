@@ -1,5 +1,5 @@
 {
-  "name": "ks2.tech-backend",
+  "name": "Puravida 23 Ecommerce Backend",
   "version": "1.0.0",
   "description": "",
   "main": "src/app.js",
@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "cloudinary": "^2.6.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -24,8 +25,10 @@
     "passport-jwt": "^4.0.1",
     "pg": "^8.13.1",
     "sequelize": "^6.37.5",
+    "swagger-jsdoc": "^6.2.8",
     "swagger-ui": "^5.20.1",
     "swagger-ui-dist": "^5.20.1",
+    "swagger-ui-express": "^5.0.1",
     "swagger-ui-react": "^5.20.1"
   }
 }

@@ -41,6 +41,11 @@ const createProduct = async (req, res) => {
 		if (categoryIds && categoryIds.length > 0) {
 			const categories = await Category.findAll({ where: { id: categoryIds } });
 			await product.addCategories(categories);
+            await cloudinary.uploader.upload(req.body.imageUrl).then(result => {
+                console.log(result);
+                product.imageUrl = result.url;})
+
+    
 		}
 
 		res.status(201).json(product);
