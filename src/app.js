@@ -6,8 +6,10 @@ const cookieParser = require("cookie-parser");
 const sequelize = require("./configs/database");
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpecs = require('./configs/swagger');
+const morgan = require('morgan');
 
 const app = express();
+app.use(morgan('dev')); // Muestra logs detallados en la terminal
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
@@ -21,7 +23,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/users", require("./routes/userRoute"));
 app.use("/api/products", require("./routes/productRoutes"));
-app.use("/api/cards", require("./routes/cardRoutes"));
 app.use("/api/orders", require("./routes/orderRoutes"));
 
 app.get("/status", (req, res) => {

@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 // 🔹 Generar token JWT con más información útil
 const createToken = (user) => {
 	return jwt.sign(
-		{ id: user.id, email: user.email, name: user.name },
+		{ id: user.id, email: user.email, name: user.name, role: user.role },
 		process.env.JWT_SECRET,
 		{ expiresIn: "7d" }
 	);
@@ -14,7 +14,7 @@ const createToken = (user) => {
 // 🔹 Registro con email y contraseña
 exports.register = async (req, res) => {
 	try {
-		const { name, email, password, address, phone } = req.body;
+		const { name, email, password, address, phone, role } = req.body;
 
 		// 1️⃣ Validar datos
 		if (!email || !password || !name) {
@@ -39,13 +39,14 @@ exports.register = async (req, res) => {
 			password,
 			address,
 			phone,
+			role,
 		});
 
 		// 5️⃣ Generar token y enviar como cookie segura
 		const token = createToken(user);
 		res.cookie("token", token, {
 			httpOnly: true, 
-			secure: true, 
+			secure: false, // Cambiar a true en producción
 			sameSite: "none",
 			maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
 		});
@@ -82,7 +83,7 @@ exports.login = async (req, res) => {
 		const token = createToken(user);
 		res.cookie("token", token, {
 			httpOnly: true,
-			secure: true,
+			secure: false, // Cambiar a true en producción
 			sameSite: "none",
 			maxAge: 7 * 24 * 60 * 60 * 1000,
 		});
