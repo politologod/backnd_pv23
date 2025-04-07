@@ -1,23 +1,30 @@
-	const express = require('express');
+const express = require("express");
 const cors = require("cors");
 const passport = require("passport");
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const sequelize = require("./configs/database");
-const swaggerUi = require('swagger-ui-express');
-const swaggerSpecs = require('./configs/swagger');
-const morgan = require('morgan');
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpecs = require("./configs/swagger");
+const morgan = require("morgan");
 
 const app = express();
-app.use(morgan('dev')); // Muestra logs detallados en la terminal
+app.use(morgan("dev")); // Muestra logs detallados en la terminal
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
+const corsOptions = {
+	origin: "http://localhost:3000", // URL de tu frontend
+	credentials: true, // Permite cookies
+	allowedHeaders: ["Content-Type", "Authorization"],
+	methods: ['GET', 'POST', 'PUT', 'DELETE'],
+	cache: false, // Desactiva caché
+};
+app.use(cors(corsOptions)); // Habilita CORS con opciones 
 require("./configs/passport")(passport);
-app.use(passport.initialize()); 
+app.use(passport.initialize());
 
 // Documentación Swagger
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 // Rutas
 app.use("/api/auth", require("./routes/auth"));
@@ -30,7 +37,9 @@ app.get("/status", (req, res) => {
 });
 
 const PORT = process.env.PORT || 777;
-app.listen(PORT, () => console.log(`🚀 Server Running Successfully on http://localhost:${PORT}`));
+app.listen(PORT, () =>
+	console.log(`🚀 Server Running Successfully on http://localhost:${PORT}`)
+);
 
 sequelize
 	.authenticate()
@@ -38,6 +47,6 @@ sequelize
 	.catch((err) => console.error("❌ Error de conexión:", err));
 
 sequelize
-	.sync({ alter: true }) 
+	.sync({ alter: true })
 	.then(() => console.log("✅ Modelos sincronizados"))
 	.catch((err) => console.error("❌ Error al sincronizar modelos:", err));

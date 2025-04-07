@@ -47,8 +47,10 @@ exports.register = async (req, res) => {
 		res.cookie("token", token, {
 			httpOnly: true, 
 			secure: false, // Cambiar a true en producción
-			sameSite: "none",
+			sameSite: "lax", // Cambiar a "none" si usas HTTPS
 			maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
+			domain: "localhost", // Cambiar a tu dominio en producción
+			
 		});
 
 		res.status(201).json({ message: "Usuario registrado con éxito.", user });
@@ -84,7 +86,7 @@ exports.login = async (req, res) => {
 		res.cookie("token", token, {
 			httpOnly: true,
 			secure: false, // Cambiar a true en producción
-			sameSite: "none",
+			sameSite: "lax",
 			maxAge: 7 * 24 * 60 * 60 * 1000,
 		});
 
@@ -107,7 +109,7 @@ exports.verifyToken = (req, res, next) => {
 		return res.status(401).json({ message: "No se proporcionó token" });
 	}
 
-	jwt.verify(
+	jwt.verify(	
 		token,
 		process.env.JWT_SECRET,
 		(err, decoded) => {
