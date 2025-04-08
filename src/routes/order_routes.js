@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { auth, checkRole } = require('../middlewares/auth');
-const {createOrder, updateOrder, deleteOrder, getAllOrders, getOrderById} = require('../controllers/orderController');
+const {createOrder, updateOrder, deleteOrder, getAllOrders, getOrderById} = require('../controllers/order_controller');
 const pagination = require('../middlewares/pagination');
 // TODO: Importar el controlador de órdenes cuando esté creado
 // const orderController = require('../controllers/orderController');
