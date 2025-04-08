@@ -1,7 +1,6 @@
 const { Order } = require("../models/model_order");
 const { OrderItem } = require("../models/model_orderItem");
 const { Product } = require("../models/model_products");
-
 const updateOrder = async (req, res) => {
     try {
         const { id } = req.params;
