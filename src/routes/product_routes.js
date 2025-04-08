@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { auth } = require('../middlewares/auth');
-const {createProduct, updateProduct, deleteProduct, getAllProducts, getProductById} = require('../controllers/productController');
+const {createProduct, updateProduct, deleteProduct, getAllProducts, getProductById} = require('../controllers/product_controller');
 const { checkRole } = require('../middlewares/auth');
 
 /**

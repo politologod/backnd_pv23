@@ -51,7 +51,7 @@ authRouter.get("/logout", (req, res) => {
 
 
 
-const { register, login, logout, verifyToken } = require("../controllers/authController");
+const { register, login, logout, verifyToken } = require("../controllers/auth_controller");
 
 authRouter.post("/register", register);
 authRouter.post("/login", login);

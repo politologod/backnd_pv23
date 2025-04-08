@@ -28,9 +28,11 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 // Rutas
 app.use("/api/auth", require("./routes/auth"));
-app.use("/api/users", require("./routes/userRoute"));
-app.use("/api/products", require("./routes/productRoutes"));
-app.use("/api/orders", require("./routes/orderRoutes"));
+app.use("/api/users", require("./routes/user_routes"));
+app.use("/api/products", require("./routes/product_routes"));
+app.use("/api/orders", require("./routes/order_routes"));
+app.use("/api/categories", require("./routes/category_routes"));
+app.use("/api/cart", require("./routes/cart_routes"));
 
 app.get("/status", (req, res) => {
 	res.status(200).json({ status: "Server is running" });
