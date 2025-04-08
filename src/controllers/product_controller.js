@@ -10,6 +10,7 @@ const  Category  = require("../models/model_category");
 const updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
+        const { categoryIds } = req.body;
 
         const product = await Product.findByPk(id);
         if (!product) {
@@ -18,12 +19,10 @@ const updateProduct = async (req, res) => {
 
         await product.update(req.body);
 
-        // Asociar categorías (N:M)
-        if (categoryIds && categoryIds.length > 0) {
-            const categories = await Category.findAll({ where: { id: categoryIds } });
-            await product.setCategories(categories);
-        }
-
+		if (Array.isArray(categoryIds) && categoryIds.length > 0) {
+			const categories = await Category.findAll({ where: { id: categoryIds } });
+			await product.setCategories(categories);
+		}
         res.json(product);
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -36,16 +35,13 @@ const updateProduct = async (req, res) => {
 // Crear un producto
 const createProduct = async (req, res) => {
 	try {
+        const { categoryIds } = req.body;
 		const product = await Product.create(req.body);
+
 		// Asociar categorías (N:M)
-		if (categoryIds && categoryIds.length > 0) {
+		if (Array.isArray(categoryIds) && categoryIds.length > 0) {
 			const categories = await Category.findAll({ where: { id: categoryIds } });
 			await product.addCategories(categories);
-            await cloudinary.uploader.upload(req.body.imageUrl).then(result => {
-                console.log(result);
-                product.imageUrl = result.url;})
-
-    
 		}
 
 		res.status(201).json(product);
@@ -57,7 +53,7 @@ const createProduct = async (req, res) => {
 // Obtener todos los productos con sus categorías
 const getAllProducts = async (req, res) => {
 	try {
-		const products = await Product.findAll({ include: [Category] });
+		const products = await Product.findAll();
 		res.json(products);
 	} catch (error) {
 		res.status(500).json({ error: "Error al obtener productos" });
