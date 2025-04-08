@@ -1,10 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { auth } = require('../middlewares/auth');
-const { pagination } = require('../middlewares/pagination');
-
-// TODO: Importar el controlador de productos cuando esté creado
-// const productController = require('../controllers/productController');
+const {createProduct, updateProduct, deleteProduct, getAllProducts, getProductById} = require('../controllers/productController');
+const { checkRole } = require('../middlewares/auth');
 
 /**
  * @swagger
@@ -46,13 +44,7 @@ const { pagination } = require('../middlewares/pagination');
  *                     offset:
  *                       type: integer
  */
-router.get('/', pagination, (req, res) => {
-    res.json({ 
-        message: 'Lista de productos',
-        pagination: req.pagination
-    });
-});
-
+router.get('/',  getAllProducts);
 /**
  * @swagger
  * /api/products/{id}:
@@ -73,9 +65,7 @@ router.get('/', pagination, (req, res) => {
  *       404:
  *         description: Producto no encontrado
  */
-router.get('/:id', (req, res) => {
-    res.json({ message: 'Detalle del producto' });
-});
+router.get('/:id', getProductById);
 
 /**
  * @swagger
@@ -113,9 +103,7 @@ router.get('/:id', (req, res) => {
  *       401:
  *         description: No autorizado
  */
-router.post('/', auth, (req, res) => {
-    res.json({ message: 'Crear producto' });
-});
+router.post('/', auth, checkRole(["vendor", "admin"]), createProduct);
 
 /**
  * @swagger
@@ -156,9 +144,7 @@ router.post('/', auth, (req, res) => {
  *       401:
  *         description: No autorizado
  */
-router.put('/:id', auth, (req, res) => {
-    res.json({ message: 'Actualizar producto' });
-});
+router.put('/:id', auth, checkRole(["vendor", "admin"]), updateProduct);
 
 /**
  * @swagger
@@ -184,117 +170,8 @@ router.put('/:id', auth, (req, res) => {
  *       401:
  *         description: No autorizado
  */
-router.delete('/:id', auth, (req, res) => {
-    res.json({ message: 'Eliminar producto' });
-});
+router.delete('/:id', auth, checkRole(["vendor", "admin"]), deleteProduct);
 
-/**
- * @swagger
- * /api/products/{id}/stock:
- *   put:
- *     summary: Actualizar stock de un producto
- *     description: Actualiza el stock de un producto
- *     tags: [Productos]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID del producto
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - quantity
- *             properties:
- *               quantity:
- *                 type: integer
- *               type:
- *                 type: string
- *                 enum: [add, remove]
- *     responses:
- *       200:
- *         description: Stock actualizado exitosamente
- *       404:
- *         description: Producto no encontrado
- *       401:
- *         description: No autorizado
- */
-router.put('/:id/stock', auth, (req, res) => {
-    res.json({ message: 'Actualizar stock del producto' });
-});
 
-/**
- * @swagger
- * /api/products/{id}/stock:
- *   get:
- *     summary: Obtener historial de stock
- *     description: Retorna el historial de cambios en el stock de un producto
- *     tags: [Productos]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID del producto
- *     responses:
- *       200:
- *         description: Historial de stock obtenido exitosamente
- *       404:
- *         description: Producto no encontrado
- *       401:
- *         description: No autorizado
- */
-router.get('/:id/stock', auth, (req, res) => {
-    res.json({ message: 'Obtener historial de stock' });
-});
-
-/**
- * @swagger
- * /api/products/category/{categoryId}:
- *   get:
- *     summary: Obtener productos por categoría
- *     description: Retorna una lista paginada de productos filtrada por categoría
- *     tags: [Productos]
- *     parameters:
- *       - in: path
- *         name: categoryId
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID de la categoría
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           default: 1
- *         description: Número de página
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 10
- *         description: Cantidad de productos por página
- *     responses:
- *       200:
- *         description: Lista de productos obtenida exitosamente
- *       404:
- *         description: Categoría no encontrada
- */
-router.get('/category/:categoryId', pagination, (req, res) => {
-    res.json({ 
-        message: 'Productos por categoría',
-        pagination: req.pagination
-    });
-});
 
 module.exports = router; 
