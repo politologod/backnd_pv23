@@ -1,7 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const { auth } = require('../middlewares/auth');
-const {createProduct, updateProduct, deleteProduct, getAllProducts, getProductById, getProductByCategory} = require('../controllers/product_controller');
+const {
+    createProduct, 
+    updateProduct, 
+    deleteProduct, 
+    getAllProducts, 
+    getProductById, 
+    getProductByCategory,
+    getProductByNames,
+    getProductByPrice
+} = require('../controllers/product_controller');
 const { checkRole } = require('../middlewares/auth');
 
 /**
@@ -44,7 +53,15 @@ const { checkRole } = require('../middlewares/auth');
  *                     offset:
  *                       type: integer
  */
-router.get('/',  getAllProducts);
+router.get('/', getAllProducts);
+
+// Added routes for filtering by name and price
+router.get('/search', getProductByNames);
+router.get('/price', getProductByPrice);
+
+// Moved the category route BEFORE the :id route to prevent conflicts
+router.get('/category/:categoryId', getProductByCategory);
+
 /**
  * @swagger
  * /api/products/{id}:
@@ -89,14 +106,16 @@ router.get('/:id', getProductById);
  *             properties:
  *               name:
  *                 type: string
- *               description:
+ *               description:Peter Smith
  *                 type: string
  *               price:
  *                 type: number
  *               stock:
  *                 type: integer
- *               categoryId:
- *                 type: integer
+ *               categoryIds:
+ *                 type: array
+ *                 items:
+ *                   type: integer
  *     responses:
  *       201:
  *         description: Producto creado exitosamente
@@ -136,6 +155,10 @@ router.post('/', auth, checkRole(["vendor", "admin"]), createProduct);
  *                 type: number
  *               stock:
  *                 type: integer
+ *               categoryIds:
+ *                 type: array
+ *                 items:
+ *                   type: integer
  *     responses:
  *       200:
  *         description: Producto actualizado exitosamente
@@ -172,6 +195,4 @@ router.put('/:id', auth, checkRole(["vendor", "admin"]), updateProduct);
  */
 router.delete('/:id', auth, checkRole(["vendor", "admin"]), deleteProduct);
 
-router.get('/category/:categoryId', getProductByCategory);
-
-module.exports = router; 
+module.exports = router;

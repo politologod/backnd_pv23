@@ -1,40 +1,22 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../configs/database");
 
-const Order = sequelize.define("Order", {
-	id: {
-		type: DataTypes.INTEGER,
-		primaryKey: true,
-		autoIncrement: true,
-	},
-	total: {
-		type: DataTypes.DECIMAL(10, 2),
-		allowNull: false,
-	},
-	status: {
-		type: DataTypes.ENUM(
-			"pendiente por pagar",
-			"pagado y procesando",
-			"enviado",
-			"entregado",
-			"cancelado"
-		),
-		defaultValue: "pendiente por pagar",
-	},
-	shippingAddress: {
-		type: DataTypes.STRING,
-		allowNull: false,
-	},
+const OrderItem = sequelize.define("OrderItem", {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+    },
+    quantity: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    priceAtPurchase: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+    },
 });
 
-// ... definición del modelo Order ...
+// No hay método associate que eliminar
 
-Order.associate = (models) => {
-	// Una orden pertenece a un usuario
-	Order.belongsTo(models.User, { foreignKey: "userId" });
-
-	// Una orden tiene muchos ítems (OrderItem)
-	Order.hasMany(models.OrderItem, { foreignKey: "orderId" });
-};
-
-module.exports = Order;
+module.exports = OrderItem;

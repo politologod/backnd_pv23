@@ -10,25 +10,22 @@ const Cart = require("./model_cart");
 const Favorite = require("./model_favorite");
 const Order = require("./model_order");
 
-
+// Crear objeto de modelos
 const db = {
-	sequelize,
-	Sequelize,
-	Product,
-	Category,
-	CartItem,
-	OrderItem,
-	User,
+    sequelize,
+    Sequelize,
+    Product,
+    Category,
+    CartItem,
+    OrderItem,
+    User,
     Cart,
     Favorite,
     Order,
 };
 
-// Ejecuta asociaciones si existen
-Object.keys(db).forEach((modelName) => {
-	if (db[modelName].associate) {
-		db[modelName].associate(db);
-	}
-});
+// Importar función de asociaciones y ejecutarla con todos los modelos
+const setupAssociations = require('./associations');
+setupAssociations(db);
 
 module.exports = db;
