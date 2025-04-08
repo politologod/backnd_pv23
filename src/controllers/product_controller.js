@@ -90,17 +90,25 @@ const deleteProduct = async (req, res) => {
 
 
 const getProductByCategory = async (req, res) => {
-    try {
-        const { categoryId } = req.params;
-        const products = await Product.findAll({
-            include: Category,
-            where: { categoryId },
-        });
-        res.json(products);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-}
+	try {
+		const { categoryId } = req.params;
+
+		// Encontrar categoría
+		const category = await Category.findByPk(categoryId, {
+			include: [Product]
+		});
+
+		if (!category) {
+			return res.status(404).json({ error: "Categoría no encontrada" });
+		}
+
+		// Devuelve los productos asociados
+		res.json(category.Products);
+	} catch (error) {
+		res.status(400).json({ error: error.message });
+	}
+};
+
 
 const getProductByNames = async (req, res) => {
     try {

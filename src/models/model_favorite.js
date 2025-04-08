@@ -1,3 +1,6 @@
+const { DataTypes } = require("sequelize");
+const sequelize = require("../configs/database");
+
 const Favorite = sequelize.define("Favorite", {
 	id: {
 		type: DataTypes.INTEGER,
@@ -5,3 +8,5 @@ const Favorite = sequelize.define("Favorite", {
 		autoIncrement: true,
 	},
 });
+
+module.exports = Favorite;

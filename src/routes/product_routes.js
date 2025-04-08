@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { auth } = require('../middlewares/auth');
-const {createProduct, updateProduct, deleteProduct, getAllProducts, getProductById} = require('../controllers/product_controller');
+const {createProduct, updateProduct, deleteProduct, getAllProducts, getProductById, getProductByCategory} = require('../controllers/product_controller');
 const { checkRole } = require('../middlewares/auth');
 
 /**
@@ -172,6 +172,6 @@ router.put('/:id', auth, checkRole(["vendor", "admin"]), updateProduct);
  */
 router.delete('/:id', auth, checkRole(["vendor", "admin"]), deleteProduct);
 
-
+router.get('/category/:categoryId', getProductByCategory);
 
 module.exports = router; 

@@ -3,7 +3,10 @@ const cors = require("cors");
 const passport = require("passport");
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
-const sequelize = require("./configs/database");
+const db = require("./models");
+const sequelize = db.sequelize;
+
+
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpecs = require("./configs/swagger");
 const morgan = require("morgan");
@@ -12,6 +15,8 @@ const app = express();
 app.use(morgan("dev")); // Muestra logs detallados en la terminal
 app.use(express.json());
 app.use(cookieParser());
+
+
 const corsOptions = {
 	origin: "http://localhost:3000", // URL de tu frontend
 	credentials: true, // Permite cookies
