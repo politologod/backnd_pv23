@@ -2,7 +2,7 @@ const Category = require('../models/model_category');
 // Obtener todas las categorías
 const getAllCategories = async (req, res) => {
     try {
-        const categories = await Category.find();
+        const categories = await Category.findAll();
         res.status(200).json(categories);
     } catch (error) {
         res.status(500).json({ message: 'Error al obtener las categorías', error });
@@ -13,7 +13,7 @@ const getAllCategories = async (req, res) => {
 const getCategoryById = async (req, res) => {
     try {
         const { id } = req.params;
-        const category = await Category.findById(id);
+        const category = await Category.findByPk(id);
         if (!category) {
             return res.status(404).json({ message: 'Categoría no encontrada' });
         }
@@ -40,15 +40,14 @@ const updateCategory = async (req, res) => {
     try {
         const { id } = req.params;
         const { name, description } = req.body;
-        const updatedCategory = await Category.findByIdAndUpdate(
-            id,
-            { name, description },
-            { new: true }
-        );
-        if (!updatedCategory) {
+        const category = await Category.findByPk(id);
+        if (!category) {
             return res.status(404).json({ message: 'Categoría no encontrada' });
         }
-        res.status(200).json(updatedCategory);
+        category.name = name;
+        category.description = description;
+        await category.save();
+        res.status(200).json(category);
     } catch (error) {
         res.status(500).json({ message: 'Error al actualizar la categoría', error });
     }
@@ -58,10 +57,11 @@ const updateCategory = async (req, res) => {
 const deleteCategory = async (req, res) => {
     try {
         const { id } = req.params;
-        const deletedCategory = await Category.findByIdAndDelete(id);
+        const deletedCategory = await Category.findByPk(id);
         if (!deletedCategory) {
             return res.status(404).json({ message: 'Categoría no encontrada' });
         }
+        await deletedCategory.destroy();
         res.status(200).json({ message: 'Categoría eliminada correctamente' });
     } catch (error) {
         res.status(500).json({ message: 'Error al eliminar la categoría', error });

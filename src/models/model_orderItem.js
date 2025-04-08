@@ -16,3 +16,5 @@ const OrderItem = sequelize.define("OrderItem", {
 		allowNull: false,
 	},
 });
+
+module.exports = OrderItem;
