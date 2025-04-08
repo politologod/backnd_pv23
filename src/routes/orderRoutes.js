@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { auth } = require('../middlewares/auth');
-const { pagination } = require('../middlewares/pagination');
-
+const { auth, checkRole } = require('../middlewares/auth');
+const {createOrder, updateOrder, deleteOrder, getAllOrders, getOrderById} = require('../controllers/orderController');
+const pagination = require('../middlewares/pagination');
 // TODO: Importar el controlador de órdenes cuando esté creado
 // const orderController = require('../controllers/orderController');
 
@@ -37,12 +37,7 @@ router.use(auth);
  *       401:
  *         description: No autorizado
  */
-router.get('/', pagination, (req, res) => {
-    res.json({ 
-        message: 'Lista de órdenes',
-        pagination: req.pagination
-    });
-});
+router.get('/', checkRole(["vendor", "admin"]), getAllOrders);
 
 /**
  * @swagger
@@ -221,12 +216,9 @@ router.delete('/:id', (req, res) => {
  *       401:
  *         description: No autorizado
  */
-router.get('/user/:userId', pagination, (req, res) => {
-    res.json({ 
-        message: 'Órdenes del usuario',
-        pagination: req.pagination
-    });
-});
+router.get('/user/:userId', auth, checkRole([ "customer", "vendor", "admin"]), getOrderById);
+
+
 
 /**
  * @swagger

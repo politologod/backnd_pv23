@@ -1,3 +1,6 @@
+const { DataTypes } = require("sequelize");
+const sequelize = require("../configs/database");
+
 const Order = sequelize.define("Order", {
 	id: {
 		type: DataTypes.INTEGER,
@@ -10,13 +13,13 @@ const Order = sequelize.define("Order", {
 	},
 	status: {
 		type: DataTypes.ENUM(
-			"pendiente",
-			"procesando",
+			"pendiente por pagar",
+			"pagado y procesando",
 			"enviado",
 			"entregado",
 			"cancelado"
 		),
-		defaultValue: "pendiente",
+		defaultValue: "pendiente por pagar",
 	},
 	shippingAddress: {
 		type: DataTypes.STRING,

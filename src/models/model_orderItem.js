@@ -1,3 +1,6 @@
+const { DataTypes } = require("sequelize");
+const sequelize = require("../configs/database");
+
 const OrderItem = sequelize.define("OrderItem", {
 	id: {
 		type: DataTypes.INTEGER,
