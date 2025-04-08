@@ -145,9 +145,13 @@ router.delete("/:id", auth, checkRole(["admin"]), userController.deleteUser);
  *           schema:
  *             type: object
  *             required:
- *               - username
- *               - email
- *               - password
+ *              - username
+ *              - email
+ *              - password
+ *              - name
+ *              - phone
+ *              - role 
+ * 
  *             properties:
  *               username:
  *                 type: string

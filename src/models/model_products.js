@@ -1,3 +1,6 @@
+const { DataTypes } = require("sequelize");
+const sequelize = require("../configs/database");
+
 const Product = sequelize.define("Product", {
 	id: {
 		type: DataTypes.INTEGER,
@@ -21,6 +24,10 @@ const Product = sequelize.define("Product", {
 	},
 	imageUrl: {
 		type: DataTypes.STRING,
+		allowNull: true,
+	},
+	metadata: {
+		type: DataTypes.JSONB,
 		allowNull: true,
 	},
 });
