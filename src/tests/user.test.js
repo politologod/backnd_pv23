@@ -45,12 +45,12 @@ describe("User Routes", () => {
 	describe("POST /api/users", () => {
 		it("debería crear un nuevo usuario y devolverlo (status 201)", async () => {
 			const newUser = {
-				username: "nuevoUser",
+				name: "Nuevo Usuario",
 				email: "nuevo@ejemplo.com",
 				password: "123456",
-				fullName: "Nuevo Usuario",
 				phone: "1234567890",
-				role: "user",
+				role: "customer",
+				address: "123 Main St",
 			};
 
 			const res = await request(app)
@@ -59,7 +59,7 @@ describe("User Routes", () => {
 				.send(newUser);
 
 			expect(res.statusCode).toBe(201);
-			expect(res.body).toHaveProperty("username", newUser.username);
+			expect(res.body).toHaveProperty("name", newUser.name);
 		});
 	});
 
@@ -96,7 +96,7 @@ describe("User Routes", () => {
 				.delete("/api/users/1")
 				.set("Cookie", [`token=${adminToken}`]);
 
-			// Dependiendo de la implementación de tu controlador
+			// Dependiendo de la implementación de tu contro	lador
 			if (res.statusCode === 200) {
 				expect(res.body).toHaveProperty("message");
 			} else {
