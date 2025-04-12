@@ -1,25 +1,20 @@
 const express = require('express');
+const cart_controller = require('../controllers/cart_controller');
+const { auth } = require('../middlewares/auth');
+const { checkRole } = require('../middlewares/auth');
 
 const router = express.Router();
 
-// Get all items in the cart
-router.get('/', (req, res) => {
-    res.send('Get all items in the cart');
-});
+// Get current user's cart
+router.get('/:userId', auth, cart_controller.getCart);
 
 // Add an item to the cart
-router.post('/', (req, res) => {
-    res.send('Add an item to the cart');
-});
+router.post('/', auth, cart_controller.addItemToCart);
 
-// Update an item in the cart
-router.put('/:id', (req, res) => {
-    res.send(`Update item with ID ${req.params.id} in the cart`);
-});
+// Remove an item from the cart
+router.delete('/', auth, cart_controller.removeItemFromCart);
 
-// Delete an item from the cart
-router.delete('/:id', (req, res) => {
-    res.send(`Delete item with ID ${req.params.id} from the cart`);
-});
+// Clear the cart
+router.delete('/clear', auth, cart_controller.clearCart);
 
 module.exports = router;
