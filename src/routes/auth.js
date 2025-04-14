@@ -55,8 +55,8 @@ const { register, login, logout, verifyToken } = require("../controllers/auth_co
 
 authRouter.post("/register", register);
 authRouter.post("/login", login);
-authRouter.get("/logout", logout);
-authRouter.get("/verify", verifyToken, (req, res) => {
+authRouter.get("/logout",  logout);
+authRouter.get("/verify",  verifyToken, (req, res) => {
 	res.json(req.user);
 });
 
