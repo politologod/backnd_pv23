@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 // 🔹 Generar token JWT con más información útil
 const createToken = (user) => {
 	return jwt.sign(
-		{ id: user.id, email: user.email, name: user.name, role: user.role },
+		{ id: user.id_autoincrement, email: user.email, name: user.name, role: user.role },
 		process.env.JWT_SECRET,
 		{ expiresIn: "7d" }
 	);
