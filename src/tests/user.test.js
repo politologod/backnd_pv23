@@ -45,12 +45,12 @@ describe("User Routes", () => {
 	describe("POST /api/users", () => {
 		it("debería crear un nuevo usuario y devolverlo (status 201)", async () => {
 			const newUser = {
-				username: "nuevoUser",
 				email: "nuevo@ejemplo.com",
 				password: "123456",
-				fullName: "Nuevo Usuario",
+				name: "Nuevo Usuario",
 				phone: "1234567890",
 				role: "user",
+				address: "123 Main St"
 			};
 
 			const res = await request(app)
@@ -59,7 +59,7 @@ describe("User Routes", () => {
 				.send(newUser);
 
 			expect(res.statusCode).toBe(201);
-			expect(res.body).toHaveProperty("username", newUser.username);
+			expect(res.body).toHaveProperty("name", newUser.name);
 		});
 	});
 
@@ -67,11 +67,11 @@ describe("User Routes", () => {
 	describe("PUT /api/users/:id", () => {
 		it("debería actualizar un usuario existente (status 200) o 404 si no existe", async () => {
 			const updateData = {
-				username: "updatedUser",
+				
 				email: "updated@ejemplo.com",
-				fullName: "Updated Name",
+				name: "Updated Name",
 				phone: "0987654321",
-				avatar: "https://example.com/avatar.png",
+				
 			};
 
 			// Suponiendo que el usuario con ID 1 exista
@@ -81,7 +81,7 @@ describe("User Routes", () => {
 				.send(updateData);
 
 			if (res.statusCode === 200) {
-				expect(res.body).toHaveProperty("username", updateData.username);
+				expect(res.body).toHaveProperty("name", updateData.name);
 			} else {
 				expect(res.statusCode).toBe(404);
 			}
