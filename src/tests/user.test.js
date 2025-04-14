@@ -49,8 +49,8 @@ describe("User Routes", () => {
 				password: "123456",
 				name: "Nuevo Usuario",
 				phone: "1234567890",
-				role: "user",
-				address: "123 Main St"
+				role: "customer",
+				address: "123 Main St",
 			};
 
 			const res = await request(app)
