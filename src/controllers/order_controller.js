@@ -491,6 +491,31 @@ deleteOrder = async (req, res) => {
 	}
 };
 
+
+const updatingStatus = async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    try {
+        const order = await Order.findByPk(id);
+
+        if (!order) {
+            return res.status(404).json({ error: "Orden no encontrada" });
+        }
+
+        await order.update({ status });
+        res.json({
+            message: `Estado de la orden actualizado a: ${status}`,
+            order,
+        });
+    } catch (error) {
+        console.error("Error al actualizar estado de orden:", error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+
 module.exports = {
 	createOrder,
 	getAllOrders,
@@ -500,4 +525,5 @@ module.exports = {
 	deleteOrder,
 	updateOrderStatus,
 	processPayment,
+    updatingStatus,
 };

@@ -10,6 +10,11 @@ router.use(auth);
 // Crear una nueva orden
 router.post('/', orderController.createOrder);
 
+
+router.put('/:id/update-status', orderController.updatingStatus);
+
+
+
 // Obtener órdenes del usuario actual
 router.get('/my-orders', (req, res) => {
     // Redirigimos a getUserOrders con el ID del usuario actual
@@ -18,7 +23,7 @@ router.get('/my-orders', (req, res) => {
 });
 
 // Obtener detalle de una orden específica (verificación de propiedad en el controlador)
-router.get('/:id', orderController.getOrderById);
+router.get('/:id', checkRole(["customer", "admin", "vendor"]), orderController.getOrderById);
 
 // Procesar pago de una orden
 router.post('/:id/payment', orderController.processPayment);
