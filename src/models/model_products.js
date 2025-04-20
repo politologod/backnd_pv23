@@ -11,6 +11,11 @@ const Product = sequelize.define("Product", {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    sku: {
+        type: DataTypes.STRING(50),
+        allowNull: true,
+        comment: 'Código único de producto (Stock Keeping Unit)'
+    },
     description: {
         type: DataTypes.TEXT,
     },
@@ -30,6 +35,14 @@ const Product = sequelize.define("Product", {
         type: DataTypes.JSONB,
         allowNull: true,
     },
+}, {
+    indexes: [
+        {
+            unique: true,
+            fields: ['sku'],
+            name: 'product_sku_unique'
+        }
+    ]
 });
 
 // No más método associate aquí - movido a associations.js
