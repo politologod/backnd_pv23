@@ -3,7 +3,12 @@ node_modules/
 npm-debug.log
 yarn-error.log
 
-
+# Logs
+logs/
+*.log
+logs/*.log
+logs/*.gz
+logs/*.json
 
 # Build directories
 dist/
