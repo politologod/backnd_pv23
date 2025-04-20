@@ -1,11 +1,48 @@
-const { Order, OrderItem, Product, User } = require("../models");
+const { Order, OrderItem, Product, User, OrderStatusHistory } = require("../models");
 const sequelize = require("../configs/database");
+const logger = require('../configs/logger');
+const taxCalculator = require('../utils/taxCalculator');
 
-// Función auxiliar para calcular el total de una orden
+// Función auxiliar para calcular el total de una orden (OBSOLETA, usando taxCalculator ahora)
 const calcularTotal = (cartItems) => {
 	return cartItems.reduce((total, item) => {
 		return total + item.price * item.quantity;
 	}, 0);
+};
+
+// Función auxiliar para registrar cambios de estado en el historial
+const registerStatusChange = async (orderId, status, notes = null, user = null, transaction = null) => {
+    try {
+        const historyData = {
+            orderId,
+            status,
+            notes,
+            updatedBy: user?.id,
+            updatedByRole: user?.role
+        };
+        
+        if (transaction) {
+            await OrderStatusHistory.create(historyData, { transaction });
+        } else {
+            await OrderStatusHistory.create(historyData);
+        }
+        
+        logger.info(`Estado de orden ${orderId} actualizado a: ${status}`, {
+            orderId,
+            status,
+            updatedBy: user?.id,
+            updatedByRole: user?.role
+        });
+        
+        return true;
+    } catch (error) {
+        logger.error(`Error al registrar cambio de estado para orden ${orderId}`, {
+            error: error.message,
+            orderId,
+            status
+        });
+        return false;
+    }
 };
 
 const VALID_PAYMENT_METHODS = [
@@ -63,9 +100,9 @@ createOrder = async (req, res) => {
 			productMap[product.id] = product;
 		});
 
-		// Verificar stock y calcular totales correctos
-		let total = 0;
+		// Verificar stock y preparar items para cálculo
 		const orderItems = [];
+		const itemsForTaxCalculation = [];
 
 		for (const item of cartItems) {
 			const product = productMap[item.productId];
@@ -86,9 +123,13 @@ createOrder = async (req, res) => {
 				});
 			}
 
-			// Añadir al total
-			const itemTotal = product.price * item.quantity;
-			total += itemTotal;
+			// Preparar item para cálculo de impuestos
+			itemsForTaxCalculation.push({
+				productId: product.id,
+				quantity: item.quantity,
+				price: product.price,
+				product
+			});
 
 			// Preparar item para la orden
 			orderItems.push({
@@ -98,10 +139,16 @@ createOrder = async (req, res) => {
 			});
 		}
 
-		// Crear la orden
+		// Calcular subtotal, impuestos y total
+		const taxCalculation = await taxCalculator.calculateTaxes(itemsForTaxCalculation);
+
+		// Crear la orden con subtotal, impuestos y total
 		const order = await Order.create(
 			{
-				total,
+				subtotal: taxCalculation.subtotal,
+				taxes_amount: taxCalculation.totalTaxAmount,
+				taxes_details: taxCalculation.taxesByType, // Guardar detalle de impuestos
+				total: taxCalculation.total,
 				status: "pendiente por pagar",
 				shippingAddress,
 				userId,
@@ -130,36 +177,50 @@ createOrder = async (req, res) => {
 			})
 		);
 
+		// Registrar el estado inicial en el historial
+		await registerStatusChange(
+		    order.id, 
+		    "pendiente por pagar", 
+		    "Orden creada", 
+		    req.user, 
+		    t
+		);
+
 		// TODO: Si tienes un modelo Cart, aquí deberías limpiar el carrito del usuario
 
 		// Confirmar la transacción
 		await t.commit();
 
 		// Devolver la orden creada con sus items
-const orderWithItems = await Order.findByPk(order.id, {
-	include: [OrderItem, { model: User, attributes: { exclude: ["password"] } }],
-	attributes: { exclude: ["userId"] },
-});
+		const orderWithItems = await Order.findByPk(order.id, {
+			include: [
+				OrderItem, 
+				{ model: User, attributes: { exclude: ["password"] } },
+				{ model: OrderStatusHistory, limit: 5, order: [['createdAt', 'DESC']] }
+			],
+			attributes: { exclude: ["userId"] },
+		});
 
-// Convertimos a JSON para mayor seguridad si se quiere modificar
-const orderJson = orderWithItems.toJSON();
+		// Convertimos a JSON para mayor seguridad si se quiere modificar
+		const orderJson = orderWithItems.toJSON();
 
-// Si por alguna razón el password aún aparece (por ejemplo, si se usa `User.rawAttributes`)
-if (orderJson.User?.password) {
-	delete orderJson.User.password;
-}
+		// Si por alguna razón el password aún aparece (por ejemplo, si se usa `User.rawAttributes`)
+		if (orderJson.User?.password) {
+			delete orderJson.User.password;
+		}
 
-res.status(201).json({
-	message: "Orden creada exitosamente",
-	order: orderJson,
-});
+		// Incluir información de impuestos en la respuesta
+		orderJson.tax_breakdown = taxCalculation.taxesByType;
+
+		res.status(201).json(orderJson);
 
 	} catch (error) {
-		// Si algo sale mal, revertimos todos los cambios
+		// En caso de error, revertir la transacción
 		await t.rollback();
-		console.error("Error al crear orden:", error);
+		logger.error("Error al crear la orden", { error: error.message });
+
 		res.status(500).json({
-			error: "Error al crear la orden",
+			error: "Error al procesar la orden",
 			details: error.message,
 		});
 	}
@@ -178,6 +239,11 @@ getAllOrders = async (req, res) => {
 					model: User,
 					attributes: ["id_autoincrement", "name", "email"],
 				},
+				{
+				    model: OrderStatusHistory,
+				    limit: 1,
+				    order: [['createdAt', 'DESC']],
+				}
 			],
 			order: [["createdAt", "DESC"]],
 		});
@@ -204,6 +270,10 @@ getOrderById = async (req, res) => {
 					model: User,
 					attributes: ["id_autoincrement", "name", "email"],
 				},
+				{
+				    model: OrderStatusHistory,
+				    order: [['createdAt', 'DESC']],
+				}
 			],
 		});
 
@@ -269,7 +339,7 @@ updateOrderStatus = async (req, res) => {
 
 	try {
 		const { id } = req.params;
-		const { status } = req.body;
+		const { status, notes } = req.body;
 
 		// Validar el nuevo estado
 		const validStatuses = [
@@ -317,13 +387,23 @@ updateOrderStatus = async (req, res) => {
 
 		// Actualizar estado
 		await order.update({ status }, { transaction: t });
+		
+		// Registrar el cambio en el historial
+        await registerStatusChange(id, status, notes, req.user, t);
 
 		// Confirmar transacción
 		await t.commit();
 
 		// Retornar orden actualizada
 		const updatedOrder = await Order.findByPk(id, {
-			include: [OrderItem],
+			include: [
+			    { model: OrderItem },
+			    { 
+			        model: OrderStatusHistory,
+			        limit: 10,
+			        order: [['createdAt', 'DESC']]
+			    }
+			],
 		});
 
 		res.json({
@@ -385,22 +465,189 @@ processPayment = async (req, res) => {
 			{
 				status: "pagado y procesando",
 				paymentMethod,
+				paymentDate: new Date()
 			},
 			{ transaction: t }
 		);
+		
+		// Registrar el cambio en el historial
+        await registerStatusChange(
+            id, 
+            "pagado y procesando", 
+            `Pago procesado con método: ${paymentMethod}`, 
+            req.user, 
+            t
+        );
 
 		// Confirmar transacción
 		await t.commit();
 
 		res.json({
 			message: "Pago procesado exitosamente",
-			order: await Order.findByPk(id, { include: [OrderItem] }),
+			order: await Order.findByPk(id, { 
+			    include: [
+			        OrderItem,
+			        { 
+			            model: OrderStatusHistory,
+			            limit: 5,
+			            order: [['createdAt', 'DESC']]
+			        }
+			    ] 
+			}),
 		});
 	} catch (error) {
 		await t.rollback();
 		console.error("Error al procesar pago:", error);
 		res.status(500).json({ error: error.message });
 	}
+};
+
+// Controlador para subir comprobante de pago
+const uploadPaymentProof = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // Verificar que la orden existe
+        const order = await Order.findByPk(id);
+        if (!order) {
+            return res.status(404).json({ error: "Orden no encontrada" });
+        }
+        
+        // Verificar que la orden pertenece al usuario actual
+        if (req.user.role !== "admin" && order.userId !== req.user.id) {
+            return res.status(403).json({ error: "No tienes permiso para modificar esta orden" });
+        }
+        
+        // Verificar si hay una URL en el cuerpo (para cuando se sube a Cloudinary)
+        if (!req.body.paymentProofUrl) {
+            return res.status(400).json({ error: "URL del comprobante de pago no proporcionada" });
+        }
+        
+        const transaction = await sequelize.transaction();
+        
+        try {
+            // Extraer los campos adicionales de pago del body
+            const {
+                paymentProofUrl,
+                paymentProofPublicId,
+                payerCedula,
+                payerBankAccount,
+                payerPhone,
+                payerName,
+                payerBank,
+                transactionLastDigits,
+                paymentNotes
+            } = req.body;
+            
+            // Actualizar la orden con los datos del pago
+            const updateData = {
+                paymentProofUrl,
+                paymentProofPublicId: paymentProofPublicId || null,
+                paymentDate: new Date(),
+                status: order.status === 'pendiente por pagar' ? 'pagado y procesando' : order.status
+            };
+            
+            // Añadir campos adicionales solo si vienen en la solicitud
+            if (payerCedula) updateData.payerCedula = payerCedula;
+            if (payerBankAccount) updateData.payerBankAccount = payerBankAccount;
+            if (payerPhone) updateData.payerPhone = payerPhone;
+            if (payerName) updateData.payerName = payerName;
+            if (payerBank) updateData.payerBank = payerBank;
+            if (transactionLastDigits) updateData.transactionLastDigits = transactionLastDigits;
+            if (paymentNotes) updateData.paymentNotes = paymentNotes;
+            
+            await order.update(updateData, { transaction });
+            
+            // Construir un mensaje detallado para el historial
+            let paymentDetailsMsg = 'Comprobante de pago subido por el cliente';
+            
+            if (payerName) paymentDetailsMsg += `, Nombre: ${payerName}`;
+            if (payerBank) paymentDetailsMsg += `, Banco: ${payerBank}`;
+            if (transactionLastDigits) paymentDetailsMsg += `, Últimos dígitos: ${transactionLastDigits}`;
+            
+            // Registrar cambio en el historial si cambió el estado
+            if (order.status === 'pendiente por pagar') {
+                await registerStatusChange(
+                    id,
+                    'pagado y procesando',
+                    paymentDetailsMsg,
+                    req.user,
+                    transaction
+                );
+            }
+            
+            await transaction.commit();
+            
+            // Obtener la orden actualizada con historial
+            const updatedOrder = await Order.findByPk(id, {
+                include: [
+                    { model: OrderItem },
+                    { 
+                        model: OrderStatusHistory,
+                        limit: 5,
+                        order: [['createdAt', 'DESC']]
+                    }
+                ]
+            });
+            
+            res.status(200).json({
+                message: "Comprobante de pago registrado correctamente",
+                order: updatedOrder
+            });
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
+    } catch (error) {
+        logger.error('Error al registrar comprobante de pago', { error: error.message });
+        res.status(500).json({ error: "Error al procesar el comprobante de pago" });
+    }
+};
+
+// Obtener historial de estados de una orden
+const getOrderStatusHistory = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // Verificar que la orden existe
+        const order = await Order.findByPk(id, {
+            include: [
+                {
+                    model: OrderStatusHistory,
+                    order: [['createdAt', 'DESC']],
+                    include: [
+                        {
+                            model: User,
+                            as: 'statusUpdater',
+                            attributes: ['id', 'name', 'email', 'role']
+                        }
+                    ]
+                }
+            ]
+        });
+        
+        if (!order) {
+            return res.status(404).json({ error: "Orden no encontrada" });
+        }
+        
+        // Verificar permisos (solo admin, vendor o el dueño de la orden)
+        if (
+            req.user.role !== "admin" &&
+            req.user.role !== "vendor" &&
+            order.userId !== req.user.id
+        ) {
+            return res.status(403).json({ error: "No tienes permiso para ver esta información" });
+        }
+        
+        res.json({
+            orderId: order.id,
+            currentStatus: order.status,
+            statusHistory: order.OrderStatusHistories
+        });
+    } catch (error) {
+        logger.error('Error al obtener historial de estados', { error: error.message });
+        res.status(500).json({ error: "Error al obtener historial de estados" });
+    }
 };
 
 // Actualizar una orden (campos generales)
@@ -428,6 +675,17 @@ updateOrder = async (req, res) => {
 		});
 
 		await order.update(updates);
+		
+		// Registrar nota en el historial si se proporcionó
+		if (req.body.notes) {
+		    await registerStatusChange(
+		        id,
+		        order.status,
+		        req.body.notes,
+		        req.user
+		    );
+		}
+		
 		res.json({
 			message: "Orden actualizada correctamente",
 			order,
@@ -436,6 +694,56 @@ updateOrder = async (req, res) => {
 		console.error("Error al actualizar orden:", error);
 		res.status(500).json({ error: error.message });
 	}
+};
+
+const updatingStatus = async (req, res) => {
+    const { id } = req.params;
+    const { status, notes } = req.body;
+
+    try {
+        const order = await Order.findByPk(id);
+
+        if (!order) {
+            return res.status(404).json({ error: "Orden no encontrada" });
+        }
+
+        // Iniciar transacción
+        const transaction = await sequelize.transaction();
+        
+        try {
+            // Actualizar estado de la orden
+            await order.update({ status }, { transaction });
+            
+            // Registrar en historial
+            await registerStatusChange(id, status, notes, req.user, transaction);
+            
+            // Confirmar transacción
+            await transaction.commit();
+            
+            // Obtener orden actualizada con historial
+            const updatedOrder = await Order.findByPk(id, {
+                include: [
+                    { 
+                        model: OrderStatusHistory,
+                        limit: 5,
+                        order: [['createdAt', 'DESC']]
+                    }
+                ]
+            });
+            
+            res.json({
+                message: `Estado de la orden actualizado a: ${status}`,
+                order: updatedOrder,
+            });
+        } catch (error) {
+            // Revertir transacción en caso de error
+            await transaction.rollback();
+            throw error;
+        }
+    } catch (error) {
+        logger.error("Error al actualizar estado de orden:", { error: error.message });
+        res.status(500).json({ error: error.message });
+    }
 };
 
 // Eliminar una orden
@@ -491,31 +799,6 @@ deleteOrder = async (req, res) => {
 	}
 };
 
-
-const updatingStatus = async (req, res) => {
-    const { id } = req.params;
-    const { status } = req.body;
-
-    try {
-        const order = await Order.findByPk(id);
-
-        if (!order) {
-            return res.status(404).json({ error: "Orden no encontrada" });
-        }
-
-        await order.update({ status });
-        res.json({
-            message: `Estado de la orden actualizado a: ${status}`,
-            order,
-        });
-    } catch (error) {
-        console.error("Error al actualizar estado de orden:", error);
-        res.status(500).json({ error: error.message });
-    }
-};
-
-
-
 module.exports = {
 	createOrder,
 	getAllOrders,
@@ -526,4 +809,6 @@ module.exports = {
 	updateOrderStatus,
 	processPayment,
     updatingStatus,
+    uploadPaymentProof,
+    getOrderStatusHistory
 };

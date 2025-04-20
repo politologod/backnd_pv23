@@ -1,0 +1,125 @@
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const logger = require('../configs/logger');
+
+// Asegurar que los directorios de carga existan
+const createUploadDirectories = () => {
+  const uploadDir = path.join(__dirname, '../../uploads');
+  const tempDir = path.join(uploadDir, 'temp');
+  
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+  
+  if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir, { recursive: true });
+  }
+};
+
+// Crear directorios al iniciar la aplicación
+createUploadDirectories();
+
+// Configuración de almacenamiento temporal para Multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, '../../uploads/temp'));
+  },
+  filename: (req, file, cb) => {
+    // Generar nombre único con timestamp y extensión original
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname);
+    cb(null, `${uniqueSuffix}${ext}`);
+  }
+});
+
+// Filtrar archivos por tipo
+const fileFilter = (req, file, cb) => {
+  // Permitir solo imágenes
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Solo se permiten archivos de imagen'), false);
+  }
+};
+
+// Límites para los archivos
+const limits = {
+  fileSize: 5 * 1024 * 1024, // 5MB
+  files: 5 // Máximo 5 archivos por carga
+};
+
+// Crear middleware de carga
+const upload = multer({ 
+  storage, 
+  fileFilter,
+  limits
+});
+
+// Middleware para manejar errores de Multer
+const handleMulterError = (err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    // Error de Multer
+    logger.error('Error en carga de archivo', { error: err });
+    
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ 
+        error: 'El archivo excede el tamaño máximo permitido (5MB)' 
+      });
+    }
+    
+    if (err.code === 'LIMIT_FILE_COUNT') {
+      return res.status(400).json({ 
+        error: 'Se ha excedido el número máximo de archivos (5)' 
+      });
+    }
+    
+    return res.status(400).json({ error: err.message });
+  }
+  
+  if (err) {
+    // Otro tipo de error
+    logger.error('Error en procesamiento de archivos', { error: err });
+    return res.status(500).json({ error: err.message });
+  }
+  
+  next();
+};
+
+// Middleware para limpiar archivos temporales después de procesarlos
+const cleanupTempFiles = (req, res, next) => {
+  // Guardar el método original end
+  const originalEnd = res.end;
+  
+  // Sobrescribir el método end
+  res.end = function(...args) {
+    // Limpiar archivos temporales si existen
+    if (req.file) {
+      fs.unlink(req.file.path, (err) => {
+        if (err) logger.error('Error al eliminar archivo temporal', { error: err, file: req.file.path });
+      });
+    }
+    
+    if (req.files) {
+      // Si hay múltiples archivos
+      const files = Array.isArray(req.files) ? req.files : Object.values(req.files).flat();
+      
+      files.forEach(file => {
+        fs.unlink(file.path, (err) => {
+          if (err) logger.error('Error al eliminar archivo temporal', { error: err, file: file.path });
+        });
+      });
+    }
+    
+    // Llamar al método original end
+    originalEnd.apply(this, args);
+  };
+  
+  next();
+};
+
+module.exports = {
+  upload,
+  handleMulterError,
+  cleanupTempFiles
+}; 

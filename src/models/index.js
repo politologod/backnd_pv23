@@ -9,6 +9,9 @@ const User = require("./model_user");
 const Cart = require("./model_cart");
 const Favorite = require("./model_favorite");
 const Order = require("./model_order");
+const OrderStatusHistory = require("./model_orderStatusHistory");
+const Tax = require("./model_tax");
+const ProductTax = require("./model_productTax");
 
 // Crear objeto de modelos
 const db = {
@@ -22,6 +25,9 @@ const db = {
     Cart,
     Favorite,
     Order,
+    OrderStatusHistory,
+    Tax,
+    ProductTax
 };
 
 // Importar función de asociaciones y ejecutarla con todos los modelos

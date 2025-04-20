@@ -17,7 +17,7 @@ describe("Auth Routes", () => {
         .send(newUser);
 
       expect(res.statusCode).toBe(201);
-      expect(res.body).toHaveProperty("message", "Usuario registrado con éxito.");
+      expect(res.body).toHaveProperty("message", "Usuario registrado exitosamente");
       expect(res.body).toHaveProperty("user");
       expect(res.body.user).toHaveProperty("name", newUser.name);
       expect(res.body.user).toHaveProperty("email", newUser.email);
@@ -42,7 +42,7 @@ describe("Auth Routes", () => {
         .send(existingUser);
 
       expect(res.statusCode).toBe(400);
-      expect(res.body).toHaveProperty("message", "El correo ya está en uso.");
+      expect(res.body).toHaveProperty("message", "El correo electrónico ya está registrado");
     });
   });
 
@@ -76,7 +76,7 @@ describe("Auth Routes", () => {
         .send(loginData);
 
       expect(res.statusCode).toBe(200);
-      expect(res.body).toHaveProperty("message", "Inicio de sesión exitoso.");
+      expect(res.body).toHaveProperty("message", "Login exitoso");
       expect(res.body).toHaveProperty("user");
       // Verificamos si hay token en la cookie o en el body
       if (res.headers["set-cookie"] && res.headers["set-cookie"].length > 0) {
@@ -97,24 +97,18 @@ describe("Auth Routes", () => {
         .send(loginData);
 
       expect(res.statusCode).toBe(401);
-      expect(res.body).toHaveProperty("message", "Credenciales incorrectas.");
+      expect(res.body).toHaveProperty("message", "Credenciales inválidas");
     });
   });
 
   // Test para logout
-  describe("GET /api/auth/logout", () => {
+  describe("POST /api/auth/logout", () => {
     it("debería cerrar sesión correctamente", async () => {
       const res = await request(app)
-        .get("/api/auth/logout");
+        .post("/api/auth/logout");
 
-      // Aceptamos tanto un 200 (API response) como un 302 (redirección)
-      expect([200, 302]).toContain(res.statusCode);
-      
-      if (res.statusCode === 200) {
-        expect(res.body).toHaveProperty("message", "Cierre de sesión exitoso.");
-      } else if (res.statusCode === 302) {
-        expect(res.headers.location).toBeDefined();
-      }
+      expect(res.statusCode).toBe(200);
+      expect(res.body).toHaveProperty("message", "Sesión cerrada exitosamente");
     });
   });
 
