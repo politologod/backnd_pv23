@@ -12,10 +12,19 @@ const OrderStatusHistory = require('./model_orderStatusHistory');
 const Tax = require('./model_tax');
 const ProductTax = require('./model_productTax');
 
-function setupAssociations() {
-    // Relaciones Producto - Categoría
-    Product.belongsTo(Category);
-    Category.hasMany(Product);
+function setupAssociations(db) {
+    // Relaciones Producto - Categoría (Many-to-Many)
+    // Primero eliminamos la relación incorrecta
+    if (Product.associations && Product.associations.Category) {
+        delete Product.associations.Category;
+    }
+    if (Category.associations && Category.associations.Products) {
+        delete Category.associations.Products;
+    }
+    
+    // Creamos la relación many-to-many correcta
+    Product.belongsToMany(Category, { through: 'ProductCategories' });
+    Category.belongsToMany(Product, { through: 'ProductCategories' });
     
     // Relaciones Usuario - Carrito
     Cart.belongsTo(User);

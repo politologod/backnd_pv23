@@ -9,7 +9,8 @@ const {
   deleteTax,
   updateProductTax,
   deleteProductTax,
-  calculateCartTaxes
+  calculateCartTaxes,
+  getProductTaxesById
 } = require('../controllers/tax_controller');
 
 /**
@@ -271,6 +272,27 @@ router.put('/products/:productId/taxes/:taxId', auth, checkRole(['admin']), upda
  *         description: Asignación no encontrada
  */
 router.delete('/products/:productId/taxes/:taxId', auth, checkRole(['admin']), deleteProductTax);
+
+/**
+ * @swagger
+ * /api/taxes/products/{productId}/taxes:
+ *   get:
+ *     summary: Obtener impuestos asignados a un producto específico
+ *     tags: [Taxes]
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID del producto
+ *     responses:
+ *       200:
+ *         description: Lista de impuestos asignados al producto
+ *       404:
+ *         description: Producto no encontrado
+ */
+router.get('/products/:productId/taxes', getProductTaxesById);
 
 /**
  * @swagger

@@ -1,4 +1,4 @@
-const { DataTypes } = require("sequelize");
+const { DataTypes, Op } = require("sequelize");
 const sequelize = require("../configs/database");
 
 const Product = sequelize.define("Product", {
@@ -14,7 +14,9 @@ const Product = sequelize.define("Product", {
     sku: {
         type: DataTypes.STRING(50),
         allowNull: true,
-        comment: 'Código único de producto (Stock Keeping Unit)'
+        comment: 'Código único de producto (Stock Keeping Unit)',
+        unique: true,
+        defaultValue: null
     },
     description: {
         type: DataTypes.TEXT,
@@ -40,7 +42,12 @@ const Product = sequelize.define("Product", {
         {
             unique: true,
             fields: ['sku'],
-            name: 'product_sku_unique'
+            name: 'product_sku_unique',
+            where: {
+                sku: {
+                    [Op.ne]: null
+                }
+            }
         }
     ]
 });

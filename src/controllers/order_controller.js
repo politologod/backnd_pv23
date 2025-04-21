@@ -64,7 +64,7 @@ createOrder = async (req, res) => {
 
 	try {
 		// Extraemos datos de la solicitud
-		const { cartItems, shippingAddress, paymentMethod } = req.body;
+		const { cartItems, shippingAddress, paymentMethod, deliveryType } = req.body;
 		const userId = req.user.id; // Obtenido del token JWT
         console.log("Usuario autenticado:", req.user);
         console.log("this is userId:", userId);
@@ -85,6 +85,15 @@ createOrder = async (req, res) => {
 			return res
 				.status(400)
 				.json({ error: "La dirección de envío es obligatoria" });
+		}
+
+		// Validación de tipo de entrega
+		const VALID_DELIVERY_TYPES = ["delivery_moto", "pickup_tienda", "encomienda_nacional"];
+		if (deliveryType && !VALID_DELIVERY_TYPES.includes(deliveryType)) {
+			return res.status(400).json({
+				error: "Tipo de entrega no válido",
+				validTypes: VALID_DELIVERY_TYPES
+			});
 		}
 
 		// Verificar existencia y stock de productos
@@ -153,6 +162,7 @@ createOrder = async (req, res) => {
 				shippingAddress,
 				userId,
 				paymentMethod: paymentMethod || "tarjeta",
+				deliveryType: deliveryType || "pickup_tienda"
 			},
 			{ transaction: t }
 		);
@@ -229,7 +239,20 @@ createOrder = async (req, res) => {
 // Obtener todas las órdenes (admin/vendor)
 getAllOrders = async (req, res) => {
 	try {
+		// Extraer posibles filtros de la consulta
+		const { status, deliveryType } = req.query;
+		
+		// Construir condiciones de filtrado
+		const whereConditions = {};
+		if (status) {
+			whereConditions.status = status;
+		}
+		if (deliveryType) {
+			whereConditions.deliveryType = deliveryType;
+		}
+		
 		const orders = await Order.findAll({
+			where: whereConditions,
 			include: [
 				{
 					model: OrderItem,
@@ -799,6 +822,40 @@ deleteOrder = async (req, res) => {
 	}
 };
 
+// Obtener tipos de entrega disponibles
+getDeliveryTypes = async (req, res) => {
+	try {
+		const deliveryTypes = [
+			{
+				id: "delivery_moto",
+				name: "Delivery con moto",
+				description: "Entrega a domicilio con motodelivery local"
+			},
+			{
+				id: "pickup_tienda",
+				name: "Retiro en tienda",
+				description: "El cliente retira su pedido en nuestra tienda física"
+			},
+			{
+				id: "encomienda_nacional",
+				name: "Encomienda nacional",
+				description: "Envío a cualquier parte del país mediante empresa de transporte"
+			}
+		];
+
+		res.json({
+			success: true,
+			data: deliveryTypes
+		});
+	} catch (error) {
+		console.error("Error al obtener tipos de entrega:", error);
+		res.status(500).json({ 
+			success: false,
+			error: error.message 
+		});
+	}
+};
+
 module.exports = {
 	createOrder,
 	getAllOrders,
@@ -810,5 +867,6 @@ module.exports = {
 	processPayment,
     updatingStatus,
     uploadPaymentProof,
-    getOrderStatusHistory
+    getOrderStatusHistory,
+    getDeliveryTypes
 };

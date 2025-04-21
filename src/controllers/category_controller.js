@@ -9,7 +9,7 @@ const getAllCategories = async (req, res) => {
         const categories = await Category.findAll();
         res.status(200).json(categories);
     } catch (error) {
-        logger.error('Error al obtener todas las categorías', { error: error.message });
+        console.error('Error al obtener todas las categorías', error.message);
         res.status(500).json({ message: 'Error al obtener las categorías', error: error.message });
     }
 };
@@ -26,13 +26,13 @@ const getCategoryById = async (req, res) => {
         
         const category = await Category.findByPk(id);
         if (!category) {
-            logger.warn('Categoría no encontrada', { categoryId: id });
+            console.warn('Categoría no encontrada', { categoryId: id });
             return res.status(404).json({ message: 'Categoría no encontrada' });
         }
         
         res.status(200).json(category);
     } catch (error) {
-        logger.error('Error al obtener categoría por ID', { error: error.message, categoryId: req.params.id });
+        console.error('Error al obtener categoría por ID', error.message);
         res.status(500).json({ message: 'Error al obtener la categoría', error: error.message });
     }
 };
@@ -57,10 +57,10 @@ const createCategory = async (req, res) => {
         const newCategory = new Category({ name, description });
         await newCategory.save();
         
-        logger.info('Nueva categoría creada', { categoryId: newCategory.id, name });
+        console.info('Nueva categoría creada', { categoryId: newCategory.id, name });
         res.status(201).json(newCategory);
     } catch (error) {
-        logger.error('Error al crear categoría', { error: error.message });
+        console.error('Error al crear categoría', error.message);
         
         if (error instanceof ValidationError) {
             return res.status(422).json({ 
@@ -92,7 +92,7 @@ const updateCategory = async (req, res) => {
         
         const category = await Category.findByPk(id);
         if (!category) {
-            logger.warn('Categoría no encontrada para actualizar', { categoryId: id });
+            console.warn('Categoría no encontrada para actualizar', { categoryId: id });
             return res.status(404).json({ message: 'Categoría no encontrada' });
         }
         
@@ -108,10 +108,10 @@ const updateCategory = async (req, res) => {
         category.description = description;
         await category.save();
         
-        logger.info('Categoría actualizada', { categoryId: id });
+        console.info('Categoría actualizada', { categoryId: id });
         res.status(200).json(category);
     } catch (error) {
-        logger.error('Error al actualizar categoría', { error: error.message, categoryId: req.params.id });
+        console.error('Error al actualizar categoría', error.message);
         
         if (error instanceof ValidationError) {
             return res.status(422).json({ 
@@ -136,14 +136,14 @@ const deleteCategory = async (req, res) => {
         
         const deletedCategory = await Category.findByPk(id);
         if (!deletedCategory) {
-            logger.warn('Categoría no encontrada para eliminar', { categoryId: id });
+            console.warn('Categoría no encontrada para eliminar', { categoryId: id });
             return res.status(404).json({ message: 'Categoría no encontrada' });
         }
         
         // Verificar si hay productos asociados antes de eliminar
         const productsCount = await deletedCategory.countProducts();
         if (productsCount > 0) {
-            logger.warn('Intento de eliminar categoría con productos asociados', { 
+            console.warn('Intento de eliminar categoría con productos asociados', { 
                 categoryId: id, 
                 productsCount 
             });
@@ -155,10 +155,10 @@ const deleteCategory = async (req, res) => {
         
         await deletedCategory.destroy();
         
-        logger.info('Categoría eliminada', { categoryId: id, name: deletedCategory.name });
+        console.info('Categoría eliminada', { categoryId: id, name: deletedCategory.name });
         res.status(200).json({ message: 'Categoría eliminada correctamente' });
     } catch (error) {
-        logger.error('Error al eliminar categoría', { error: error.message, categoryId: req.params.id });
+        console.error('Error al eliminar categoría', error.message);
         res.status(500).json({ message: 'Error al eliminar la categoría', error: error.message });
     }
 };

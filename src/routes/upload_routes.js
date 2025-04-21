@@ -187,4 +187,47 @@ router.delete(
   deleteProductImageController
 );
 
+/**
+ * @swagger
+ * /api/uploads/products/{productId}/deleteimage:
+ *   delete:
+ *     summary: Eliminar imagen de producto
+ *     description: Elimina una imagen asociada a un producto usando query parameter
+ *     tags: [Uploads]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID del producto
+ *       - in: query
+ *         name: publicId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID público de la imagen en Cloudinary
+ *       - in: query
+ *         name: isMain
+ *         schema:
+ *           type: boolean
+ *         required: false
+ *         description: Si es true, elimina la imagen principal
+ *     responses:
+ *       200:
+ *         description: Imagen eliminada exitosamente
+ *       401:
+ *         description: No autorizado
+ *       404:
+ *         description: Producto o imagen no encontrados
+ */
+router.delete(
+  '/products/:productId/deleteimage',
+  auth,
+  checkRole(['admin', 'vendor']),
+  deleteProductImageController
+);
+
 module.exports = router; 

@@ -3,6 +3,9 @@ const router = express.Router();
 const { auth, checkRole } = require('../middlewares/auth');
 const orderController = require('../controllers/order_controller');
 
+// Ruta pública para obtener tipos de entrega (no requiere autenticación)
+router.get('/delivery-types', orderController.getDeliveryTypes);
+
 // Todas las rutas de órdenes requieren autenticación
 router.use(auth);
 
