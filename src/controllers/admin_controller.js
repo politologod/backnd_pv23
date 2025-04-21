@@ -6,155 +6,8 @@ const OrderStatusHistory = require('../models/model_orderStatusHistory');
 const SiteConfig = require('../models/model_siteConfig');
 const Category = require('../models/model_category');
 const sequelize = require('../configs/database');
-const logger = require('../configs/logger');
+const { logger } = require('../configs/logger');
 const { QueryTypes, Op } = require('sequelize');
-
-/**
- * Actualiza el estado de una orden (solo admin)
- */
-const updateOrderStatus = async (req, res) => {
-  const { orderId } = req.params;
-  const { status, notes } = req.body;
-  
-  if (!status) {
-    return res.status(400).json({
-      success: false,
-      message: 'El estado de la orden es requerido'
-    });
-  }
-
-  const validStatuses = [
-    'pendiente por pagar', 
-    'pagado y procesando', 
-    'enviado', 
-    'entregado', 
-    'cancelado'
-  ];
-  
-  if (!validStatuses.includes(status)) {
-    return res.status(400).json({
-      success: false,
-      message: `Estado no válido. Estados válidos: ${validStatuses.join(', ')}`
-    });
-  }
-
-  try {
-    // Iniciar transacción
-    const transaction = await sequelize.transaction();
-    
-    try {
-      const order = await Order.findByPk(orderId);
-      
-      if (!order) {
-        await transaction.rollback();
-        return res.status(404).json({
-          success: false,
-          message: 'Orden no encontrada'
-        });
-      }
-      
-      // Si el estado es el mismo, no hacemos cambios
-      if (order.status === status) {
-        await transaction.rollback();
-        return res.status(400).json({
-          success: false,
-          message: 'La orden ya tiene este estado'
-        });
-      }
-      
-      // Actualizar el estado de la orden
-      const oldStatus = order.status;
-      await order.update({ status }, { transaction });
-      
-      // Registrar el cambio en el historial
-      await OrderStatusHistory.create({
-        orderId,
-        status,
-        previousStatus: oldStatus,
-        notes: notes || `Estado actualizado de "${oldStatus}" a "${status}"`,
-        updatedBy: req.user.id,
-        updatedByRole: req.user.role
-      }, { transaction });
-      
-      // Si la orden fue cancelada y estaba pagada, se podría procesar la devolución aquí
-      
-      // Confirmar transacción
-      await transaction.commit();
-      
-      // Obtener la orden actualizada con su historial
-      const updatedOrder = await Order.findByPk(orderId, {
-        include: [
-          { 
-            model: OrderStatusHistory,
-            limit: 10,
-            order: [['createdAt', 'DESC']]
-          }
-        ]
-      });
-      
-      res.status(200).json({
-        success: true,
-        message: 'Estado de la orden actualizado correctamente',
-        order: {
-          id: order.id,
-          status: order.status,
-          history: updatedOrder.OrderStatusHistories
-        }
-      });
-    } catch (error) {
-      await transaction.rollback();
-      throw error;
-    }
-  } catch (error) {
-    logger.error('Error al actualizar el estado de la orden', { error: error.message, orderId });
-    res.status(500).json({
-      success: false,
-      message: 'Error al actualizar el estado de la orden',
-      error: error.message
-    });
-  }
-};
-
-/**
- * Obtiene el historial de estados de una orden
- */
-const getOrderStatusHistory = async (req, res) => {
-  const { orderId } = req.params;
-  
-  try {
-    const order = await Order.findByPk(orderId);
-    
-    if (!order) {
-      return res.status(404).json({
-        success: false,
-        message: 'Orden no encontrada'
-      });
-    }
-    
-    const history = await OrderStatusHistory.findAll({
-      where: { orderId },
-      order: [['createdAt', 'DESC']],
-      include: [
-        {
-          model: User,
-          attributes: ['id', 'name', 'email']
-        }
-      ]
-    });
-    
-    res.status(200).json({
-      success: true,
-      history
-    });
-  } catch (error) {
-    logger.error('Error al obtener el historial de estados de la orden', { error: error.message, orderId });
-    res.status(500).json({
-      success: false,
-      message: 'Error al obtener el historial de estados de la orden',
-      error: error.message
-    });
-  }
-};
 
 /**
  * Actualiza el estado del modo de mantenimiento del sitio
@@ -191,7 +44,7 @@ const setMaintenanceMode = async (req, res) => {
       });
     }
 
-    logger.info(`Modo de mantenimiento actualizado por usuario ${userId}: ${maintenance_mode}`);
+    console.info(`Modo de mantenimiento actualizado por usuario ${userId}: ${maintenance_mode}`);
     
     return res.status(200).json({
       success: true,
@@ -202,7 +55,7 @@ const setMaintenanceMode = async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error(`Error al actualizar modo de mantenimiento: ${error.message}`);
+    console.error('Error al actualizar el modo de mantenimiento', error.message);
     return res.status(500).json({
       success: false,
       message: 'Error al actualizar el modo de mantenimiento',
@@ -247,7 +100,7 @@ const getMaintenanceMode = async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error(`Error al obtener modo de mantenimiento: ${error.message}`);
+    console.error(`Error al obtener modo de mantenimiento: ${error.message}`);
     return res.status(500).json({
       success: false,
       message: 'Error al obtener el modo de mantenimiento',
@@ -265,9 +118,9 @@ const getMaintenanceMode = async (req, res) => {
 const getGeneralStats = async (req, res) => {
   try {
     // Estadísticas totales
-    const totalSales = await Order.sum('total', { where: { status: 'completed' } });
+    const totalSales = await Order.sum('total', { where: { status: 'entregado' } });
     const totalOrders = await Order.count();
-    const totalCustomers = await User.count({ where: { role: 'client' } });
+    const totalCustomers = await User.count({ where: { role: 'customer' } });
     const totalProducts = await Product.count({ where: { active: true } });
     const totalCategories = await Category.count({ where: { active: true } });
 
@@ -282,7 +135,7 @@ const getGeneralStats = async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error(`Error al obtener estadísticas generales: ${error.message}`);
+    console.error(`Error al obtener estadísticas generales: ${error.message}`);
     return res.status(500).json({
       success: false,
       message: 'Error al obtener estadísticas generales',
@@ -302,10 +155,10 @@ const getSalesByCategory = async (req, res) => {
     const salesByCategory = await sequelize.query(`
       SELECT c.name as category, SUM(oi.quantity * oi.price) as total
       FROM OrderItems oi
-      JOIN Products p ON oi.product_id = p.id
-      JOIN Categories c ON p.category_id = c.id
-      JOIN Orders o ON oi.order_id = o.id
-      WHERE o.status = 'completed'
+      JOIN Products p ON oi.productId = p.id
+      JOIN Categories c ON p.categoryId = c.id
+      JOIN Orders o ON oi.orderId = o.id
+      WHERE o.status = 'entregado'
       GROUP BY c.id, c.name
       ORDER BY total DESC
     `, { type: sequelize.QueryTypes.SELECT });
@@ -315,7 +168,7 @@ const getSalesByCategory = async (req, res) => {
       data: salesByCategory
     });
   } catch (error) {
-    logger.error(`Error al obtener ventas por categoría: ${error.message}`);
+    console.error(`Error al obtener ventas por categoría: ${error.message}`);
     return res.status(500).json({
       success: false,
       message: 'Error al obtener ventas por categoría',
@@ -337,14 +190,14 @@ const getOrdersByMonth = async (req, res) => {
     
     const ordersByMonth = await sequelize.query(`
       SELECT 
-        EXTRACT(MONTH FROM created_at) as month, 
+        EXTRACT(MONTH FROM "createdAt") as month, 
         COUNT(*) as count,
-        SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed,
-        SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
-        SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) as cancelled
+        SUM(CASE WHEN status = 'entregado' THEN 1 ELSE 0 END) as completed,
+        SUM(CASE WHEN status = 'pendiente por pagar' THEN 1 ELSE 0 END) as pending,
+        SUM(CASE WHEN status = 'cancelado' THEN 1 ELSE 0 END) as cancelled
       FROM Orders
-      WHERE EXTRACT(YEAR FROM created_at) = :year
-      GROUP BY EXTRACT(MONTH FROM created_at)
+      WHERE EXTRACT(YEAR FROM "createdAt") = :year
+      GROUP BY EXTRACT(MONTH FROM "createdAt")
       ORDER BY month
     `, {
       replacements: { year },
@@ -359,7 +212,7 @@ const getOrdersByMonth = async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error(`Error al obtener órdenes por mes: ${error.message}`);
+    console.error(`Error al obtener órdenes por mes: ${error.message}`);
     return res.status(500).json({
       success: false,
       message: 'Error al obtener órdenes por mes',
@@ -381,11 +234,11 @@ const getCustomersByMonth = async (req, res) => {
     
     const customersByMonth = await sequelize.query(`
       SELECT 
-        EXTRACT(MONTH FROM created_at) as month, 
+        EXTRACT(MONTH FROM "createdAt") as month, 
         COUNT(*) as count
       FROM Users
-      WHERE role = 'client' AND EXTRACT(YEAR FROM created_at) = :year
-      GROUP BY EXTRACT(MONTH FROM created_at)
+      WHERE role = 'customer' AND EXTRACT(YEAR FROM "createdAt") = :year
+      GROUP BY EXTRACT(MONTH FROM "createdAt")
       ORDER BY month
     `, {
       replacements: { year },
@@ -400,7 +253,7 @@ const getCustomersByMonth = async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error(`Error al obtener clientes por mes: ${error.message}`);
+    console.error(`Error al obtener clientes por mes: ${error.message}`);
     return res.status(500).json({
       success: false,
       message: 'Error al obtener clientes por mes',
@@ -422,11 +275,11 @@ const getSalesByMonth = async (req, res) => {
     
     const salesByMonth = await sequelize.query(`
       SELECT 
-        EXTRACT(MONTH FROM created_at) as month, 
+        EXTRACT(MONTH FROM "createdAt") as month, 
         SUM(total) as total
       FROM Orders
-      WHERE status = 'completed' AND EXTRACT(YEAR FROM created_at) = :year
-      GROUP BY EXTRACT(MONTH FROM created_at)
+      WHERE status = 'entregado' AND EXTRACT(YEAR FROM "createdAt") = :year
+      GROUP BY EXTRACT(MONTH FROM "createdAt")
       ORDER BY month
     `, {
       replacements: { year },
@@ -441,7 +294,7 @@ const getSalesByMonth = async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error(`Error al obtener ventas por mes: ${error.message}`);
+    console.error(`Error al obtener ventas por mes: ${error.message}`);
     return res.status(500).json({
       success: false,
       message: 'Error al obtener ventas por mes',
@@ -467,10 +320,10 @@ const getDashboardStats = async (req, res) => {
     // Ventas del mes actual
     const currentMonthSales = await Order.sum('total', {
       where: {
-        status: 'completed',
+        status: 'entregado',
         [Op.and]: [
-          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('MONTH FROM created_at')), currentMonth),
-          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('YEAR FROM created_at')), currentYear)
+          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('MONTH FROM "createdAt"')), currentMonth),
+          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('YEAR FROM "createdAt"')), currentYear)
         ]
       }
     });
@@ -478,10 +331,10 @@ const getDashboardStats = async (req, res) => {
     // Ventas del mes anterior
     const previousMonthSales = await Order.sum('total', {
       where: {
-        status: 'completed',
+        status: 'entregado',
         [Op.and]: [
-          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('MONTH FROM created_at')), previousMonth),
-          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('YEAR FROM created_at')), previousMonthYear)
+          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('MONTH FROM "createdAt"')), previousMonth),
+          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('YEAR FROM "createdAt"')), previousMonthYear)
         ]
       }
     });
@@ -490,8 +343,8 @@ const getDashboardStats = async (req, res) => {
     const currentMonthOrders = await Order.count({
       where: {
         [Op.and]: [
-          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('MONTH FROM created_at')), currentMonth),
-          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('YEAR FROM created_at')), currentYear)
+          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('MONTH FROM "createdAt"')), currentMonth),
+          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('YEAR FROM "createdAt"')), currentYear)
         ]
       }
     });
@@ -500,8 +353,8 @@ const getDashboardStats = async (req, res) => {
     const previousMonthOrders = await Order.count({
       where: {
         [Op.and]: [
-          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('MONTH FROM created_at')), previousMonth),
-          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('YEAR FROM created_at')), previousMonthYear)
+          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('MONTH FROM "createdAt"')), previousMonth),
+          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('YEAR FROM "createdAt"')), previousMonthYear)
         ]
       }
     });
@@ -509,10 +362,10 @@ const getDashboardStats = async (req, res) => {
     // Nuevos clientes del mes actual
     const currentMonthCustomers = await User.count({
       where: {
-        role: 'client',
+        role: 'customer',
         [Op.and]: [
-          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('MONTH FROM created_at')), currentMonth),
-          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('YEAR FROM created_at')), currentYear)
+          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('MONTH FROM "createdAt"')), currentMonth),
+          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('YEAR FROM "createdAt"')), currentYear)
         ]
       }
     });
@@ -520,10 +373,10 @@ const getDashboardStats = async (req, res) => {
     // Nuevos clientes del mes anterior
     const previousMonthCustomers = await User.count({
       where: {
-        role: 'client',
+        role: 'customer',
         [Op.and]: [
-          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('MONTH FROM created_at')), previousMonth),
-          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('YEAR FROM created_at')), previousMonthYear)
+          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('MONTH FROM "createdAt"')), previousMonth),
+          sequelize.where(sequelize.fn('EXTRACT', sequelize.literal('YEAR FROM "createdAt"')), previousMonthYear)
         ]
       }
     });
@@ -531,12 +384,12 @@ const getDashboardStats = async (req, res) => {
     // Productos más vendidos
     const topProducts = await sequelize.query(`
       SELECT 
-        p.id, p.name, p.price, p.description, p.image_url,
+        p.id, p.name, p.price, p.description, p.imageUrl,
         SUM(oi.quantity) as total_sold
       FROM OrderItems oi
-      JOIN Products p ON oi.product_id = p.id
-      JOIN Orders o ON oi.order_id = o.id
-      WHERE o.status = 'completed'
+      JOIN Products p ON oi.productId = p.id
+      JOIN Orders o ON oi.orderId = o.id
+      WHERE o.status = 'entregado'
       GROUP BY p.id, p.name
       ORDER BY total_sold DESC
       LIMIT 5
@@ -564,7 +417,7 @@ const getDashboardStats = async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error(`Error al obtener estadísticas del dashboard: ${error.message}`);
+    console.error(`Error al obtener estadísticas del dashboard: ${error.message}`);
     return res.status(500).json({
       success: false,
       message: 'Error al obtener estadísticas del dashboard',
@@ -574,8 +427,6 @@ const getDashboardStats = async (req, res) => {
 };
 
 module.exports = {
-  updateOrderStatus,
-  getOrderStatusHistory,
   setMaintenanceMode,
   getMaintenanceMode,
   getGeneralStats,

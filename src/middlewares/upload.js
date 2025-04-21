@@ -60,7 +60,7 @@ const upload = multer({
 const handleMulterError = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     // Error de Multer
-    logger.error('Error en carga de archivo', { error: err });
+    console.error('Error en carga de archivo', err);
     
     if (err.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({ 
@@ -79,7 +79,7 @@ const handleMulterError = (err, req, res, next) => {
   
   if (err) {
     // Otro tipo de error
-    logger.error('Error en procesamiento de archivos', { error: err });
+    console.error('Error en procesamiento de archivos', err);
     return res.status(500).json({ error: err.message });
   }
   
@@ -96,7 +96,7 @@ const cleanupTempFiles = (req, res, next) => {
     // Limpiar archivos temporales si existen
     if (req.file) {
       fs.unlink(req.file.path, (err) => {
-        if (err) logger.error('Error al eliminar archivo temporal', { error: err, file: req.file.path });
+        if (err) console.error('Error al eliminar archivo temporal', err, req.file.path);
       });
     }
     
@@ -106,7 +106,7 @@ const cleanupTempFiles = (req, res, next) => {
       
       files.forEach(file => {
         fs.unlink(file.path, (err) => {
-          if (err) logger.error('Error al eliminar archivo temporal', { error: err, file: file.path });
+          if (err) console.error('Error al eliminar archivo temporal', err, file.path);
         });
       });
     }

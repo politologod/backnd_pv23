@@ -2,6 +2,7 @@ const { Tax, ProductTax, Product } = require('../models');
 const sequelize = require('../configs/database');
 const logger = require('../configs/logger');
 const { validateString, validateNumber } = require('../utils/validator');
+const taxCalculator = require('../utils/taxCalculator');
 
 /**
  * Obtener todos los impuestos
@@ -472,6 +473,49 @@ const calculateCartTaxes = async (req, res) => {
   }
 };
 
+/**
+ * Obtener impuestos asociados a un producto específico
+ */
+const getProductTaxesById = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    
+    // Verificar si el producto existe
+    const product = await Product.findByPk(productId);
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        error: 'Producto no encontrado'
+      });
+    }
+    
+    // Obtener impuestos aplicables al producto
+    const productTaxes = await taxCalculator.getProductTaxes(productId);
+    
+    // Obtener información del producto para contexto
+    const productInfo = {
+      id: product.id,
+      name: product.name,
+      price: product.price
+    };
+    
+    res.status(200).json({
+      success: true,
+      data: {
+        product: productInfo,
+        taxes: productTaxes
+      }
+    });
+  } catch (error) {
+    logger.error(`Error al obtener impuestos para producto ID ${req.params.productId}`, { error: error.message });
+    res.status(500).json({
+      success: false,
+      error: 'Error al obtener impuestos del producto',
+      details: error.message
+    });
+  }
+};
+
 module.exports = {
   getAllTaxes,
   getTaxById,
@@ -480,5 +524,6 @@ module.exports = {
   deleteTax,
   updateProductTax,
   deleteProductTax,
-  calculateCartTaxes
+  calculateCartTaxes,
+  getProductTaxesById
 }; 

@@ -123,13 +123,37 @@ const uploadMultipleProductImages = async (files, productId) => {
  */
 const deleteImage = async (publicId) => {
   try {
+    // Validar que tenemos un publicId
+    if (!publicId) {
+      logger.error('Error al eliminar imagen: publicId no proporcionado');
+      return {
+        success: false,
+        error: 'ID de imagen no proporcionado'
+      };
+    }
+    
+    logger.info('Intentando eliminar imagen de Cloudinary', { publicId });
     const result = await cloudinary.uploader.destroy(publicId);
+    
+    // Cloudinary puede devolver diferentes respuestas
+    const success = result === 'ok' || result.result === 'ok';
+    
+    if (success) {
+      logger.info('Imagen eliminada correctamente de Cloudinary', { publicId });
+    } else {
+      logger.warn('Respuesta inesperada de Cloudinary al eliminar imagen', { publicId, result });
+    }
+    
     return {
-      success: result === 'ok',
+      success,
       result
     };
   } catch (error) {
-    logger.error('Error al eliminar imagen de Cloudinary:', { error: error.message });
+    logger.error('Error al eliminar imagen de Cloudinary:', { 
+      publicId, 
+      error: error.message,
+      stack: error.stack
+    });
     return {
       success: false,
       error: error.message

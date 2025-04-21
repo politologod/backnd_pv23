@@ -65,7 +65,7 @@ const uploadProductImageController = async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error('Error en uploadProductImageController', { error: error.message });
+    console.error('Error en uploadProductImageController', error.message);
     res.status(500).json({ 
       success: false, 
       message: 'Error al procesar la imagen', 
@@ -152,7 +152,7 @@ const uploadMultipleProductImagesController = async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error('Error en uploadMultipleProductImagesController', { error: error.message });
+    console.error('Error en uploadMultipleProductImagesController', error.message);
     res.status(500).json({ 
       success: false, 
       message: 'Error al procesar las imágenes', 
@@ -297,7 +297,7 @@ const uploadPaymentProofController = async (req, res) => {
       throw error;
     }
   } catch (error) {
-    logger.error('Error en uploadPaymentProofController', { error: error.message });
+    console.error('Error en uploadPaymentProofController', error.message);
     res.status(500).json({ 
       success: false, 
       message: 'Error al procesar el comprobante de pago', 
@@ -311,7 +311,12 @@ const uploadPaymentProofController = async (req, res) => {
  */
 const deleteProductImageController = async (req, res) => {
   try {
-    const { productId, imageId } = req.params;
+    const { productId } = req.params;
+    // Obtener el ID de la imagen del query o de los params
+    const imageId = req.query.publicId || req.params.imageId;
+    const isMain = req.query.isMain === 'true';
+    
+    console.log('Intentando eliminar imagen:', { productId, imageId, isMain });
 
     // Verificar que el producto existe
     const product = await Product.findByPk(productId);
@@ -321,28 +326,83 @@ const deleteProductImageController = async (req, res) => {
         message: 'Producto no encontrado' 
       });
     }
-
-    // Comprobar si es la imagen principal o una adicional
-    if (product.metadata && product.metadata.imagePublicId === imageId) {
-      // Es la imagen principal
-      const result = await deleteImage(imageId);
+    
+    // Si no hay metadata, no hay imágenes
+    if (!product.metadata) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'El producto no tiene imágenes asociadas' 
+      });
+    }
+    
+    let targetImageId;
+    let isMainImage = false;
+    
+    // Si se especificó que es imagen principal o coincide el ID
+    if (isMain || (product.metadata.imagePublicId === imageId)) {
+      isMainImage = true;
+      targetImageId = product.metadata.imagePublicId;
+    } else if (product.metadata.additionalImages) {
+      // Buscar en imágenes adicionales
+      const imageIndex = product.metadata.additionalImages.findIndex(img => img.publicId === imageId);
+      
+      if (imageIndex === -1) {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'Imagen no encontrada para este producto',
+          debug: {
+            imageId,
+            availableImages: [
+              product.metadata.imagePublicId,
+              ...product.metadata.additionalImages.map(img => img.publicId)
+            ]
+          }
+        });
+      }
+      
+      targetImageId = product.metadata.additionalImages[imageIndex].publicId;
+    } else {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'El producto no tiene imágenes adicionales' 
+      });
+    }
+    
+    console.log('Imagen encontrada, intentando eliminar:', targetImageId);
+    
+    // Eliminar de Cloudinary
+    try {
+      const result = await deleteImage(targetImageId);
       
       if (!result.success) {
         return res.status(500).json({ 
           success: false, 
-          message: 'Error al eliminar la imagen', 
+          message: 'Error al eliminar la imagen en Cloudinary', 
           error: result.error 
         });
       }
       
-      // Actualizar producto
+      console.log('Imagen eliminada de Cloudinary correctamente');
+    } catch (cloudinaryError) {
+      console.error('Error al eliminar la imagen de Cloudinary:', cloudinaryError);
+      // Continuamos incluso si falla Cloudinary para actualizar la BD
+    }
+    
+    // Actualizar producto según si es principal o adicional
+    if (isMainImage) {
+      // Es la imagen principal
       const metadata = { ...product.metadata };
       delete metadata.imagePublicId;
       
       // Si hay imágenes adicionales, usar la primera como principal
       let newMainImageUrl = null;
+      let newMainImageId = null;
+      
       if (metadata.additionalImages && metadata.additionalImages.length > 0) {
-        newMainImageUrl = metadata.additionalImages[0].url;
+        const firstImage = metadata.additionalImages[0];
+        newMainImageUrl = firstImage.url;
+        newMainImageId = firstImage.publicId;
+        metadata.imagePublicId = newMainImageId;
         metadata.additionalImages = metadata.additionalImages.slice(1);
       }
       
@@ -360,30 +420,11 @@ const deleteProductImageController = async (req, res) => {
           imageUrl: product.imageUrl
         }
       });
-    } else if (product.metadata && product.metadata.additionalImages) {
-      // Buscar en imágenes adicionales
-      const imageIndex = product.metadata.additionalImages.findIndex(img => img.publicId === imageId);
-      
-      if (imageIndex === -1) {
-        return res.status(404).json({ 
-          success: false, 
-          message: 'Imagen no encontrada para este producto' 
-        });
-      }
-      
-      // Eliminar de Cloudinary
-      const result = await deleteImage(imageId);
-      
-      if (!result.success) {
-        return res.status(500).json({ 
-          success: false, 
-          message: 'Error al eliminar la imagen', 
-          error: result.error 
-        });
-      }
-      
-      // Actualizar producto
+    } else {
+      // Es una imagen adicional
       const metadata = { ...product.metadata };
+      const imageIndex = metadata.additionalImages.findIndex(img => img.publicId === imageId);
+      
       metadata.additionalImages = [
         ...metadata.additionalImages.slice(0, imageIndex),
         ...metadata.additionalImages.slice(imageIndex + 1)
@@ -401,13 +442,8 @@ const deleteProductImageController = async (req, res) => {
         }
       });
     }
-    
-    return res.status(404).json({ 
-      success: false, 
-      message: 'Imagen no encontrada para este producto' 
-    });
   } catch (error) {
-    logger.error('Error en deleteProductImageController', { error: error.message });
+    console.error('Error en deleteProductImageController:', error);
     res.status(500).json({ 
       success: false, 
       message: 'Error al eliminar la imagen', 

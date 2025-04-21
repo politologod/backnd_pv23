@@ -33,12 +33,12 @@ SiteConfig.init(
       allowNull: false,
       defaultValue: true,
     },
-    created_at: {
+    createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
     },
-    updated_at: {
+    updatedAt: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
@@ -49,8 +49,6 @@ SiteConfig.init(
     modelName: 'SiteConfig',
     tableName: 'site_configs',
     timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
   }
 );
 

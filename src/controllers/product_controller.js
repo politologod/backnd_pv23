@@ -27,7 +27,7 @@ const updateProduct = async (req, res) => {
         if (Array.isArray(categoryIds) && categoryIds.length > 0) {
             const categories = await Category.findAll({ where: { id: categoryIds } });
             if (categories.length !== categoryIds.length) {
-                logger.warn('Algunas categorías no fueron encontradas', { 
+                console.warn('Algunas categorías no fueron encontradas', { 
                     productId: id, 
                     requestedCategories: categoryIds,
                     foundCategories: categories.map(c => c.id)
@@ -36,10 +36,10 @@ const updateProduct = async (req, res) => {
             await product.setCategories(categories);
         }
         
-        logger.info('Producto actualizado exitosamente', { productId: id });
+        console.info('Producto actualizado exitosamente', { productId: id });
         res.json(product);
     } catch (error) {
-        logger.error('Error al actualizar producto', { error: error.message, productId: req.params.id });
+        console.error('Error al actualizar producto', error.message);
         
         if (error instanceof ValidationError) {
             return res.status(422).json({ 
@@ -55,6 +55,15 @@ const updateProduct = async (req, res) => {
 // Creating a product
 const createProduct = async (req, res) => {
     try {
+        // Detectar si la solicitud es para un solo producto o para múltiples
+        const isBatchOperation = Array.isArray(req.body);
+        
+        // Si es una operación por lotes
+        if (isBatchOperation) {
+            return await handleBatchProductCreation(req, res);
+        }
+        
+        // Lógica para un solo producto (existente)
         const { categoryIds } = req.body;
         
         // Validar producto
@@ -63,25 +72,67 @@ const createProduct = async (req, res) => {
             throw new ValidationError('Datos de producto inválidos', validationResult.errors);
         }
         
-        const product = await Product.create(req.body);
+        // Crear el producto sin las categorías primero
+        const productData = { ...req.body };
+        
+        // Eliminar categoryIds del objeto si existe
+        if (productData.categoryIds) {
+            delete productData.categoryIds;
+        }
+        
+        // Crear el producto
+        const product = await Product.create(productData);
+        console.info('Producto creado', product.toJSON());
 
         // Associate categories (N:M)
         if (Array.isArray(categoryIds) && categoryIds.length > 0) {
-            const categories = await Category.findAll({ where: { id: categoryIds } });
-            if (categories.length !== categoryIds.length) {
-                logger.warn('Algunas categorías no fueron encontradas', { 
-                    productId: product.id, 
-                    requestedCategories: categoryIds,
-                    foundCategories: categories.map(c => c.id)
-                });
+            try {
+                const categories = await Category.findAll({ where: { id: categoryIds } });
+                console.info('Categorías encontradas', categories.map(c => c.id));
+                
+                if (categories.length !== categoryIds.length) {
+                    console.warn('Algunas categorías no fueron encontradas', { 
+                        productId: product.id, 
+                        requestedCategories: categoryIds,
+                        foundCategories: categories.map(c => c.id)
+                    });
+                }
+                
+                if (categories.length > 0) {
+                    // Verificar que setCategories está disponible
+                    if (typeof product.setCategories !== 'function') {
+                        console.error('La función setCategories no está disponible en el producto', {
+                            productMethods: Object.keys(product.__proto__),
+                            hasAssociations: !!Product.associations,
+                            associationsKeys: Product.associations ? Object.keys(Product.associations) : []
+                        });
+                    } else {
+                        await product.setCategories(categories);
+                        console.info('Categorías asociadas correctamente');
+                    }
+                }
+            } catch (categoryError) {
+                console.error('Error al asociar categorías', categoryError);
+                // No fallamos toda la creación por un error en las categorías
             }
-            await product.setCategories(categories);
         }
 
-        logger.info('Nuevo producto creado', { productId: product.id, name: product.name });
+        console.info('Nuevo producto creado', { productId: product.id, name: product.name });
         res.status(201).json(product);
     } catch (error) {
-        logger.error('Error al crear producto', { error: error.message });
+        console.error('Error al crear producto completo:', error);
+        
+        // Verificar si es un error de validación de Sequelize
+        if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+            return res.status(400).json({ 
+                error: 'Error de validación en Sequelize', 
+                details: error.errors.map(e => ({ 
+                    message: e.message, 
+                    field: e.path,
+                    type: e.type
+                }))
+            });
+        }
         
         if (error instanceof ValidationError) {
             return res.status(422).json({ 
@@ -92,6 +143,136 @@ const createProduct = async (req, res) => {
         
         res.status(400).json({ error: error.message });
     }
+};
+
+/**
+ * Maneja la creación de múltiples productos en una sola operación
+ * @param {Object} req - Request object
+ * @param {Object} res - Response object
+ */
+const handleBatchProductCreation = async (req, res) => {
+    const products = req.body;
+    const results = {
+        success: [],
+        errors: []
+    };
+
+    // Validar que sea un array no vacío
+    if (!Array.isArray(products) || products.length === 0) {
+        return res.status(400).json({ 
+            error: "El formato para creación por lotes debe ser un array no vacío de productos" 
+        });
+    }
+
+    // Limitar la cantidad de productos por operación
+    const MAX_BATCH_SIZE = 50;
+    if (products.length > MAX_BATCH_SIZE) {
+        return res.status(400).json({ 
+            error: `Demasiados productos en una sola operación. Máximo permitido: ${MAX_BATCH_SIZE}` 
+        });
+    }
+
+    console.info(`Iniciando creación por lotes de ${products.length} productos`);
+
+    // Procesar cada producto
+    for (let i = 0; i < products.length; i++) {
+        const productData = products[i];
+        
+        try {
+            // Validar producto
+            const validationResult = validateProduct(productData);
+            if (!validationResult.valid) {
+                throw new ValidationError('Datos de producto inválidos', validationResult.errors);
+            }
+
+            // Extraer categoryIds y crear el producto
+            const { categoryIds, ...productDetails } = productData;
+            
+            // Crear el producto
+            const product = await Product.create(productDetails);
+            
+            // Asociar categorías si existen
+            if (Array.isArray(categoryIds) && categoryIds.length > 0) {
+                try {
+                    const categories = await Category.findAll({ 
+                        where: { id: categoryIds } 
+                    });
+                    
+                    if (categories.length > 0) {
+                        await product.setCategories(categories);
+                    }
+                } catch (categoryError) {
+                    console.warn(`Error al asociar categorías para producto ${i}`, categoryError.message);
+                    // No fallamos la creación por un error en las categorías
+                }
+            }
+            
+            // Añadir a resultados exitosos
+            results.success.push({
+                index: i,
+                id: product.id,
+                name: product.name,
+                sku: product.sku
+            });
+            
+            console.info(`Producto ${i+1}/${products.length} creado con éxito`, { 
+                id: product.id, 
+                name: product.name 
+            });
+            
+        } catch (error) {
+            console.error(`Error al crear producto ${i+1}/${products.length}:`, error);
+            
+            // Determinar el tipo de error y estructurar la respuesta
+            let errorDetails;
+            
+            if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+                errorDetails = {
+                    type: 'validation',
+                    details: error.errors.map(e => ({ 
+                        message: e.message, 
+                        field: e.path,
+                        type: e.type
+                    }))
+                };
+            } else if (error instanceof ValidationError) {
+                errorDetails = {
+                    type: 'validation',
+                    details: error.errors
+                };
+            } else {
+                errorDetails = {
+                    type: 'general',
+                    message: error.message
+                };
+            }
+            
+            // Añadir a errores
+            results.errors.push({
+                index: i,
+                name: productData.name || 'Desconocido',
+                sku: productData.sku || 'N/A',
+                error: errorDetails
+            });
+        }
+    }
+    
+    // Enviar respuesta con resultados
+    const totalSuccess = results.success.length;
+    const totalErrors = results.errors.length;
+    
+    console.info(`Creación por lotes completada. Éxitos: ${totalSuccess}, Errores: ${totalErrors}`);
+    
+    res.status(207).json({
+        message: `Creación por lotes completada. ${totalSuccess} productos creados con éxito, ${totalErrors} errores.`,
+        success: results.success,
+        errors: results.errors,
+        stats: {
+            total: products.length,
+            successful: totalSuccess,
+            failed: totalErrors
+        }
+    });
 };
 
 // Getting all products with pagination added
@@ -128,7 +309,7 @@ const getAllProducts = async (req, res) => {
             }
         });
     } catch (error) {
-        logger.error('Error al obtener lista de productos', { error: error.message });
+        console.error('Error al obtener lista de productos', error.message);
         res.status(500).json({ error: "Error al obtener productos" });
     }
 };
@@ -148,7 +329,7 @@ const getProductById = async (req, res) => {
         }
         res.json(product);
     } catch (error) {
-        logger.error('Error al obtener producto por ID', { error: error.message, productId: req.params.id });
+        console.error('Error al obtener producto por ID', error.message);
         res.status(400).json({ error: error.message });
     }
 };
@@ -168,10 +349,10 @@ const deleteProduct = async (req, res) => {
         }
         await product.destroy();
         
-        logger.info('Producto eliminado exitosamente', { productId: id });
+        console.info('Producto eliminado exitosamente', { productId: id });
         res.json({ message: "Producto eliminado con éxito" });
     } catch (error) {
-        logger.error('Error al eliminar producto', { error: error.message, productId: req.params.id });
+        console.error('Error al eliminar producto', error.message);
         res.status(400).json({ error: error.message });
     }
 };
@@ -197,10 +378,7 @@ const getProductByCategory = async (req, res) => {
         // Return associated products
         res.json(category.Products);
     } catch (error) {
-        logger.error('Error al obtener productos por categoría', { 
-            error: error.message, 
-            categoryId: req.params.categoryId 
-        });
+        console.error('Error al obtener productos por categoría', error.message);
         res.status(400).json({ error: error.message });
     }
 };
@@ -223,7 +401,7 @@ const getProductByNames = async (req, res) => {
         });
         res.json(products);
     } catch (error) {
-        logger.error('Error al buscar productos por nombre', { error: error.message, name: req.query.name });
+        console.error('Error al buscar productos por nombre', error.message);
         res.status(400).json({ error: error.message });
     }
 };
@@ -256,11 +434,7 @@ const getProductByPrice = async (req, res) => {
         });
         res.json(products);
     } catch (error) {
-        logger.error('Error al buscar productos por precio', { 
-            error: error.message, 
-            min: req.query.min, 
-            max: req.query.max 
-        });
+        console.error('Error al buscar productos por precio', error.message);
         res.status(400).json({ error: error.message });
     }
 };

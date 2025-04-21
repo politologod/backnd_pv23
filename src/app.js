@@ -237,9 +237,14 @@ if (require.main === module) {
 		})
 		.catch((err) => console.error("❌ Error de conexión:", err));
 
+	// Forzar sincronización solo para modificar la tabla de productos
+	const shouldForceSync = process.env.FORCE_DB_SYNC === 'true'; // Temporalmente forzar sincronización
+	
 	sequelize
-		.sync({ alter: true })
-		.then(() => console.log("✅ Modelos sincronizados"))
+		.sync({ force: shouldForceSync })
+		.then(() => {
+			console.log(`✅ Modelos sincronizados ${shouldForceSync ? '(con force)' : ''}`);
+		})
 		.catch((err) => console.error("❌ Error al sincronizar modelos:", err));
 }
 

@@ -5,6 +5,23 @@ const { auth, checkRole } = require("../middlewares/auth");
 
 /**
  * @swagger
+ * /api/users/me:
+ *   get:
+ *     summary: Obtener usuario actual
+ *     description: Retorna información del usuario autenticado
+ *     tags: [Usuarios]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Información del usuario actual
+ *       401:
+ *         description: No autorizado
+ */
+router.get("/me", auth, userController.getCurrentUser);
+
+/**
+ * @swagger
  * /api/users:
  *   get:
  *     summary: Obtener lista de usuarios

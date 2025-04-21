@@ -43,6 +43,16 @@ const Order = sequelize.define("Order", {
 		type: DataTypes.STRING,
 		allowNull: false,
 	},
+	deliveryType: {
+		type: DataTypes.ENUM(
+			"delivery_moto",
+			"pickup_tienda", 
+			"encomienda_nacional"
+		),
+		allowNull: false,
+		defaultValue: "pickup_tienda",
+		comment: "Tipo de entrega seleccionado por el cliente"
+	},
 	paymentMethod: {
 		type: DataTypes.STRING,
 		allowNull: false,
