@@ -121,8 +121,8 @@ const getGeneralStats = async (req, res) => {
     const totalSales = await Order.sum('total', { where: { status: 'entregado' } });
     const totalOrders = await Order.count();
     const totalCustomers = await User.count({ where: { role: 'customer' } });
-    const totalProducts = await Product.count({ where: { active: true } });
-    const totalCategories = await Category.count({ where: { active: true } });
+    const totalProducts = await Product.count();
+    const totalCategories = await Category.count();
 
     return res.status(200).json({
       success: true,
@@ -152,28 +152,57 @@ const getGeneralStats = async (req, res) => {
  */
 const getSalesByCategory = async (req, res) => {
   try {
+    // Consulta corregida para usar la tabla intermedia ProductCategories (relación many-to-many)
+    // y el nombre correcto de la columna priceAtPurchase
     const salesByCategory = await sequelize.query(`
-      SELECT c.name as category, SUM(oi.quantity * oi.price) as total
-      FROM OrderItems oi
-      JOIN Products p ON oi.productId = p.id
-      JOIN Categories c ON p.categoryId = c.id
-      JOIN Orders o ON oi.orderId = o.id
+      SELECT c.name as category, SUM(oi.quantity * oi."priceAtPurchase") as total
+      FROM "OrderItems" oi
+      JOIN "Products" p ON oi."ProductId" = p.id
+      JOIN "ProductCategories" pc ON p.id = pc."ProductId"
+      JOIN "Categories" c ON pc."CategoryId" = c.id
+      JOIN "Orders" o ON oi."OrderId" = o.id
       WHERE o.status = 'entregado'
       GROUP BY c.id, c.name
       ORDER BY total DESC
     `, { type: sequelize.QueryTypes.SELECT });
 
+    if (salesByCategory && salesByCategory.length > 0) {
+      return res.status(200).json({
+        success: true,
+        data: salesByCategory
+      });
+    }
+
+    // Si no hay resultados, devolver un array vacío
     return res.status(200).json({
       success: true,
-      data: salesByCategory
+      data: []
     });
   } catch (error) {
     console.error(`Error al obtener ventas por categoría: ${error.message}`);
-    return res.status(500).json({
-      success: false,
-      message: 'Error al obtener ventas por categoría',
-      error: error.message
-    });
+    
+    // Intento final simplificado sin usar categorías
+    try {
+      const simpleSales = await sequelize.query(`
+        SELECT 'Todas las categorías' as category, COALESCE(SUM(oi.quantity * oi."priceAtPurchase"), 0) as total
+        FROM "OrderItems" oi
+        JOIN "Orders" o ON oi."OrderId" = o.id
+        WHERE o.status = 'entregado'
+      `, { type: sequelize.QueryTypes.SELECT });
+      
+      return res.status(200).json({
+        success: true,
+        data: simpleSales,
+        message: 'Mostrando total general debido a error en consulta detallada'
+      });
+    } catch (finalError) {
+      console.error(`Error en consulta final: ${finalError.message}`);
+      return res.status(500).json({
+        success: false,
+        message: 'Error al obtener ventas por categoría',
+        error: error.message
+      });
+    }
   }
 };
 
@@ -192,10 +221,10 @@ const getOrdersByMonth = async (req, res) => {
       SELECT 
         EXTRACT(MONTH FROM "createdAt") as month, 
         COUNT(*) as count,
-        SUM(CASE WHEN status = 'entregado' THEN 1 ELSE 0 END) as completed,
-        SUM(CASE WHEN status = 'pendiente por pagar' THEN 1 ELSE 0 END) as pending,
-        SUM(CASE WHEN status = 'cancelado' THEN 1 ELSE 0 END) as cancelled
-      FROM Orders
+        SUM(CASE WHEN "status" = 'entregado' THEN 1 ELSE 0 END) as completed,
+        SUM(CASE WHEN "status" = 'pendiente por pagar' THEN 1 ELSE 0 END) as pending,
+        SUM(CASE WHEN "status" = 'cancelado' THEN 1 ELSE 0 END) as cancelled
+      FROM "Orders"
       WHERE EXTRACT(YEAR FROM "createdAt") = :year
       GROUP BY EXTRACT(MONTH FROM "createdAt")
       ORDER BY month
@@ -236,8 +265,8 @@ const getCustomersByMonth = async (req, res) => {
       SELECT 
         EXTRACT(MONTH FROM "createdAt") as month, 
         COUNT(*) as count
-      FROM Users
-      WHERE role = 'customer' AND EXTRACT(YEAR FROM "createdAt") = :year
+      FROM "Users"
+      WHERE "role" = 'customer' AND EXTRACT(YEAR FROM "createdAt") = :year
       GROUP BY EXTRACT(MONTH FROM "createdAt")
       ORDER BY month
     `, {
@@ -276,9 +305,9 @@ const getSalesByMonth = async (req, res) => {
     const salesByMonth = await sequelize.query(`
       SELECT 
         EXTRACT(MONTH FROM "createdAt") as month, 
-        SUM(total) as total
-      FROM Orders
-      WHERE status = 'entregado' AND EXTRACT(YEAR FROM "createdAt") = :year
+        SUM("total") as total
+      FROM "Orders"
+      WHERE "status" = 'entregado' AND EXTRACT(YEAR FROM "createdAt") = :year
       GROUP BY EXTRACT(MONTH FROM "createdAt")
       ORDER BY month
     `, {
@@ -384,13 +413,13 @@ const getDashboardStats = async (req, res) => {
     // Productos más vendidos
     const topProducts = await sequelize.query(`
       SELECT 
-        p.id, p.name, p.price, p.description, p.imageUrl,
-        SUM(oi.quantity) as total_sold
-      FROM OrderItems oi
-      JOIN Products p ON oi.productId = p.id
-      JOIN Orders o ON oi.orderId = o.id
-      WHERE o.status = 'entregado'
-      GROUP BY p.id, p.name
+        p."id", p."name", p."price", p."description", p."imageUrl",
+        SUM(oi."quantity") as total_sold
+      FROM "OrderItems" as oi
+      JOIN "Products" as p ON oi."ProductId" = p."id"
+      JOIN "Orders" as o ON oi."OrderId" = o."id"
+      WHERE o."status" = 'entregado'
+      GROUP BY p."id", p."name", p."price", p."description", p."imageUrl"
       ORDER BY total_sold DESC
       LIMIT 5
     `, { type: sequelize.QueryTypes.SELECT });

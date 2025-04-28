@@ -439,6 +439,59 @@ const getProductByPrice = async (req, res) => {
     }
 };
 
+const getProductWithTaxes = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // Validar que el ID sea un número válido
+        if (isNaN(id)) {
+            return res.status(400).json({ error: "ID de producto inválido" });
+        }
+        
+        // Buscar el producto
+        const product = await Product.findByPk(id, { include: Category });
+        if (!product) {
+            return res.status(404).json({ error: "Producto no encontrado" });
+        }
+        
+        // Calcular impuestos para el producto
+        const taxCalculator = require('../utils/taxCalculator');
+        
+        const itemWithTaxes = await taxCalculator.calculateItemTaxes({
+            productId: product.id,
+            quantity: 1,
+            price: product.price,
+            product
+        });
+        
+        res.status(200).json({
+            success: true,
+            data: {
+                product: {
+                    id: product.id,
+                    name: product.name,
+                    description: product.description,
+                    price: product.price,
+                    categories: product.Categories || [],
+                    images: product.images || [],
+                    stock: product.stock
+                },
+                priceWithoutTax: product.price,
+                taxes: itemWithTaxes.taxDetails,
+                totalTaxAmount: itemWithTaxes.totalTaxAmount,
+                priceWithTax: itemWithTaxes.total
+            }
+        });
+    } catch (error) {
+        console.error('Error al obtener producto con impuestos', error.message);
+        res.status(500).json({ 
+            success: false, 
+            error: "Error al obtener producto con impuestos",
+            details: error.message 
+        });
+    }
+};
+
 module.exports = { 
     createProduct, 
     getAllProducts, 
@@ -447,5 +500,6 @@ module.exports = {
     deleteProduct, 
     getProductByCategory, 
     getProductByNames, 
-    getProductByPrice 
+    getProductByPrice,
+    getProductWithTaxes
 };
