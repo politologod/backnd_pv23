@@ -68,7 +68,7 @@ authRouter.get(
 	}
 );
 
-const { register, login, logout, verifyToken } = require("../controllers/auth_controller");
+const { register, login, logout, verifyToken, requestPasswordReset, resetPassword } = require("../controllers/auth_controller");
 
 // 🔹 Registro de usuario (cualquiera puede registrarse como customer)
 authRouter.post("/register", register);
@@ -81,6 +81,12 @@ authRouter.post("/login", login);
 
 // 🔹 Cerrar sesión
 authRouter.post("/logout", logout);
+
+// 🔹 Solicitar restablecimiento de contraseña
+authRouter.post("/request-password-reset", requestPasswordReset);
+
+// 🔹 Restablecer contraseña con token
+authRouter.post("/reset-password", resetPassword);
 
 // 🔹 Verificación de token para frontend
 authRouter.get("/verify", verifyToken, (req, res) => {

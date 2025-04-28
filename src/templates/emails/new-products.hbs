@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Nuevos Productos Disponibles!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #9b59b6;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+        .product {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .product-image {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            float: left;
+            margin-right: 15px;
+            border-radius: 3px;
+        }
+        .product-details {
+            overflow: hidden;
+        }
+        .product-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 0;
+        }
+        .product-price {
+            font-size: 16px;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .button {
+            display: inline-block;
+            background-color: #9b59b6;
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 3px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        .unsubscribe {
+            color: #999;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>¡Nuevos Productos Disponibles!</h1>
+        </div>
+        <div class="content">
+            <p>Hemos añadido nuevos productos a nuestra tienda que creemos te pueden interesar. ¡No te los pierdas!</p>
+            
+            {{#each products}}
+            <div class="product">
+                <img src="{{imageUrl}}" alt="{{name}}" class="product-image">
+                <div class="product-details">
+                    <h2 class="product-name">{{name}}</h2>
+                    <p class="product-price">${{price}}</p>
+                    <a href="{{productUrl}}" class="button">Ver Producto</a>
+                </div>
+            </div>
+            {{/each}}
+            
+            <p style="text-align: center;">
+                <a href="{{siteUrl}}" class="button" style="padding: 10px 20px;">Visitar la Tienda</a>
+            </p>
+        </div>
+        <div class="footer">
+            <p>© {{currentYear}} Pura Vida Store. Todos los derechos reservados.</p>
+            <p class="unsubscribe">Si ya no deseas recibir estos correos, puedes <a href="{{unsubscribeUrl}}">darte de baja aquí</a>.</p>
+        </div>
+    </div>
+</body>
+</html> 

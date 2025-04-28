@@ -49,6 +49,14 @@ const User = sequelize.define(
             allowNull: false,
             defaultValue: "customer",
         },
+        resetPasswordToken: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        resetPasswordExpires: {
+            type: DataTypes.DATE,
+            allowNull: true
+        },
     },
     { timestamps: true }
 );

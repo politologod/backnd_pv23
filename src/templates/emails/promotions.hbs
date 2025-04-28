@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Ofertas Especiales!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #e74c3c;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+        .product {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        .discount-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: #e74c3c;
+            color: white;
+            padding: 5px 10px;
+            font-weight: bold;
+            border-radius: 0 5px 0 5px;
+        }
+        .product-image {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            float: left;
+            margin-right: 15px;
+            border-radius: 3px;
+        }
+        .product-details {
+            overflow: hidden;
+        }
+        .product-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 0;
+        }
+        .original-price {
+            text-decoration: line-through;
+            color: #999;
+            margin-right: 10px;
+        }
+        .discount-price {
+            font-size: 18px;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .button {
+            display: inline-block;
+            background-color: #e74c3c;
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 3px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .promo-header {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        .unsubscribe {
+            color: #999;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>¡Ofertas Especiales!</h1>
+        </div>
+        <div class="content">
+            <div class="promo-header">
+                ¡Tiempo limitado! Descuentos exclusivos para nuestros suscriptores.
+            </div>
+            
+            <p>Hemos preparado estas ofertas especiales solo para ti. ¡No esperes demasiado, las existencias son limitadas!</p>
+            
+            {{#each products}}
+            <div class="product">
+                <div class="discount-badge">-{{discountPercentage}}%</div>
+                <img src="{{imageUrl}}" alt="{{name}}" class="product-image">
+                <div class="product-details">
+                    <h2 class="product-name">{{name}}</h2>
+                    <p>
+                        <span class="original-price">${{originalPrice}}</span>
+                        <span class="discount-price">${{discountPrice}}</span>
+                    </p>
+                    <a href="{{productUrl}}" class="button">¡Comprar Ahora!</a>
+                </div>
+            </div>
+            {{/each}}
+            
+            <p style="text-align: center; margin-top: 20px;">
+                <a href="{{storeUrl}}" class="button" style="padding: 10px 20px; font-size: 16px;">Ver Todas las Ofertas</a>
+            </p>
+        </div>
+        <div class="footer">
+            <p>© {{currentYear}} Pura Vida Store. Todos los derechos reservados.</p>
+            <p>Estas ofertas son válidas hasta agotar existencias.</p>
+            <p class="unsubscribe">Si ya no deseas recibir estos correos, puedes <a href="{{unsubscribeUrl}}">darte de baja aquí</a>.</p>
+        </div>
+    </div>
+</body>
+</html> 
