@@ -37,6 +37,18 @@ const Product = sequelize.define("Product", {
         type: DataTypes.JSONB,
         allowNull: true,
     },
+    metaTitle: {
+        type: DataTypes.STRING(150),
+        allowNull: true
+    },
+    metaDescription: {
+        type: DataTypes.STRING(320),
+        allowNull: true
+    },
+    seoKeywords: {
+        type: DataTypes.STRING(250),
+        allowNull: true
+    }
 }, {
     indexes: [
         {
