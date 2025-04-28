@@ -2,6 +2,7 @@ const { Order, OrderItem, Product, User, OrderStatusHistory } = require("../mode
 const sequelize = require("../configs/database");
 const logger = require('../configs/logger');
 const taxCalculator = require('../utils/taxCalculator');
+const EmailNotificationService = require('../services/emailNotificationService');
 
 // Función auxiliar para calcular el total de una orden (OBSOLETA, usando taxCalculator ahora)
 const calcularTotal = (cartItems) => {
@@ -204,7 +205,10 @@ createOrder = async (req, res) => {
 		// Devolver la orden creada con sus items
 		const orderWithItems = await Order.findByPk(order.id, {
 			include: [
-				OrderItem, 
+				{
+					model: OrderItem,
+					include: [Product]
+				}, 
 				{ model: User, attributes: { exclude: ["password"] } },
 				{ model: OrderStatusHistory, limit: 5, order: [['createdAt', 'DESC']] }
 			],
@@ -221,6 +225,20 @@ createOrder = async (req, res) => {
 
 		// Incluir información de impuestos en la respuesta
 		orderJson.tax_breakdown = taxCalculation.taxesByType;
+
+		// Enviar correo de confirmación de la orden (asíncrono, no bloquea la respuesta)
+		EmailNotificationService.sendOrderConfirmationEmail(orderWithItems, orderWithItems.OrderItems, req.user)
+			.then(emailSent => {
+				if (!emailSent) {
+					logger.warn('No se pudo enviar correo de confirmación de orden', { orderId: order.id });
+				}
+			})
+			.catch(err => {
+				logger.error('Error al enviar correo de confirmación de orden', { 
+					orderId: order.id, 
+					error: err.message 
+				});
+			});
 
 		res.status(201).json(orderJson);
 

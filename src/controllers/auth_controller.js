@@ -2,6 +2,11 @@ const User = require("../models/model_user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { BadRequestError, UnauthorizedError } = require("../utils/errorHandler");
+const crypto = require('crypto');
+const EmailNotificationService = require('../services/emailNotificationService');
+const { logger } = require('../configs/logger');
+const { Op } = require('sequelize');
+const { v4: uuidv4 } = require('uuid');
 
 // 🔹 Generar token JWT con más información útil pero excluyendo datos sensibles
 const createToken = (user) => {
@@ -113,6 +118,17 @@ const register = async (req, res) => {
 			email: user.email,
 			role: user.role
 		});
+
+		// Enviar correo de bienvenida (asíncrono, no bloquea la respuesta)
+		EmailNotificationService.sendWelcomeEmail(user.id)
+			.then(emailSent => {
+				if (!emailSent) {
+					logger.warn('No se pudo enviar correo de bienvenida', { userId: user.id });
+				}
+			})
+			.catch(err => {
+				logger.error('Error al enviar correo de bienvenida', { userId: user.id, error: err.message });
+			});
 
 		// Generar token
 		const token = createToken(user);
@@ -260,9 +276,128 @@ const verifyToken = (req, res, next) => {
 	}
 }
 
+/**
+ * Maneja la solicitud de restablecimiento de contraseña
+ * @param {Object} req - Objeto de solicitud
+ * @param {Object} res - Objeto de respuesta
+ * @returns {Object} - Respuesta JSON
+ */
+const requestPasswordReset = async (req, res) => {
+	try {
+		const { email } = req.body;
+		
+		if (!email) {
+			return res.status(400).json({ 
+				success: false, 
+				message: 'El correo electrónico es requerido' 
+			});
+		}
+		
+		// Buscar usuario por email
+		const user = await User.findOne({ where: { email } });
+		
+		// Si el usuario existe, generar token de restablecimiento
+		if (user) {
+			// Generar token aleatorio
+			const resetToken = crypto.randomBytes(32).toString('hex');
+			
+			// Establecer expiración (1 hora)
+			const resetTokenExpiration = new Date();
+			resetTokenExpiration.setHours(resetTokenExpiration.getHours() + 1);
+			
+			// Actualizar usuario con token
+			await user.update({
+				resetPasswordToken: resetToken,
+				resetPasswordExpires: resetTokenExpiration
+			});
+			
+			// Enviar correo con instrucciones
+			await EmailNotificationService.sendPasswordResetEmail(user, resetToken);
+			
+			logger.info('Solicitud de restablecimiento de contraseña procesada', { email });
+		}
+		
+		// Siempre devolver success para no revelar si el email existe
+		return res.status(200).json({
+			success: true,
+			message: 'Si la dirección de correo está registrada, recibirás un email con instrucciones para restablecer tu contraseña'
+		});
+	} catch (error) {
+		logger.error('Error al procesar solicitud de restablecimiento de contraseña', { error: error.message });
+		return res.status(500).json({
+			success: false,
+			message: 'Error al procesar la solicitud. Por favor, inténtalo más tarde.'
+		});
+	}
+};
+
+/**
+ * Maneja el restablecimiento de contraseña con token
+ * @param {Object} req - Objeto de solicitud
+ * @param {Object} res - Objeto de respuesta
+ * @returns {Object} - Respuesta JSON
+ */
+const resetPassword = async (req, res) => {
+	try {
+		const { token, newPassword } = req.body;
+		
+		if (!token || !newPassword) {
+			return res.status(400).json({ 
+				success: false, 
+				message: 'Token y nueva contraseña son requeridos' 
+			});
+		}
+		
+		// Buscar usuario con token válido y no expirado
+		const user = await User.findOne({ 
+			where: { 
+				resetPasswordToken: token,
+				resetPasswordExpires: { 
+					[Op.gt]: new Date() // Token no expirado (fecha mayor a la actual)
+				}
+			} 
+		});
+		
+		if (!user) {
+			return res.status(400).json({ 
+				success: false, 
+				message: 'El token es inválido o ha expirado' 
+			});
+		}
+		
+		// Encriptar nueva contraseña
+		const hashedPassword = await bcrypt.hash(newPassword, 10);
+		
+		// Actualizar usuario
+		await user.update({
+			password: hashedPassword,
+			resetPasswordToken: null,
+			resetPasswordExpires: null
+		});
+		
+		// Enviar correo de confirmación
+		await EmailNotificationService.sendPasswordChangedConfirmationEmail(user);
+		
+		logger.info('Contraseña restablecida correctamente', { userId: user.id });
+		
+		return res.status(200).json({
+			success: true,
+			message: 'Tu contraseña ha sido actualizada correctamente'
+		});
+	} catch (error) {
+		logger.error('Error al restablecer contraseña', { error: error.message });
+		return res.status(500).json({
+			success: false,
+			message: 'Error al restablecer la contraseña. Por favor, inténtalo más tarde.'
+		});
+	}
+};
+
 module.exports = {
 	register,
 	login,
 	logout,
-	verifyToken
+	verifyToken,
+	requestPasswordReset,
+	resetPassword
 };
