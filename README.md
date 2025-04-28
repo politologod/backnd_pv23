@@ -1,5 +1,15 @@
 # Backend PuraVida E-commerce
 
+## 🟢 Estado Actual (2024)
+
+- Todas las rutas de autenticación están centralizadas en `src/routes/auth.js`.
+- El sistema de autenticación utiliza JWT almacenado en cookies seguras (`httpOnly`, `secure`, `sameSite`).
+- El frontend debe verificar la autenticación consultando `/api/auth/verify` (usuario) o `/api/auth/verify/admin` (admin), sin necesidad de manejar el token manualmente.
+- Se eliminaron rutas y middlewares duplicados para mayor claridad y seguridad.
+- El flujo de autenticación soporta login tradicional y Google OAuth, ambos con el mismo sistema de cookies.
+- El middleware de autenticación (`auth.js`) valida el JWT desde la cookie y expone el usuario en `req.user`.
+- El sistema es robusto, seguro y preparado para producción.
+
 API REST completa y robusta para la aplicación de e-commerce PuraVida.
 
 ## Estado Actual del Proyecto
