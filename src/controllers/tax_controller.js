@@ -516,6 +516,237 @@ const getProductTaxesById = async (req, res) => {
   }
 };
 
+/**
+ * Aplicar impuesto a todos los productos
+ */
+const applyTaxToAllProducts = async (req, res) => {
+  try {
+    const { taxId } = req.params;
+    const { is_exempt, custom_rate } = req.body;
+
+    // Verificar que el impuesto existe
+    const tax = await Tax.findByPk(taxId);
+    if (!tax) {
+      return res.status(404).json({
+        success: false,
+        error: 'Impuesto no encontrado'
+      });
+    }
+
+    const products = await Product.findAll();
+    const results = [];
+
+    for (const product of products) {
+      const [productTax] = await ProductTax.findOrCreate({
+        where: { product_id: product.id, tax_id: taxId },
+        defaults: { is_exempt, custom_rate }
+      });
+      results.push(productTax);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Impuesto aplicado a todos los productos',
+      data: results
+    });
+  } catch (error) {
+    logger.error('Error al aplicar impuesto a todos los productos', { error: error.message });
+    res.status(500).json({
+      success: false,
+      error: 'Error al aplicar impuesto a todos los productos',
+      details: error.message
+    });
+  }
+};
+
+/**
+ * Obtener productos por impuesto
+ */
+const getProductsByTax = async (req, res) => {
+  try {
+    const { taxId } = req.params;
+    
+    // Verificar que el impuesto existe
+    const tax = await Tax.findByPk(taxId);
+    if (!tax) {
+      return res.status(404).json({
+        success: false,
+        error: 'Impuesto no encontrado'
+      });
+    }
+
+    const products = await Product.findAll({
+      include: [{
+        model: ProductTax,
+        where: { tax_id: taxId }
+      }]
+    });
+
+    res.status(200).json({
+      success: true,
+      data: products
+    });
+  } catch (error) {
+    logger.error('Error al obtener productos por impuesto', { error: error.message });
+    res.status(500).json({
+      success: false,
+      error: 'Error al obtener productos por impuesto',
+      details: error.message
+    });
+  }
+};
+
+/**
+ * Remover impuesto de productos seleccionados
+ */
+const removeTaxFromProducts = async (req, res) => {
+  try {
+    const { taxId } = req.params;
+    const { productIds } = req.body;
+
+    // Verificar que el impuesto existe
+    const tax = await Tax.findByPk(taxId);
+    if (!tax) {
+      return res.status(404).json({
+        success: false,
+        error: 'Impuesto no encontrado'
+      });
+    }
+
+    // Verificar que se proporcionaron IDs de productos
+    if (!Array.isArray(productIds) || productIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Debe proporcionar al menos un ID de producto'
+      });
+    }
+
+    // Eliminar las relaciones de impuesto-producto
+    await ProductTax.destroy({
+      where: {
+        tax_id: taxId,
+        product_id: productIds
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Impuesto removido de los productos seleccionados'
+    });
+  } catch (error) {
+    logger.error('Error al remover impuesto de productos', { error: error.message });
+    res.status(500).json({
+      success: false,
+      error: 'Error al remover impuesto de productos',
+      details: error.message
+    });
+  }
+};
+
+/**
+ * Aplicar impuesto a productos seleccionados (por lotes)
+ */
+const applyTaxToSelectedProducts = async (req, res) => {
+  const transaction = await sequelize.transaction();
+  
+  try {
+    const { taxId } = req.params;
+    const { productIds, is_exempt, custom_rate } = req.body;
+
+    // Verificar que el impuesto existe
+    const tax = await Tax.findByPk(taxId);
+    if (!tax) {
+      return res.status(404).json({
+        success: false,
+        error: 'Impuesto no encontrado'
+      });
+    }
+
+    // Verificar que se proporcionaron IDs de productos
+    if (!Array.isArray(productIds) || productIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Debe proporcionar al menos un ID de producto'
+      });
+    }
+
+    // Verificar que los productos existen
+    const products = await Product.findAll({
+      where: { id: productIds }
+    });
+
+    if (products.length !== productIds.length) {
+      // Algunos productos no existen
+      const foundIds = products.map(p => p.id);
+      const missingIds = productIds.filter(id => !foundIds.includes(parseInt(id)));
+      
+      return res.status(404).json({
+        success: false,
+        error: 'Algunos productos no fueron encontrados',
+        details: {
+          missingIds
+        }
+      });
+    }
+
+    // Aplicar o actualizar impuesto a los productos seleccionados
+    const results = [];
+
+    for (const productId of productIds) {
+      // Buscar si ya existe una asignación
+      let productTax = await ProductTax.findOne({
+        where: { product_id: productId, tax_id: taxId }
+      });
+      
+      if (productTax) {
+        // Actualizar existente
+        await productTax.update({
+          is_exempt: is_exempt !== undefined ? is_exempt : productTax.is_exempt,
+          custom_rate: custom_rate !== undefined ? custom_rate : productTax.custom_rate
+        }, { transaction });
+      } else {
+        // Crear nueva asignación
+        productTax = await ProductTax.create({
+          product_id: productId,
+          tax_id: taxId,
+          is_exempt: is_exempt !== undefined ? is_exempt : false,
+          custom_rate
+        }, { transaction });
+      }
+      
+      results.push({
+        productId,
+        taxId,
+        is_exempt: productTax.is_exempt,
+        custom_rate: productTax.custom_rate
+      });
+    }
+
+    await transaction.commit();
+    
+    res.status(200).json({
+      success: true,
+      message: `Impuesto aplicado exitosamente a ${results.length} productos`,
+      data: {
+        tax: {
+          id: tax.id,
+          name: tax.name,
+          code: tax.code
+        },
+        results
+      }
+    });
+  } catch (error) {
+    await transaction.rollback();
+    logger.error('Error al aplicar impuesto a productos seleccionados', { error: error.message });
+    res.status(500).json({
+      success: false,
+      error: 'Error al aplicar impuesto a productos seleccionados',
+      details: error.message
+    });
+  }
+};
+
 module.exports = {
   getAllTaxes,
   getTaxById,
@@ -525,5 +756,9 @@ module.exports = {
   updateProductTax,
   deleteProductTax,
   calculateCartTaxes,
-  getProductTaxesById
+  getProductTaxesById,
+  applyTaxToAllProducts,
+  applyTaxToSelectedProducts,
+  getProductsByTax,
+  removeTaxFromProducts
 }; 

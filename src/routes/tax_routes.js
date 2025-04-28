@@ -10,7 +10,11 @@ const {
   updateProductTax,
   deleteProductTax,
   calculateCartTaxes,
-  getProductTaxesById
+  getProductTaxesById,
+  applyTaxToAllProducts,
+  applyTaxToSelectedProducts,
+  getProductsByTax,
+  removeTaxFromProducts
 } = require('../controllers/tax_controller');
 
 /**
@@ -328,5 +332,138 @@ router.get('/products/:productId/taxes', getProductTaxesById);
  *         description: Datos inválidos
  */
 router.post('/calculate', calculateCartTaxes);
+
+/**
+ * @swagger
+ * /api/taxes/{taxId}/products:
+ *   put:
+ *     summary: Aplicar impuesto a todos los productos
+ *     tags: [Taxes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: taxId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID del impuesto
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               is_exempt:
+ *                 type: boolean
+ *                 description: Si el producto está exento
+ *               custom_rate:
+ *                 type: number
+ *                 description: Tasa personalizada para este producto
+ *     responses:
+ *       200:
+ *         description: Impuesto aplicado a todos los productos
+ */
+router.put('/:taxId/products', auth, checkRole(['admin']), applyTaxToAllProducts);
+
+/**
+ * @swagger
+ * /api/taxes/{taxId}/products:
+ *   get:
+ *     summary: Obtener productos por impuesto
+ *     tags: [Taxes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: taxId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID del impuesto
+ *     responses:
+ *       200:
+ *         description: Lista de productos por impuesto
+ */
+router.get('/:taxId/products', auth, checkRole(['admin']), getProductsByTax);
+
+/**
+ * @swagger
+ * /api/taxes/{taxId}/products:
+ *   delete:
+ *     summary: Eliminar impuesto de productos seleccionados
+ *     tags: [Taxes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: taxId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID del impuesto
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               productIds:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *                 description: IDs de los productos
+ *     responses:
+ *       200:
+ *         description: Impuesto removido de los productos seleccionados
+ */
+router.delete('/:taxId/products', auth, checkRole(['admin']), removeTaxFromProducts);
+
+/**
+ * @swagger
+ * /api/taxes/{taxId}/products/batch:
+ *   put:
+ *     summary: Aplicar impuesto a múltiples productos seleccionados (por lotes)
+ *     tags: [Taxes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: taxId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID del impuesto
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - productIds
+ *             properties:
+ *               productIds:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *                 description: IDs de los productos a los que aplicar el impuesto
+ *               is_exempt:
+ *                 type: boolean
+ *                 description: Si el producto está exento del impuesto
+ *               custom_rate:
+ *                 type: number
+ *                 description: Tasa personalizada para estos productos
+ *     responses:
+ *       200:
+ *         description: Impuesto aplicado a los productos seleccionados
+ *       400:
+ *         description: Datos inválidos en la solicitud
+ *       404:
+ *         description: Impuesto o productos no encontrados
+ */
+router.put('/:taxId/products/batch', auth, checkRole(['admin']), applyTaxToSelectedProducts);
 
 module.exports = router; 
