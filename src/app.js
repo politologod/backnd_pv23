@@ -136,11 +136,15 @@ const adminRoutes = require('./routes/admin_routes');
 const siteRoutes = require('./routes/site');
 const uploadRoutes = require('./routes/upload_routes');
 const taxRoutes = require('./routes/tax_routes');
+const seoRoutes = require('./routes/seo_routes');
 
 // Maintenance middleware - debe estar después de las rutas de auth y antes de otras rutas
 const maintenanceMiddleware = require('./middlewares/maintenance.middleware');
 
-// Configuración de rutas
+// Configuración de rutas SEO - estas deben estar a nivel raíz, no bajo /api
+app.use('/', seoRoutes);
+
+// Configuración de rutas API
 app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
