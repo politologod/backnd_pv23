@@ -1,0 +1,9 @@
+version: "2"
+authtoken: "tu_token_de_ngrok"
+web_addr: "localhost:4040"
+tunnels:
+  backend:
+    proto: "http"
+    addr: "2300"
+    inspect: true
+    host_header: "localhost" 
