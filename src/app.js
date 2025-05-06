@@ -90,6 +90,14 @@ app.use(compression());
 // Configuración de CORS más permisiva para desarrollo
 const corsOptions = {
 	origin: function(origin, callback) {
+		// Para desarrollo o cuando se usa ngrok, ser más permisivo
+		const isNgrok = process.env.USING_NGROK === 'true';
+		
+		// Cuando se usa ngrok, aceptar todos los orígenes
+		if (isNgrok) {
+			return callback(null, true);
+		}
+		
 		const allowedOrigins = [
 			process.env.FRONTEND_URL,
 			process.env.ADMIN_URL,
@@ -105,6 +113,7 @@ const corsOptions = {
 		if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
 			callback(null, true);
 		} else {
+			console.warn('Origen rechazado por CORS:', origin);
 			callback(new Error('No permitido por CORS'));
 		}
 	},
