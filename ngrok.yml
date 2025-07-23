@@ -1,5 +1,5 @@
 version: "2"
-authtoken: "tu_token_de_ngrok"
+authtoken: "2whozGbsMcvgjth225SAfVXrOaE_4B8KhBDwzXQDMwAzBee9v"
 web_addr: "localhost:4040"
 tunnels:
   backend:

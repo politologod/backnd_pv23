@@ -122,7 +122,7 @@ const csrfProtection = (req, res, next) => {
     const referer = req.headers.referer;
     
     // En producción, verificar que las solicitudes vengan de orígenes permitidos
-    const allowedOrigins = [process.env.FRONTEND_URL]; // Agregar más orígenes permitidos según sea necesario
+    const allowedOrigins = [process.env.FRONTEND_URL, process.env.ADMIN_URL]; // Agregar más orígenes permitidos según sea necesario
     
     if (origin && !allowedOrigins.includes(origin)) {
         console.warn('Posible ataque CSRF detectado', {
