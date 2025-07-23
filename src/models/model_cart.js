@@ -7,7 +7,14 @@ const Cart = sequelize.define("Cart", {
 		primaryKey: true,
 		autoIncrement: true,
 	},
+	UserIdAutoincrement: {
+		type: DataTypes.INTEGER,
+		allowNull: false,
+		references: {
+			model: 'Users',
+			key: 'id'
+		}
+	}
 });
-
 
 module.exports = Cart;

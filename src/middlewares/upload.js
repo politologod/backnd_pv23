@@ -95,9 +95,16 @@ const cleanupTempFiles = (req, res, next) => {
   res.end = function(...args) {
     // Limpiar archivos temporales si existen
     if (req.file) {
-      fs.unlink(req.file.path, (err) => {
-        if (err) console.error('Error al eliminar archivo temporal', err, req.file.path);
-      });
+      try {
+        if (fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+        }
+      } catch (err) {
+        // Solo loguear el error si el archivo existe pero no se puede eliminar
+        if (err.code !== 'ENOENT') {
+          console.error('Error al eliminar archivo temporal', err, req.file.path);
+        }
+      }
     }
     
     if (req.files) {
@@ -105,9 +112,16 @@ const cleanupTempFiles = (req, res, next) => {
       const files = Array.isArray(req.files) ? req.files : Object.values(req.files).flat();
       
       files.forEach(file => {
-        fs.unlink(file.path, (err) => {
-          if (err) console.error('Error al eliminar archivo temporal', err, file.path);
-        });
+        try {
+          if (fs.existsSync(file.path)) {
+            fs.unlinkSync(file.path);
+          }
+        } catch (err) {
+          // Solo loguear el error si el archivo existe pero no se puede eliminar
+          if (err.code !== 'ENOENT') {
+            console.error('Error al eliminar archivo temporal', err, file.path);
+          }
+        }
       });
     }
     

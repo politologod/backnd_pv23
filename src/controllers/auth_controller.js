@@ -237,44 +237,33 @@ const logout = (req, res) => {
 	}
 };
 
-const verifyToken = (req, res, next) => {
-	const token = req.cookies["token"];
+const verifyToken = (req, res) => {
+	const token = req.cookies.token;
+  
 	if (!token) {
-		return res.status(401).json({ message: "No se proporcionó token" });
+	  return res.json({ authenticated: false, user: null });
 	}
-
-	try {
-		// Opciones de verificación de JWT
-		const verifyOptions = {
-			algorithms: ["HS256"]
-		};
-		
-		// Añadir issuer y audience solo en producción
-		if (process.env.NODE_ENV === 'production') {
-			verifyOptions.issuer = "puravida-api";
-			verifyOptions.audience = "puravida-client";
+  
+	jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+	  if (err) {
+		return res.json({ authenticated: false, user: null });
+	  }
+  
+	  try {
+		const user = await User.findByPk(decoded.id, {
+		  attributes: ['id', 'email', 'role'],
+		});
+  
+		if (!user) {
+		  return res.json({ authenticated: false, user: null });
 		}
-		
-		const decoded = jwt.verify(
-			token,
-			process.env.JWT_SECRET,
-			verifyOptions
-		);
-		
-		// Verificar tiempo de expiración
-		const currentTime = Math.floor(Date.now() / 1000);
-		if (decoded.exp <= currentTime) {
-			return res.status(401).json({ message: "Token expirado" });
-		}
-		
-		// Guarda la información decodificada para usarla en otras rutas
-		req.user = decoded;
-		next();
-	} catch (err) {
-		console.warn("Token inválido en verificación", { error: err.message });
-		return res.status(401).json({ message: "Token inválido" });
-	}
-}
+  
+		res.json({ authenticated: true, user });
+	  } catch (err) {
+		res.status(500).json({ error: 'Internal error' });
+	  }
+	});
+};
 
 /**
  * Maneja la solicitud de restablecimiento de contraseña

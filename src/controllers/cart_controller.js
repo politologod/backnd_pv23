@@ -4,7 +4,8 @@ const Product = require('../models/model_products');
 
 exports.addItemToCart = async (req, res) => {
     try {
-        const { productId, quantity, userId} = req.body;
+        const { productId, quantity } = req.body;
+        const userId = req.user.id;
 
         // Validate input
         if (!productId || !quantity || quantity <= 0) {
@@ -24,9 +25,9 @@ exports.addItemToCart = async (req, res) => {
         }
 
         // Find or create cart
-        let cart = await Cart.findOne({ where: { userId } });
+        let cart = await Cart.findOne({ where: { UserIdAutoincrement: userId } });
         if (!cart) {
-            cart = await Cart.create({ userId });
+            cart = await Cart.create({ UserIdAutoincrement: userId });
         }
 
         // Find or create cart item
@@ -70,7 +71,7 @@ exports.removeItemFromCart = async (req, res) => {
 
         // Buscar el carrito del usuario
         const cart = await Cart.findOne({
-            where: { userId }
+            where: { UserIdAutoincrement: userId }
         });
 
         if (!cart) {
@@ -102,12 +103,11 @@ exports.removeItemFromCart = async (req, res) => {
 // Get cart details
 exports.getCart = async (req, res) => {
     try {
-        // Fixed: Changed from req.user to req.user.id
         const userId = req.user.id;
 
         // Buscar el carrito con sus items y productos
         const cart = await Cart.findOne({
-            where: { userId },
+            where: { UserIdAutoincrement: userId },
             include: [{
                 model: CartItem,
                 include: [Product]
@@ -116,7 +116,7 @@ exports.getCart = async (req, res) => {
 
         if (!cart) {
             // Si no existe, crear un carrito vacío
-            const newCart = await Cart.create({ userId });
+            const newCart = await Cart.create({ UserIdAutoincrement: userId });
             return res.status(200).json({ success: true, cart: newCart, items: [] });
         }
 
@@ -134,7 +134,7 @@ exports.clearCart = async (req, res) => {
 
         // Buscar el carrito
         const cart = await Cart.findOne({
-            where: { userId }
+            where: { UserIdAutoincrement: userId }
         });
 
         if (!cart) {
