@@ -66,7 +66,7 @@ El backend se encuentra en un estado avanzado (8.5/10) con las siguientes caract
 
 ## Características Técnicas
 
-- **Arquitectura**: MVC con separación clara de responsabilidades
+- **Arquitectura**: MVC en capas (Layered MVC Architecture)
 - **Base de datos**: PostgreSQL con Sequelize ORM
 - **Autenticación**: JWT, cookies seguras, Google OAuth
 - **Seguridad**: CSRF, Helmet, Rate Limiting, validación de inputs
@@ -75,6 +75,77 @@ El backend se encuentra en un estado avanzado (8.5/10) con las siguientes caract
 - **Monitoreo**: Healthchecks, liveness probes, métricas de rendimiento
 - **Documentación**: Swagger UI para explorar la API
 - **Tests**: Suite completa de pruebas automatizadas
+
+## Arquitectura del Proyecto
+
+Este proyecto implementa una **Arquitectura MVC en Capas (Layered MVC Architecture)**, también conocida como arquitectura de tres capas extendida. Esta arquitectura organiza el código en capas separadas con responsabilidades bien definidas.
+
+### Patrón Arquitectónico
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Capa de Presentación                    │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐     │
+│  │   Routes    │───▶│ Controllers │───▶│   Views     │     │
+│  │  (Rutas)    │    │(Controladores)│   │ (Swagger)   │     │
+│  └─────────────┘    └─────────────┘    └─────────────┘     │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                     Capa de Negocio                         │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐     │
+│  │  Services   │    │ Middlewares │    │    Utils    │     │
+│  │ (Servicios) │    │             │    │ (Utilidades)│     │
+│  └─────────────┘    └─────────────┘    └─────────────┘     │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                     Capa de Datos                           │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐     │
+│  │   Models    │───▶│  Sequelize  │───▶│ PostgreSQL  │     │
+│  │  (Modelos)  │    │    ORM      │    │   (DB)      │     │
+│  └─────────────┘    └─────────────┘    └─────────────┘     │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Descripción de Capas
+
+| Capa | Directorio | Responsabilidad |
+|------|------------|-----------------|
+| **Routes** | `src/routes/` | Define los endpoints de la API REST y asigna URLs a controladores |
+| **Controllers** | `src/controllers/` | Maneja peticiones HTTP, valida datos de entrada y coordina respuestas |
+| **Services** | `src/services/` | Contiene la lógica de negocio reutilizable (emails, notificaciones) |
+| **Models** | `src/models/` | Define la estructura de datos y relaciones con Sequelize ORM |
+| **Middlewares** | `src/middlewares/` | Procesa peticiones antes de llegar a controladores (auth, logging, uploads) |
+| **Configs** | `src/configs/` | Almacena configuraciones (database, passport, swagger, logger) |
+| **Utils** | `src/utils/` | Funciones auxiliares reutilizables (validadores, calculadoras) |
+| **Database** | `src/database/` | Migraciones y seeders para versionamiento de esquema de BD |
+
+### Flujo de una Petición
+
+```
+Cliente HTTP → Routes → Middlewares → Controller → Service → Model → Database
+                                          ↓
+Cliente HTTP ← Controller ← Service ← Model ←────────────────────────┘
+```
+
+1. **Request**: El cliente envía una petición HTTP
+2. **Routes**: La ruta correspondiente recibe la petición
+3. **Middlewares**: Se ejecutan middlewares (autenticación, logging, validación)
+4. **Controller**: El controlador procesa la petición y coordina la lógica
+5. **Service**: Los servicios ejecutan la lógica de negocio
+6. **Model**: Los modelos interactúan con la base de datos
+7. **Response**: La respuesta regresa al cliente siguiendo el camino inverso
+
+### Ventajas de esta Arquitectura
+
+- ✅ **Separación de responsabilidades**: Cada capa tiene un propósito específico
+- ✅ **Mantenibilidad**: Fácil de modificar y extender
+- ✅ **Testabilidad**: Cada capa puede probarse de forma aislada
+- ✅ **Reutilización**: Servicios y utilidades pueden usarse en múltiples controladores
+- ✅ **Escalabilidad**: Permite crecer el proyecto de manera organizada
 
 ## Configuración del proyecto
 
