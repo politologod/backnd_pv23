@@ -1,10 +1,12 @@
 import {  error, debug  } from '../configs/logger';
+import { Request, Response, NextFunction } from 'express';
+
 
 /**
  * Middleware centralizado para manejar errores en la aplicación
  * Registra los errores y devuelve respuestas adecuadas
  */
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
   // Determinar el código de estado (usar 500 por defecto)
   const statusCode = err.statusCode || 500;
   

@@ -1,7 +1,8 @@
+import { IProduct } from '../types/models';
 import {  DataTypes, Op  } from 'sequelize';
 import sequelize from '../configs/database';
 
-const Product = sequelize.define("Product", {
+const Product = sequelize.define<IProduct>("Product", {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,

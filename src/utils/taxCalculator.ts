@@ -25,7 +25,7 @@ const getActiveTaxes = async () => {
  * @param {number} productId - ID del producto
  * @returns {Promise<Array>} Lista de impuestos aplicables al producto
  */
-const getProductTaxes = async (productId) => {
+const getProductTaxes = async (productId: number) => {
   try {
     // Buscar relaciones específicas de producto-impuesto
     const productTaxes = await ProductTax.findAll({
@@ -131,7 +131,7 @@ const calculateItemTaxes = async (item) => {
  * @param {Array} items - Lista de ítems
  * @returns {Promise<Object>} Detalles del cálculo de impuestos
  */
-const calculateTaxes = async (items) => {
+const calculateTaxes = async (items: any[]) => {
   try {
     let subtotal = 0;
     let totalTaxAmount = 0;

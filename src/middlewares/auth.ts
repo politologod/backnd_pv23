@@ -2,8 +2,10 @@ import jwt from 'jsonwebtoken';
 // Reemplazamos logger por console directamente
 // import logger from '../configs/logger';
 import {  UnauthorizedError, ForbiddenError  } from '../utils/errorHandler';
+import { Request, Response, NextFunction } from 'express';
 
-const auth = (req, res, next) => {
+
+const auth = (req: Request, res: Response, next: NextFunction) => {
     try {
         // Obtener el token de la cookie
         const token = req.cookies.token;
@@ -53,7 +55,7 @@ const auth = (req, res, next) => {
 
 // Middleware más robusto para verificación de roles
 const checkRole = (roles) => {
-    return (req, res, next) => {
+    return (req: Request, res: Response, next: NextFunction) => {
         try {
             // Depuración - Registrar el usuario y roles requeridos
             console.debug('Verificando roles de usuario', {
@@ -111,7 +113,7 @@ const checkRole = (roles) => {
 };
 
 // Middleware para prevenir CSRF
-const csrfProtection = (req, res, next) => {
+const csrfProtection = (req: Request, res: Response, next: NextFunction) => {
     // En desarrollo, permitir todas las solicitudes
     if (process.env.NODE_ENV !== 'production') {
         return next();

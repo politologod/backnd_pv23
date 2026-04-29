@@ -5,9 +5,11 @@ import {  validateProduct  } from '../utils/validator';
 import {  ValidationError  } from '../utils/errorHandler';
 import logger from '../configs/logger';
 import taxCalculator from '../utils/taxCalculator';
+import { Request, Response } from 'express';
+
 
 // Updating a product
-const updateProduct = async (req, res) => {
+const updateProduct = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const { categoryIds } = req.body;
@@ -54,7 +56,7 @@ const updateProduct = async (req, res) => {
 };
 
 // Creating a product
-const createProduct = async (req, res) => {
+const createProduct = async (req: Request, res: Response) => {
     try {
         // Detectar si la solicitud es para un solo producto o para múltiples
         const isBatchOperation = Array.isArray(req.body);
@@ -151,7 +153,7 @@ const createProduct = async (req, res) => {
  * @param {Object} req - Request object
  * @param {Object} res - Response object
  */
-const handleBatchProductCreation = async (req, res) => {
+const handleBatchProductCreation = async (req: Request, res: Response) => {
     const products = req.body;
     const results = {
         success: [],
@@ -277,7 +279,7 @@ const handleBatchProductCreation = async (req, res) => {
 };
 
 // Getting all products with pagination added
-const getAllProducts = async (req, res) => {
+const getAllProducts = async (req: Request, res: Response) => {
     try {
         // Extract pagination parameters
         const page = parseInt(req.query.page) || 1;
@@ -315,7 +317,7 @@ const getAllProducts = async (req, res) => {
     }
 };
 
-const getProductById = async (req, res) => {
+const getProductById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         
@@ -335,7 +337,7 @@ const getProductById = async (req, res) => {
     }
 };
 
-const deleteProduct = async (req, res) => {
+const deleteProduct = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         
@@ -358,7 +360,7 @@ const deleteProduct = async (req, res) => {
     }
 };
 
-const getProductByCategory = async (req, res) => {
+const getProductByCategory = async (req: Request, res: Response) => {
     try {
         const { categoryId } = req.params;
         
@@ -384,7 +386,7 @@ const getProductByCategory = async (req, res) => {
     }
 };
 
-const getProductByNames = async (req, res) => {
+const getProductByNames = async (req: Request, res: Response) => {
     try {
         const { name } = req.query;
         
@@ -407,7 +409,7 @@ const getProductByNames = async (req, res) => {
     }
 };
 
-const getProductByPrice = async (req, res) => {
+const getProductByPrice = async (req: Request, res: Response) => {
     try {
         const { min, max } = req.query;
         
@@ -440,7 +442,7 @@ const getProductByPrice = async (req, res) => {
     }
 };
 
-const getProductWithTaxes = async (req, res) => {
+const getProductWithTaxes = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         

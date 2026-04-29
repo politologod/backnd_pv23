@@ -1,11 +1,13 @@
 import {  http, logWithContext  } from '../configs/logger';
 import { v4 as uuidv4 } from 'uuid';
+import { Request, Response, NextFunction } from 'express';
+
 
 /**
  * Middleware para registrar todas las solicitudes HTTP entrantes
  * y sus respuestas correspondientes.
  */
-const httpLogger = (req, res, next) => {
+const httpLogger = (req: Request, res: Response, next: NextFunction) => {
   // Generar un ID único para cada solicitud
   req.id = req.id || uuidv4();
   

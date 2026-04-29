@@ -6,6 +6,8 @@
 
 import db from '../models';
 import logger from '../configs/logger';
+import { Request, Response, NextFunction } from 'express';
+
 
 let maintenanceModeActive = false;
 
@@ -22,7 +24,7 @@ const setMaintenanceMode = (active) => {
 };
 
 // Middleware para verificar si el sitio está en mantenimiento
-const maintenanceMiddleware = (req, res, next) => {
+const maintenanceMiddleware = (req: Request, res: Response, next: NextFunction) => {
   // Si el modo de mantenimiento no está activo, continuar
   if (!maintenanceModeActive) {
     return next();

@@ -2,9 +2,11 @@ import Category from '../models/model_category';
 import {  validateCategory  } from '../utils/validator';
 import {  ValidationError  } from '../utils/errorHandler';
 import logger from '../configs/logger';
+import { Request, Response } from 'express';
+
 
 // Obtener todas las categorías
-const getAllCategories = async (req, res) => {
+const getAllCategories = async (req: Request, res: Response) => {
     try {
         const categories = await Category.findAll();
         res.status(200).json(categories);
@@ -15,7 +17,7 @@ const getAllCategories = async (req, res) => {
 };
 
 // Obtener una categoría por ID
-const getCategoryById = async (req, res) => {
+const getCategoryById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         
@@ -38,7 +40,7 @@ const getCategoryById = async (req, res) => {
 };
 
 // Crear una nueva categoría
-const createCategory = async (req, res) => {
+const createCategory = async (req: Request, res: Response) => {
     try {
         const { name, description } = req.body;
         
@@ -74,7 +76,7 @@ const createCategory = async (req, res) => {
 };
 
 // Actualizar una categoría por ID
-const updateCategory = async (req, res) => {
+const updateCategory = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const { name, description } = req.body;
@@ -125,7 +127,7 @@ const updateCategory = async (req, res) => {
 };
 
 // Eliminar una categoría por ID
-const deleteCategory = async (req, res) => {
+const deleteCategory = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         

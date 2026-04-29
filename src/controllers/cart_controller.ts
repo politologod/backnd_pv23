@@ -1,8 +1,10 @@
 import Cart from '../models/model_cart';
 import CartItem from '../models/model_cartItem';
 import Product from '../models/model_products';
+import { Request, Response } from 'express';
 
-export const addItemToCart = async (req, res) => {
+
+export const addItemToCart = async (req: Request, res: Response) => {
     try {
         const { productId, quantity } = req.body;
         const userId = req.user.id;
@@ -64,7 +66,7 @@ export const addItemToCart = async (req, res) => {
 };
 
 // Remove item from cart
-export const removeItemFromCart = async (req, res) => {
+export const removeItemFromCart = async (req: Request, res: Response) => {
     try {
         const userId = req.user.id;
         const { productId } = req.body;
@@ -101,7 +103,7 @@ export const removeItemFromCart = async (req, res) => {
 };
 
 // Get cart details
-export const getCart = async (req, res) => {
+export const getCart = async (req: Request, res: Response) => {
     try {
         const userId = req.user.id;
 
@@ -128,7 +130,7 @@ export const getCart = async (req, res) => {
 };
 
 // Clear cart
-export const clearCart = async (req, res) => {
+export const clearCart = async (req: Request, res: Response) => {
     try {
         const userId = req.user.id;
 

@@ -1,13 +1,15 @@
 import SiteConfig from '../models/model_siteConfig';
 import {  validateString  } from '../utils/validator';
 import logger from '../configs/logger';
+import { Request, Response } from 'express';
+
 
 /**
  * Obtener estado actual del modo mantenimiento
  * @param {Object} req - Objeto de solicitud
  * @param {Object} res - Objeto de respuesta
  */
-const getMaintenanceStatus = async (req, res) => {
+const getMaintenanceStatus = async (req: Request, res: Response) => {
   try {
     const config = await SiteConfig.findOne({ 
       where: { name: 'main', active: true } 
@@ -41,7 +43,7 @@ const getMaintenanceStatus = async (req, res) => {
  * @param {Object} req - Objeto de solicitud
  * @param {Object} res - Objeto de respuesta
  */
-const toggleMaintenanceMode = async (req, res) => {
+const toggleMaintenanceMode = async (req: Request, res: Response) => {
   try {
     const { enabled, message } = req.body;
 

@@ -1,7 +1,8 @@
+import { IOrder } from '../types/models';
 import {  DataTypes  } from 'sequelize';
 import sequelize from '../configs/database';
 
-const Order = sequelize.define("Order", {
+const Order = sequelize.define<IOrder>("Order", {
 	id: {
 		type: DataTypes.INTEGER,
 		primaryKey: true,

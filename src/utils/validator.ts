@@ -119,7 +119,7 @@ const validateArray = (array, { minLength = 0, maxLength, required = true } = {}
 };
 
 // Validadores para modelos específicos
-const validateProduct = (data) => {
+const validateProduct = (data: any) => {
     const errors = {};
     
     // Validar nombre
@@ -174,7 +174,7 @@ const validateProduct = (data) => {
     };
 };
 
-const validateCategory = (data) => {
+const validateCategory = (data: any) => {
     const errors = {};
     
     // Validar nombre
@@ -195,7 +195,7 @@ const validateCategory = (data) => {
     };
 };
 
-const validateUser = (data, isUpdate = false) => {
+const validateUser = (data: any, isUpdate = false) => {
     const errors = {};
     
     // Validar nombre

@@ -7,6 +7,8 @@ import EmailNotificationService from '../services/emailNotificationService';
 import {  logger  } from '../configs/logger';
 import {  Op  } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
+import { Request, Response } from 'express';
+
 
 // 🔹 Generar token JWT con más información útil pero excluyendo datos sensibles
 const createToken = (user) => {
@@ -57,7 +59,7 @@ const secureCookieConfig = {
 };
 
 // 🔹 Registro con email y contraseña
-const register = async (req, res) => {
+const register = async (req: Request, res: Response) => {
 	try {
 		const { email, password, name, role } = req.body;
 
@@ -157,7 +159,7 @@ const register = async (req, res) => {
 };
 
 // 🔹 Inicio de sesión con email y contraseña
-const login = async (req, res) => {
+const login = async (req: Request, res: Response) => {
 	try {
 		const { email, password } = req.body;
 
@@ -219,7 +221,7 @@ const login = async (req, res) => {
 };
 
 // 🔹 Cerrar sesión
-const logout = (req, res) => {
+const logout = (req: Request, res: Response) => {
 	try {
 		// Limpiar cookie
 		res.clearCookie('token', {
@@ -237,7 +239,7 @@ const logout = (req, res) => {
 	}
 };
 
-const verifyToken = (req, res) => {
+const verifyToken = (req: Request, res: Response) => {
 	const token = req.cookies.token;
   
 	if (!token) {
@@ -271,7 +273,7 @@ const verifyToken = (req, res) => {
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Respuesta JSON
  */
-const requestPasswordReset = async (req, res) => {
+const requestPasswordReset = async (req: Request, res: Response) => {
 	try {
 		const { email } = req.body;
 		
@@ -326,7 +328,7 @@ const requestPasswordReset = async (req, res) => {
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Respuesta JSON
  */
-const resetPassword = async (req, res) => {
+const resetPassword = async (req: Request, res: Response) => {
 	try {
 		const { token, newPassword } = req.body;
 		

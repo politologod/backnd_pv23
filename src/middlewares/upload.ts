@@ -2,6 +2,8 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import logger from '../configs/logger';
+import { Request, Response, NextFunction } from 'express';
+
 
 // Asegurar que los directorios de carga existan
 const createUploadDirectories = () => {
@@ -57,7 +59,7 @@ const upload = multer({
 });
 
 // Middleware para manejar errores de Multer
-const handleMulterError = (err, req, res, next) => {
+const handleMulterError = (err: any, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof multer.MulterError) {
     // Error de Multer
     console.error('Error en carga de archivo', err);
@@ -87,7 +89,7 @@ const handleMulterError = (err, req, res, next) => {
 };
 
 // Middleware para limpiar archivos temporales después de procesarlos
-const cleanupTempFiles = (req, res, next) => {
+const cleanupTempFiles = (req: Request, res: Response, next: NextFunction) => {
   // Guardar el método original end
   const originalEnd = res.end;
   

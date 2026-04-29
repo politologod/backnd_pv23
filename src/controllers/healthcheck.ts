@@ -7,6 +7,8 @@ import sequelize from '../configs/database';
 import {  logger  } from '../configs/logger';
 import os from 'os';
 import {  version  } from '../../package.json';
+import { Request, Response } from 'express';
+
 
 // Tiempo de inicio de la aplicación
 const startTime = Date.now();
@@ -22,7 +24,7 @@ const startTime = Date.now();
  * @param {Object} req - Objeto de solicitud Express
  * @param {Object} res - Objeto de respuesta Express
  */
-const getStatus = async (req, res) => {
+const getStatus = async (req: Request, res: Response) => {
     try {
         const serviceStatus = {
             service: 'PuraVida Backend API',
@@ -75,7 +77,7 @@ const getStatus = async (req, res) => {
  * @param {Object} req - Objeto de solicitud Express
  * @param {Object} res - Objeto de respuesta Express
  */
-const getLiveness = (req, res) => {
+const getLiveness = (req: Request, res: Response) => {
     logger.debug('Liveness check solicitado', {
         component: 'healthcheck',
         operation: 'getLiveness',
@@ -94,7 +96,7 @@ const getLiveness = (req, res) => {
  * @param {Object} req - Objeto de solicitud Express
  * @param {Object} res - Objeto de respuesta Express
  */
-const getReadiness = async (req, res) => {
+const getReadiness = async (req: Request, res: Response) => {
     try {
         await sequelize.authenticate();
         
@@ -131,7 +133,7 @@ const getReadiness = async (req, res) => {
  * @param {Object} req - Objeto de solicitud Express
  * @param {Object} res - Objeto de respuesta Express
  */
-const getMetrics = (req, res) => {
+const getMetrics = (req: Request, res: Response) => {
     // Recopilación de métricas del sistema
     const memoryUsage = process.memoryUsage();
     const systemInfo = {

@@ -1,6 +1,8 @@
 import morgan from 'morgan';
 import { v4 as uuidv4 } from 'uuid';
 import {  logger, stream  } from '../configs/logger';
+import { Request, Response, NextFunction } from 'express';
+
 
 /**
  * Middleware para asignar un ID único a cada solicitud y registrar detalles
@@ -8,7 +10,7 @@ import {  logger, stream  } from '../configs/logger';
  * @param {Object} res - Objeto de respuesta Express
  * @param {Function} next - Función para pasar al siguiente middleware
  */
-const requestIdMiddleware = (req, res, next) => {
+const requestIdMiddleware = (req, res, next: NextFunction) => {
   // Generar un ID único para la solicitud
   const requestId = uuidv4();
   req.id = requestId;
@@ -25,7 +27,7 @@ const requestIdMiddleware = (req, res, next) => {
 };
 
 // Formato personalizado para Morgan
-const morganFormat = (tokens, req, res) => {
+const morganFormat = (tokens: any, req: Request, res: Response) => {
   return JSON.stringify({
     'request-id': req.id,
     method: tokens.method(req, res),
@@ -45,7 +47,7 @@ const httpLogger = morgan(morganFormat, { stream });
 /**
  * Middleware para registrar el cuerpo de la solicitud (solo en desarrollo)
  */
-const requestBodyLogger = (req, res, next) => {
+const requestBodyLogger = (req, res, next: NextFunction) => {
   if (process.env.NODE_ENV !== 'production') {
     const { method, url, body, query, params } = req;
     

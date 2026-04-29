@@ -9,11 +9,13 @@ import Product from '../models/model_products';
 import Order from '../models/model_order';
 import OrderStatusHistory from '../models/model_orderStatusHistory';
 import sequelize from '../configs/database';
+import { Request, Response } from 'express';
+
 
 /**
  * Controlador para la subida de imágenes de productos
  */
-const uploadProductImageController = async (req, res) => {
+const uploadProductImageController = async (req: Request, res: Response) => {
   try {
     // Verificar que se haya proporcionado un archivo
     if (!req.file) {
@@ -77,7 +79,7 @@ const uploadProductImageController = async (req, res) => {
 /**
  * Controlador para la subida de múltiples imágenes de productos
  */
-const uploadMultipleProductImagesController = async (req, res) => {
+const uploadMultipleProductImagesController = async (req: Request, res: Response) => {
   try {
     // Verificar que se hayan proporcionado archivos
     if (!req.files || req.files.length === 0) {
@@ -164,7 +166,7 @@ const uploadMultipleProductImagesController = async (req, res) => {
 /**
  * Controlador para la subida de comprobantes de pago
  */
-const uploadPaymentProofController = async (req, res) => {
+const uploadPaymentProofController = async (req: Request, res: Response) => {
   try {
     // Verificar que se haya proporcionado un archivo
     if (!req.file) {
@@ -309,7 +311,7 @@ const uploadPaymentProofController = async (req, res) => {
 /**
  * Controlador para eliminar una imagen de producto
  */
-const deleteProductImageController = async (req, res) => {
+const deleteProductImageController = async (req: Request, res: Response) => {
   try {
     const { productId } = req.params;
     // Obtener el ID de la imagen del query o de los params

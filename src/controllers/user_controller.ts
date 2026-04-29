@@ -2,8 +2,10 @@ import User from '../models/model_user';
 import bcrypt from 'bcrypt';
 import sequelize from '../configs/database';
 import {  Order, OrderItem, Product  } from '../models';
+import { Request, Response } from 'express';
 
-export const getAllUsers = async (req, res) => {
+
+export const getAllUsers = async (req: Request, res: Response) => {
     try {
         // Obtener total de usuarios por rol para diagnóstico
         const userCountByRole = await User.findAll({
@@ -62,7 +64,7 @@ export const getAllUsers = async (req, res) => {
     }
 };
 
-export const getUserById = async (req, res) => {
+export const getUserById = async (req: Request, res: Response) => {
     try {
         const user = await User.findByPk(req.params.id);
         if (!user) {
@@ -74,7 +76,7 @@ export const getUserById = async (req, res) => {
     }
 };
 
-export const updateUser = async (req, res) => {
+export const updateUser = async (req: Request, res: Response) => {
     try {
         const user = await User.findByPk(req.params.id);
         if (!user) {
@@ -87,7 +89,7 @@ export const updateUser = async (req, res) => {
     }
 };
 
-export const deleteUser = async (req, res) => {
+export const deleteUser = async (req: Request, res: Response) => {
     try {
         const user = await User.findByPk(req.params.id);
         if (!user) {
@@ -100,7 +102,7 @@ export const deleteUser = async (req, res) => {
     }
 };
 
-export const createUser = async (req, res) => {
+export const createUser = async (req: Request, res: Response) => {
     try {
         // Detectar si la solicitud es para un solo usuario o para múltiples
         const isBatchOperation = Array.isArray(req.body);
@@ -274,7 +276,7 @@ async function handleBatchUserCreation(req, res) {
 /**
  * Obtiene información del usuario autenticado actual
  */
-export const getCurrentUser = async (req, res) => {
+export const getCurrentUser = async (req: Request, res: Response) => {
     try {
         if (!req.user || !req.user.id) {
             return res.status(401).json({ 

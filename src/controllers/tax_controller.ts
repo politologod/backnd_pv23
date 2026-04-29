@@ -3,11 +3,13 @@ import sequelize from '../configs/database';
 import logger from '../configs/logger';
 import {  validateString, validateNumber  } from '../utils/validator';
 import taxCalculator from '../utils/taxCalculator';
+import { Request, Response } from 'express';
+
 
 /**
  * Obtener todos los impuestos
  */
-const getAllTaxes = async (req, res) => {
+const getAllTaxes = async (req: Request, res: Response) => {
   try {
     // Filtros opcionales
     const { active, country, region } = req.query;
@@ -55,7 +57,7 @@ const getAllTaxes = async (req, res) => {
 /**
  * Obtener un impuesto por ID
  */
-const getTaxById = async (req, res) => {
+const getTaxById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     
@@ -93,7 +95,7 @@ const getTaxById = async (req, res) => {
 /**
  * Crear un nuevo impuesto
  */
-const createTax = async (req, res) => {
+const createTax = async (req: Request, res: Response) => {
   const transaction = await sequelize.transaction();
   
   try {
@@ -168,7 +170,7 @@ const createTax = async (req, res) => {
 /**
  * Actualizar un impuesto existente
  */
-const updateTax = async (req, res) => {
+const updateTax = async (req: Request, res: Response) => {
   const transaction = await sequelize.transaction();
   
   try {
@@ -250,7 +252,7 @@ const updateTax = async (req, res) => {
 /**
  * Eliminar un impuesto
  */
-const deleteTax = async (req, res) => {
+const deleteTax = async (req: Request, res: Response) => {
   const transaction = await sequelize.transaction();
   
   try {
@@ -294,7 +296,7 @@ const deleteTax = async (req, res) => {
 /**
  * Asignar o actualizar impuesto a un producto
  */
-const updateProductTax = async (req, res) => {
+const updateProductTax = async (req: Request, res: Response) => {
   const transaction = await sequelize.transaction();
   
   try {
@@ -365,7 +367,7 @@ const updateProductTax = async (req, res) => {
 /**
  * Eliminar asignación de impuesto a un producto
  */
-const deleteProductTax = async (req, res) => {
+const deleteProductTax = async (req: Request, res: Response) => {
   try {
     const { productId, taxId } = req.params;
     
@@ -405,7 +407,7 @@ const deleteProductTax = async (req, res) => {
 /**
  * Calcular impuestos para un carrito (simulación)
  */
-const calculateCartTaxes = async (req, res) => {
+const calculateCartTaxes = async (req: Request, res: Response) => {
   try {
     const { items } = req.body;
     
@@ -476,7 +478,7 @@ const calculateCartTaxes = async (req, res) => {
 /**
  * Obtener impuestos asociados a un producto específico
  */
-const getProductTaxesById = async (req, res) => {
+const getProductTaxesById = async (req: Request, res: Response) => {
   try {
     const { productId } = req.params;
     
@@ -519,7 +521,7 @@ const getProductTaxesById = async (req, res) => {
 /**
  * Aplicar impuesto a todos los productos
  */
-const applyTaxToAllProducts = async (req, res) => {
+const applyTaxToAllProducts = async (req: Request, res: Response) => {
   try {
     const { taxId } = req.params;
     const { is_exempt, custom_rate } = req.body;
@@ -562,7 +564,7 @@ const applyTaxToAllProducts = async (req, res) => {
 /**
  * Obtener productos por impuesto
  */
-const getProductsByTax = async (req, res) => {
+const getProductsByTax = async (req: Request, res: Response) => {
   try {
     const { taxId } = req.params;
     
@@ -599,7 +601,7 @@ const getProductsByTax = async (req, res) => {
 /**
  * Remover impuesto de productos seleccionados
  */
-const removeTaxFromProducts = async (req, res) => {
+const removeTaxFromProducts = async (req: Request, res: Response) => {
   try {
     const { taxId } = req.params;
     const { productIds } = req.body;
@@ -646,7 +648,7 @@ const removeTaxFromProducts = async (req, res) => {
 /**
  * Aplicar impuesto a productos seleccionados (por lotes)
  */
-const applyTaxToSelectedProducts = async (req, res) => {
+const applyTaxToSelectedProducts = async (req: Request, res: Response) => {
   const transaction = await sequelize.transaction();
   
   try {

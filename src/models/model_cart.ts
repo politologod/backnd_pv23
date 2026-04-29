@@ -1,7 +1,8 @@
+import { ICart } from '../types/models';
 import {  DataTypes  } from 'sequelize';
 import sequelize from '../configs/database';
 
-const Cart = sequelize.define("Cart", {
+const Cart = sequelize.define<ICart>("Cart", {
 	id: {
 		type: DataTypes.INTEGER,
 		primaryKey: true,

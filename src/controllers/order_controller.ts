@@ -3,6 +3,8 @@ import sequelize from '../configs/database';
 import logger from '../configs/logger';
 import taxCalculator from '../utils/taxCalculator';
 import EmailNotificationService from '../services/emailNotificationService';
+import { Request, Response } from 'express';
+
 
 // Función auxiliar para calcular el total de una orden (OBSOLETA, usando taxCalculator ahora)
 const calcularTotal = (cartItems) => {
@@ -59,7 +61,7 @@ const VALID_PAYMENT_METHODS = [
 ];
 
 // Crear una nueva orden (con transacción)
-const createOrder = async (req, res) => {
+const createOrder = async (req: Request, res: Response) => {
 	// Iniciamos una transacción
 	const t = await sequelize.transaction();
 
@@ -255,7 +257,7 @@ const createOrder = async (req, res) => {
 };
 
 // Obtener todas las órdenes (admin/vendor)
-const getAllOrders = async (req, res) => {
+const getAllOrders = async (req: Request, res: Response) => {
 	try {
 		// Extraer posibles filtros de la consulta
 		const { status, deliveryType } = req.query;
@@ -297,7 +299,7 @@ const getAllOrders = async (req, res) => {
 };
 
 // Obtener orden por ID
-const getOrderById = async (req, res) => {
+const getOrderById = async (req: Request, res: Response) => {
 	try {
 		const { id } = req.params;
 
@@ -341,7 +343,7 @@ const getOrderById = async (req, res) => {
 };
 
 // Obtener órdenes de un usuario específico
-const getUserOrders = async (req, res) => {
+const getUserOrders = async (req: Request, res: Response) => {
 	try {
 		const { userId } = req.params;
 
@@ -375,7 +377,7 @@ const getUserOrders = async (req, res) => {
 };
 
 // Actualizar estado de una orden
-const updateOrderStatus = async (req, res) => {
+const updateOrderStatus = async (req: Request, res: Response) => {
 	const t = await sequelize.transaction();
 
 	try {
@@ -459,7 +461,7 @@ const updateOrderStatus = async (req, res) => {
 };
 
 // Procesar pago de una orden
-const processPayment = async (req, res) => {
+const processPayment = async (req: Request, res: Response) => {
 	const t = await sequelize.transaction();
 
 	try {
@@ -544,7 +546,7 @@ const processPayment = async (req, res) => {
 };
 
 // Controlador para subir comprobante de pago
-const uploadPaymentProof = async (req, res) => {
+const uploadPaymentProof = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         
@@ -646,7 +648,7 @@ const uploadPaymentProof = async (req, res) => {
 };
 
 // Obtener historial de estados de una orden
-const getOrderStatusHistory = async (req, res) => {
+const getOrderStatusHistory = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         
@@ -692,7 +694,7 @@ const getOrderStatusHistory = async (req, res) => {
 };
 
 // Actualizar una orden (campos generales)
-const updateOrder = async (req, res) => {
+const updateOrder = async (req: Request, res: Response) => {
 	try {
 		const { id } = req.params;
 		const order = await Order.findByPk(id);
@@ -737,7 +739,7 @@ const updateOrder = async (req, res) => {
 	}
 };
 
-const updatingStatus = async (req, res) => {
+const updatingStatus = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { status, notes } = req.body;
 
@@ -788,7 +790,7 @@ const updatingStatus = async (req, res) => {
 };
 
 // Eliminar una orden
-const deleteOrder = async (req, res) => {
+const deleteOrder = async (req: Request, res: Response) => {
 	const t = await sequelize.transaction();
 
 	try {
@@ -840,7 +842,7 @@ const deleteOrder = async (req, res) => {
 	}
 };
 
-// Obtener tipos de entrega disponiblesconst getDeliveryTypes = async (req, res) => {
+// Obtener tipos de entrega disponiblesconst getDeliveryTypes = async (req: Request, res: Response) => {
 	try {
 		const deliveryTypes = [
 			{

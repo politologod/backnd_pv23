@@ -1,13 +1,15 @@
 import Product from '../models/model_products';
 import Category from '../models/model_category';
 import {  logger  } from '../configs/logger';
+import { Request, Response } from 'express';
+
 
 /**
  * Genera el archivo robots.txt
  * @param {Object} req - Objeto de solicitud Express
  * @param {Object} res - Objeto de respuesta Express
  */
-const getRobotsTxt = async (req, res) => {
+const getRobotsTxt = async (req: Request, res: Response) => {
   try {
     const baseUrl = `${req.protocol}://${req.get('host')}`;
     
@@ -53,7 +55,7 @@ Sitemap: ${baseUrl}/sitemap.xml
  * @param {Object} req - Objeto de solicitud Express
  * @param {Object} res - Objeto de respuesta Express
  */
-const getSitemap = async (req, res) => {
+const getSitemap = async (req: Request, res: Response) => {
   try {
     const baseUrl = process.env.FRONTEND_URL || `${req.protocol}://${req.get('host')}`;
     const now = new Date().toISOString();

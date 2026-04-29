@@ -1,3 +1,4 @@
+import { IProductTax } from '../types/models';
 import {  DataTypes, Model  } from 'sequelize';
 import sequelize from '../configs/database';
 

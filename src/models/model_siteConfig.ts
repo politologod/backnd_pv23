@@ -1,3 +1,4 @@
+import { ISiteConfig } from '../types/models';
 import {  DataTypes, Model  } from 'sequelize';
 import sequelize from '../configs/database';
 import User from './model_user';

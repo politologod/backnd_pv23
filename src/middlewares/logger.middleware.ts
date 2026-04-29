@@ -1,5 +1,7 @@
 import morgan from 'morgan';
 import {  logger  } from '../configs/logger';
+import { Request, Response, NextFunction } from 'express';
+
 
 /**
  * Sistema de Logging para la API
@@ -19,7 +21,7 @@ import {  logger  } from '../configs/logger';
 const requestLogger = morgan('combined');
 
 // Middleware para loguear errores con información detallada
-const errorLogger = (err, req, res, next) => {
+const errorLogger = (err: any, req: Request, res: Response, next: NextFunction) => {
   // Simplificamos a console.error para evitar problemas
   console.error(`[ERROR] ${err.status || 500} - ${err.message || 'Error del servidor'} - ${req.method} ${req.originalUrl || req.url}`);
   
@@ -31,7 +33,7 @@ const errorLogger = (err, req, res, next) => {
 };
 
 // Middleware para añadir información contextual a los logs
-const requestContextLogger = (req, res, next) => {
+const requestContextLogger = (req: Request, res: Response, next: NextFunction) => {
   // Generar un ID de solicitud si no existe
   req.id = req.headers['x-request-id'] || `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   

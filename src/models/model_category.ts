@@ -1,7 +1,8 @@
+import { ICategory } from '../types/models';
 import {  DataTypes  } from 'sequelize';
 import sequelize from '../configs/database';
 
-const Category = sequelize.define("Category", {
+const Category = sequelize.define<ICategory>("Category", {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,

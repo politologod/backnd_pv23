@@ -1,9 +1,9 @@
+import { IUser } from '../types/models';
 import {  DataTypes  } from 'sequelize';
 import sequelize from '../configs/database';
 import bcrypt from 'bcrypt';
 
-const User = sequelize.define(
-    "User",
+const User = sequelize.define<IUser>("User",
     {
         id_autoincrement: {
             type: DataTypes.INTEGER,

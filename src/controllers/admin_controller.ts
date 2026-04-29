@@ -8,6 +8,8 @@ import Category from '../models/model_category';
 import sequelize from '../configs/database';
 import {  logger  } from '../configs/logger';
 import {  QueryTypes, Op  } from 'sequelize';
+import { Request, Response } from 'express';
+
 
 /**
  * Actualiza el estado del modo de mantenimiento del sitio
@@ -15,7 +17,7 @@ import {  QueryTypes, Op  } from 'sequelize';
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Respuesta JSON
  */
-const setMaintenanceMode = async (req, res) => {
+const setMaintenanceMode = async (req: Request, res: Response) => {
   try {
     const { maintenance_mode, maintenance_message } = req.body;
     const userId = req.user.id;
@@ -70,7 +72,7 @@ const setMaintenanceMode = async (req, res) => {
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Respuesta JSON
  */
-const getMaintenanceMode = async (req, res) => {
+const getMaintenanceMode = async (req: Request, res: Response) => {
   try {
     // Buscar configuración existente o crear una por defecto
     let config = await SiteConfig.findOne({ 
@@ -115,7 +117,7 @@ const getMaintenanceMode = async (req, res) => {
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Respuesta JSON con estadísticas
  */
-const getGeneralStats = async (req, res) => {
+const getGeneralStats = async (req: Request, res: Response) => {
   try {
     // Estadísticas totales
     const totalSales = await Order.sum('total', { where: { status: 'entregado' } });
@@ -150,7 +152,7 @@ const getGeneralStats = async (req, res) => {
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Respuesta JSON con estadísticas por categoría
  */
-const getSalesByCategory = async (req, res) => {
+const getSalesByCategory = async (req: Request, res: Response) => {
   try {
     // Consulta corregida para usar la tabla intermedia ProductCategories (relación many-to-many)
     // y el nombre correcto de la columna priceAtPurchase
@@ -212,7 +214,7 @@ const getSalesByCategory = async (req, res) => {
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Respuesta JSON con estadísticas de órdenes por mes
  */
-const getOrdersByMonth = async (req, res) => {
+const getOrdersByMonth = async (req: Request, res: Response) => {
   try {
     // Obtener año de la consulta o usar el año actual
     const year = req.query.year || new Date().getFullYear();
@@ -256,7 +258,7 @@ const getOrdersByMonth = async (req, res) => {
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Respuesta JSON con estadísticas de clientes por mes
  */
-const getCustomersByMonth = async (req, res) => {
+const getCustomersByMonth = async (req: Request, res: Response) => {
   try {
     // Obtener año de la consulta o usar el año actual
     const year = req.query.year || new Date().getFullYear();
@@ -297,7 +299,7 @@ const getCustomersByMonth = async (req, res) => {
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Respuesta JSON con estadísticas de ventas por mes
  */
-const getSalesByMonth = async (req, res) => {
+const getSalesByMonth = async (req: Request, res: Response) => {
   try {
     // Obtener año de la consulta o usar el año actual
     const year = req.query.year || new Date().getFullYear();
@@ -338,7 +340,7 @@ const getSalesByMonth = async (req, res) => {
  * @param {Object} res - Objeto de respuesta
  * @returns {Object} - Respuesta JSON con estadísticas para el dashboard
  */
-const getDashboardStats = async (req, res) => {
+const getDashboardStats = async (req: Request, res: Response) => {
   try {
     const now = new Date();
     const currentMonth = now.getMonth() + 1;

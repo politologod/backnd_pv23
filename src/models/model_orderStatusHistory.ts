@@ -1,8 +1,8 @@
+import { IOrderStatusHistory } from '../types/models';
 import {  DataTypes  } from 'sequelize';
 import sequelize from '../configs/database';
 
-const OrderStatusHistory = sequelize.define(
-  "OrderStatusHistory",
+const OrderStatusHistory = sequelize.define<IOrderStatusHistory>("OrderStatusHistory",
   {
     id: {
       type: DataTypes.INTEGER,
