@@ -189,7 +189,7 @@ process.on('unhandledRejection', (reason, promise) => {
   }
 });
 
-export default {
+export {
   AppError,
   BadRequestError,
   UnauthorizedError,

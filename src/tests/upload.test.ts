@@ -1,3 +1,4 @@
+import { describe, it, expect, jest, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
 import request from 'supertest';
 import app from '../app';
 import fs from 'fs';
@@ -5,10 +6,10 @@ import path from 'path';
 import {  cloudinary  } from '../utils/cloudinaryConfig';
 
 describe('Upload Routes', () => {
-  let adminToken;
-  let userToken;
-  let productId;
-  let orderId;
+  let adminToken: string;
+  let userToken: string;
+  let productId: number;
+  let orderId: number;
 
   // Configuración inicial para obtener tokens
   beforeAll(async () => {
@@ -65,7 +66,7 @@ describe('Upload Routes', () => {
             description: "Category for upload tests"
           });
 
-        let categoryId;
+        let categoryId: number;
         if (categoryRes.body && categoryRes.body.category) {
           categoryId = categoryRes.body.category.id;
         }

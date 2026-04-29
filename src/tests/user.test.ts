@@ -1,3 +1,4 @@
+import { describe, it, expect, jest, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
 // tests/user.test.js
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
@@ -15,7 +16,7 @@ const generatedAdminToken = jwt.sign(
 
 describe("User Routes", () => {
 	let adminToken = generatedAdminToken;
-	let userId;
+	let userId: number;
 
 	// Configuración inicial para obtener token de admin
 	beforeAll(async () => {
@@ -63,7 +64,7 @@ describe("User Routes", () => {
 			}
 
 			// Probamos diferentes formas de autenticación
-			let res;
+			let res: any;
 			try {
 				// Intento 1: Bearer Token
 				res = await request(app)
@@ -92,7 +93,7 @@ describe("User Routes", () => {
 			}
 
 			// Probamos diferentes formas de autenticación
-			let res;
+			let res: any;
 			try {
 				// Intento 1: Cookie (que parece funcionar según los logs)
 				res = await request(app)
@@ -156,7 +157,7 @@ describe("User Routes", () => {
 			};
 
 			// Probamos diferentes formas de autenticación
-			let res;
+			let res: any;
 			try {
 				// Intento 1: Cookie (que parece funcionar según los logs)
 				res = await request(app)
@@ -195,7 +196,7 @@ describe("User Routes", () => {
 			}
 
 			// Probamos diferentes formas de autenticación
-			let res;
+			let res: any;
 			try {
 				// Intento 1: Cookie (que parece funcionar según los logs)
 				res = await request(app)

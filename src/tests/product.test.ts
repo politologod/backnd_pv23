@@ -1,10 +1,11 @@
+import { describe, it, expect, jest, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
 import request from 'supertest';
 import app from '../app';
 
 describe("Product Routes", () => {
-  let adminToken;
-  let productId;
-  let categoryId;
+  let adminToken: string;
+  let productId: number;
+  let categoryId: number;
 
   // Configuración inicial para obtener token de admin y crear una categoría
   beforeAll(async () => {

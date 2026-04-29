@@ -1,3 +1,4 @@
+import { describe, it, expect, jest, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
 import request from 'supertest';
 import app from '../app';
 
@@ -10,8 +11,8 @@ describe('GET /api/categories', () => {
 });
 
 describe("Category Routes", () => {
-  let adminToken;
-  let categoryId;
+  let adminToken: string;
+  let categoryId: number;
 
   // Configuración inicial para obtener token de admin
   beforeAll(async () => {
@@ -48,7 +49,7 @@ describe("Category Routes", () => {
       };
 
       // Probamos diferentes formas de autenticación
-      let res;
+      let res: any;
       try {
         // Intento 1: Bearer Token
         res = await request(app)
@@ -87,7 +88,7 @@ describe("Category Routes", () => {
       };
 
       // Probamos diferentes formas de autenticación
-      let res;
+      let res: any;
       try {
         // Intento 1: Bearer Token
         res = await request(app)
@@ -235,7 +236,7 @@ describe("Category Routes", () => {
       };
 
       // Probamos diferentes formas de autenticación
-      let res;
+      let res: any;
       try {
         // Intento 1: Bearer Token
         res = await request(app)
@@ -306,7 +307,7 @@ describe("Category Routes", () => {
       }
 
       // Probamos diferentes formas de autenticación
-      let res;
+      let res: any;
       try {
         // Intento 1: Bearer Token
         res = await request(app)

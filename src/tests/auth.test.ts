@@ -1,3 +1,4 @@
+import { describe, it, expect, jest, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
 import request from 'supertest';
 import app from '../app';
 
@@ -114,7 +115,7 @@ describe("Auth Routes", () => {
 
   // Test para verificación de token
   describe("GET /api/auth/verify", () => {
-    let token;
+    let token: string;
     let userEmail;
 
     beforeAll(async () => {

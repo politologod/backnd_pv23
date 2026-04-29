@@ -1,12 +1,13 @@
+import { describe, it, expect, jest, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
 import request from 'supertest';
 import app from '../app';
 
 describe("Order Routes", () => {
-  let userToken;
-  let adminToken;
-  let orderId;
-  let productId;
-  let categoryId;
+  let userToken: string;
+  let adminToken: string;
+  let orderId: number;
+  let productId: number;
+  let categoryId: number;
 
   // Configuración inicial
   beforeAll(async () => {
@@ -151,7 +152,7 @@ describe("Order Routes", () => {
       };
 
       // Intentamos con ambas rutas posibles
-      let res;
+      let res: any;
       try {
         res = await request(app)
           .post("/orders")
@@ -184,7 +185,7 @@ describe("Order Routes", () => {
       };
 
       // Intentamos con ambas rutas posibles
-      let res;
+      let res: any;
       try {
         res = await request(app)
           .post("/orders")
@@ -212,7 +213,7 @@ describe("Order Routes", () => {
       }
 
       // Intentamos con ambas rutas posibles
-      let res;
+      let res: any;
       try {
         res = await request(app)
           .get("/orders")
@@ -238,7 +239,7 @@ describe("Order Routes", () => {
       }
 
       // Intentamos con ambas rutas posibles
-      let res;
+      let res: any;
       try {
         res = await request(app)
           .get(`/orders/${orderId}`)
@@ -261,7 +262,7 @@ describe("Order Routes", () => {
       }
 
       // Intentamos con ambas rutas posibles
-      let res;
+      let res: any;
       try {
         res = await request(app)
           .get("/orders/999999")
@@ -291,7 +292,7 @@ describe("Order Routes", () => {
       };
 
       // Intentamos con ambas rutas posibles
-      let res;
+      let res: any;
       try {
         res = await request(app)
           .put(`/orders/${orderId}/status`)
@@ -321,7 +322,7 @@ describe("Order Routes", () => {
       };
 
       // Intentamos con ambas rutas posibles
-      let res;
+      let res: any;
       try {
         res = await request(app)
           .put(`/orders/${orderId}/status`)
@@ -349,7 +350,7 @@ describe("Order Routes", () => {
       }
 
       // Intentamos con ambas rutas posibles
-      let res;
+      let res: any;
       try {
         res = await request(app)
           .post(`/orders/${orderId}/cancel`)

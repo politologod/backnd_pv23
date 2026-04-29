@@ -1,11 +1,12 @@
+import { describe, it, expect, jest, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
 import request from 'supertest';
 import app from '../app';
 
 describe("Cart Routes", () => {
-  let userToken;
-  let adminToken;
-  let productId;
-  let categoryId;
+  let userToken: string;
+  let adminToken: string;
+  let productId: number;
+  let categoryId: number;
 
   // Configuración inicial
   beforeAll(async () => {
@@ -125,7 +126,7 @@ describe("Cart Routes", () => {
       };
 
       // Intentamos con ambas rutas posibles
-      let res;
+      let res: any;
       try {
         res = await request(app)
           .post("/cart")
@@ -158,7 +159,7 @@ describe("Cart Routes", () => {
       };
 
       // Intentamos con ambas rutas posibles
-      let res;
+      let res: any;
       try {
         res = await request(app)
           .post("/cart")
@@ -186,7 +187,7 @@ describe("Cart Routes", () => {
       }
 
       // Intentamos con ambas rutas posibles
-      let res;
+      let res: any;
       try {
         res = await request(app)
           .get("/cart")
@@ -204,7 +205,7 @@ describe("Cart Routes", () => {
 
   // Test para actualizar cantidad en el carrito
   describe("PUT /cart/:id", () => {
-    let cartItemId;
+    let cartItemId: number;
 
     beforeAll(async () => {
       // Solo ejecutamos si tenemos token y producto
@@ -252,7 +253,7 @@ describe("Cart Routes", () => {
       };
 
       // Intentamos con ambas rutas posibles
-      let res;
+      let res: any;
       try {
         res = await request(app)
           .put(`/cart/${cartItemId}`)
@@ -273,7 +274,7 @@ describe("Cart Routes", () => {
 
   // Test para eliminar item del carrito
   describe("DELETE /cart/:id", () => {
-    let cartItemId;
+    let cartItemId: number;
 
     beforeAll(async () => {
       // Solo ejecutamos si tenemos token y producto
@@ -317,7 +318,7 @@ describe("Cart Routes", () => {
       }
 
       // Intentamos con ambas rutas posibles
-      let res;
+      let res: any;
       try {
         res = await request(app)
           .delete(`/cart/${cartItemId}`)
@@ -343,7 +344,7 @@ describe("Cart Routes", () => {
       }
 
       // Intentamos con ambas rutas posibles
-      let res;
+      let res: any;
       try {
         res = await request(app)
           .delete("/cart")
