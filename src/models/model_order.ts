@@ -59,6 +59,21 @@ const Order = sequelize.define<IOrder>("Order", {
 		allowNull: false,
 		defaultValue: "tarjeta",
 	},
+	paymentCurrency: {
+		type: DataTypes.ENUM('USD', 'EUR', 'VES', 'USDT'),
+		allowNull: true,
+		comment: 'Moneda en que realizó el pago el cliente',
+	},
+	exchangeRateAtPurchase: {
+		type: DataTypes.DECIMAL(18, 6),
+		allowNull: true,
+		comment: 'Tasa de cambio VES usada en el momento del pago (solo si pagó en VES)',
+	},
+	totalInVES: {
+		type: DataTypes.DECIMAL(14, 2),
+		allowNull: true,
+		comment: 'Total de la orden convertido a bolívares (si el cliente pagó en VES)',
+	},
 	paymentProofUrl: {
 		type: DataTypes.STRING,
 		allowNull: true,

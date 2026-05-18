@@ -1,5 +1,5 @@
 import { IProduct } from '../types/models';
-import {  DataTypes, Op  } from 'sequelize';
+import { DataTypes, Op } from 'sequelize';
 import sequelize from '../configs/database';
 
 const Product = sequelize.define<IProduct>("Product", {
@@ -25,6 +25,12 @@ const Product = sequelize.define<IProduct>("Product", {
     price: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
+    },
+    currency: {
+        type: DataTypes.ENUM('USD', 'EUR'),
+        allowNull: false,
+        defaultValue: 'USD',
+        comment: 'Moneda en que está expresado el precio del producto',
     },
     stock: {
         type: DataTypes.INTEGER,

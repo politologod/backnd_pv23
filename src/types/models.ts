@@ -30,6 +30,7 @@ export interface ProductAttributes {
   sku?: string | null;
   description?: string | null;
   price: number;
+  currency: 'USD' | 'EUR'; // Moneda base del precio
   stock: number;
   imageUrl?: string | null;
   metadata?: any;
@@ -75,6 +76,9 @@ export interface OrderAttributes {
   taxes_details?: any;
   shippingAddress: string;
   paymentMethod: string;
+  paymentCurrency?: 'USD' | 'EUR' | 'VES' | 'USDT' | null; // Moneda en que pagó el cliente
+  exchangeRateAtPurchase?: number | null;                    // Tasa VES usada al momento del pago
+  totalInVES?: number | null;                                // Total convertido a VES (si pagó en VES)
   deliveryType: string;
   paymentProofUrl?: string | null;
   paymentProofPublicId?: string | null;
@@ -214,3 +218,36 @@ export interface FavoriteAttributes {
 export interface FavoriteCreationAttributes extends Optional<FavoriteAttributes, 'id'> {}
 
 export interface IFavorite extends Model<FavoriteAttributes, FavoriteCreationAttributes>, FavoriteAttributes {}
+
+// --- ExchangeRate ---
+export interface ExchangeRateAttributes {
+  id: number;
+  currency_from: 'USD' | 'EUR';  // Moneda de origen
+  currency_to: 'VES';             // Moneda de destino (siempre VES por ahora)
+  rate: number;                   // Tasa de cambio (ej: 36.50 = 1 USD → 36.50 VES)
+  source: 'manual' | 'api';      // Quién estableció la tasa
+  is_active: boolean;             // Solo una activa por par de monedas
+  set_by?: number | null;         // FK → Users (si fue manual)
+  valid_from?: Date | null;       // Fecha desde la que aplica
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface ExchangeRateCreationAttributes extends Optional<ExchangeRateAttributes, 'id' | 'is_active'> {}
+
+export interface IExchangeRate extends Model<ExchangeRateAttributes, ExchangeRateCreationAttributes>, ExchangeRateAttributes {}
+
+// --- ExchangeRateConfig ---
+export interface ExchangeRateConfigAttributes {
+  id: number;
+  mode: 'auto' | 'manual' | 'disabled'; // Modo activo del sistema de tasas
+  auto_api_url?: string | null;           // URL de la API para modo auto
+  auto_update_hour?: number | null;       // Hora del día (0-23) para actualización automática
+  last_auto_update?: Date | null;         // Última vez que se actualizó automáticamente
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface ExchangeRateConfigCreationAttributes extends Optional<ExchangeRateConfigAttributes, 'id'> {}
+
+export interface IExchangeRateConfig extends Model<ExchangeRateConfigAttributes, ExchangeRateConfigCreationAttributes>, ExchangeRateConfigAttributes {}

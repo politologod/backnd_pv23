@@ -1,5 +1,5 @@
 {
-  "name": "puravida-23-ecommerce-backend",
+  "name": "ecommerce-backend",
   "version": "1.0.0",
   "description": "",
   "main": "dist/app.js",
@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.16.1",
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.6.0",
     "compression": "^1.8.0",

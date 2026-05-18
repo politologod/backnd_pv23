@@ -3,6 +3,7 @@ import sequelize from '../configs/database';
 import logger from '../configs/logger';
 import taxCalculator from '../utils/taxCalculator';
 import EmailNotificationService from '../services/emailNotificationService';
+import currencyService from '../services/currencyService';
 import { Request, Response } from 'express';
 
 
@@ -49,15 +50,24 @@ const registerStatusChange = async (orderId, status, notes = null, user = null, 
 };
 
 const VALID_PAYMENT_METHODS = [
-	"transferencia",
-	"pago_movil",
-	"punto_venta",
-	"efectivo_divisa_USD",
-	"tarjeta",
-    "zelle",
-    "paypal",
-    "efectivo_bolivares",
-    "efectivo_divisa_EUR"
+	// Bolívares (VES)
+	"transferencia_ves",        // Transferencia bancaria en bolívares
+	"pago_movil",               // Pago móvil (Bancamiga, Mercantil, etc.)
+	"punto_venta",              // Punto de venta en bolívares
+	"efectivo_bolivares",       // Efectivo en bolívares
+	// Dólares (USD)
+	"efectivo_usd",             // Efectivo en dólares
+	// Euros (EUR)
+	"efectivo_eur",             // Efectivo en euros
+	// Cripto
+	"usdt",                     // Tether USDT
+	// Internacional / General
+	"tarjeta",                  // Tarjeta débito/crédito
+	"transferencia_internacional", // Wire transfer internacional
+	// Aliases legacy (compatibilidad con pedidos anteriores)
+	"transferencia",            // → transferencia_ves
+	"efectivo_divisa_USD",      // → efectivo_usd
+	"efectivo_divisa_EUR",      // → efectivo_eur
 ];
 
 // Crear una nueva orden (con transacción)
@@ -154,6 +164,24 @@ const createOrder = async (req: Request, res: Response) => {
 		// Calcular subtotal, impuestos y total
 		const taxCalculation = await taxCalculator.calculateTaxes(itemsForTaxCalculation);
 
+		// Determinar moneda del pago y calcular totalInVES si aplica
+		const paymentCurrency = currencyService.getPaymentCurrency(paymentMethod || 'tarjeta');
+		let exchangeRateAtPurchase: number | null = null;
+		let totalInVES: number | null = null;
+
+		if (paymentCurrency === 'VES') {
+			// El cliente paga en bolívares: necesitamos saber la tasa activa
+			// El total está en la moneda base de los productos
+			// Asumimos que todos los productos tienen la misma moneda base (o tomamos la del primer producto)
+			const firstProduct = products[0];
+			const baseCurrency = (firstProduct as any).currency || 'USD';
+			const conversion = await currencyService.convertToVES(taxCalculation.total, baseCurrency);
+			if (conversion) {
+				exchangeRateAtPurchase = conversion.rate;
+				totalInVES = conversion.amount_ves;
+			}
+		}
+
 		// Crear la orden con subtotal, impuestos y total
 		const order = await Order.create(
 			{
@@ -165,6 +193,9 @@ const createOrder = async (req: Request, res: Response) => {
 				shippingAddress,
 				userId,
 				paymentMethod: paymentMethod || "tarjeta",
+				paymentCurrency,
+				exchangeRateAtPurchase,
+				totalInVES,
 				deliveryType: deliveryType || "pickup_tienda"
 			},
 			{ transaction: t }

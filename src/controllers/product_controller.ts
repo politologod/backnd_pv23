@@ -5,6 +5,7 @@ import {  validateProduct  } from '../utils/validator';
 import {  ValidationError  } from '../utils/errorHandler';
 import logger from '../configs/logger';
 import taxCalculator from '../utils/taxCalculator';
+import currencyService from '../services/currencyService';
 import { Request, Response } from 'express';
 
 
@@ -294,21 +295,37 @@ const getAllProducts = async (req: Request, res: Response) => {
             });
         }
 
-        const products = await Product.findAndCountAll({
+        const result = await Product.findAndCountAll({
             limit,
             offset,
             include: Category,
         });
 
+        // Enriquecer productos con precio en VES (una sola consulta de tasa)
+        const enrichedProducts = await Promise.all(
+            result.rows.map(async (product) => {
+                const productJson = product.toJSON() as any;
+                const vesConversion = await currencyService.convertToVES(
+                    parseFloat(productJson.price),
+                    productJson.currency || 'USD'
+                );
+                if (vesConversion) {
+                    productJson.price_ves = vesConversion.amount_ves;
+                    productJson.exchange_rate_ves = vesConversion.rate;
+                }
+                return productJson;
+            })
+        );
+
         res.status(200).json({
             message: "Lista de productos obtenida exitosamente",
-            products: products.rows,
+            products: enrichedProducts,
             pagination: {
                 page,
                 limit,
                 offset,
-                totalItems: products.count,
-                totalPages: Math.ceil(products.count / limit)
+                totalItems: result.count,
+                totalPages: Math.ceil(result.count / limit)
             }
         });
     } catch (error) {
@@ -330,7 +347,20 @@ const getProductById = async (req: Request, res: Response) => {
         if (!product) {
             return res.status(404).json({ error: "Producto no encontrado" });
         }
-        res.json(product);
+
+        // Enriquecer con precio en VES si la tasa está activa
+        const productJson = product.toJSON() as any;
+        const vesConversion = await currencyService.convertToVES(
+            parseFloat(productJson.price),
+            productJson.currency || 'USD'
+        );
+        if (vesConversion) {
+            productJson.price_ves = vesConversion.amount_ves;
+            productJson.exchange_rate_ves = vesConversion.rate;
+            productJson.exchange_rate_source = vesConversion.source;
+        }
+
+        res.json(productJson);
     } catch (error) {
         console.error('Error al obtener producto por ID', error.message);
         res.status(400).json({ error: error.message });

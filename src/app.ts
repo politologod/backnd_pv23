@@ -11,6 +11,7 @@ import helmet from 'helmet';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import {  csrfProtection  } from './middlewares/auth';
+import currencyService from './services/currencyService';
 
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpecs from './configs/swagger';
@@ -107,8 +108,6 @@ const corsOptions = {
 			process.env.ADMIN_URL,
 			'http://localhost:3000',
 			'http://localhost:3001',
-			'https://puravida-admin-kappa.vercel.app',
-			'https://v0-puravida-23-ecommerce-7l.vercel.app'
 		].filter(Boolean);
 
 		// Permitir solicitudes sin origen (como aplicaciones móviles o curl)
@@ -175,6 +174,7 @@ import siteRoutes from './routes/site';
 import uploadRoutes from './routes/upload_routes';
 import taxRoutes from './routes/tax_routes';
 import seoRoutes from './routes/seo_routes';
+import exchangeRateRoutes from './routes/exchangeRate_routes';
 
 // Maintenance middleware - debe estar después de las rutas de auth y antes de otras rutas
 import maintenanceMiddleware from './middlewares/maintenance.middleware';
@@ -198,6 +198,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/uploads', uploadRoutes);
 app.use('/api/taxes', taxRoutes);
+app.use('/api/exchange-rates', exchangeRateRoutes);
 
 // Headers de seguridad adicionales - Solo en producción
 if (process.env.NODE_ENV === 'production') {
@@ -279,14 +280,66 @@ if (require.main === module) {
 		.catch((err) => console.error("❌ Error de conexión:", err));
 
 	// Forzar sincronización solo para modificar la tabla de productos
-	const shouldForceSync = process.env.FORCE_DB_SYNC === 'true'; // Temporalmente forzar sincronización
+	const shouldForceSync = process.env.FORCE_DB_SYNC === 'true';
+	const isProduction = process.env.NODE_ENV === 'production';
 	
 	sequelize
-		.sync({ force: shouldForceSync })
-		.then(() => {
-			console.log(`✅ Modelos sincronizados ${shouldForceSync ? '(con force)' : ''}`);
+		.sync({ 
+			force: shouldForceSync,
+			// alter:true en desarrollo agrega columnas nuevas sin borrar datos
+			alter: !isProduction && !shouldForceSync
+		})
+		.then(async () => {
+			console.log(`✅ Modelos sincronizados ${shouldForceSync ? '(con force)' : !isProduction ? '(con alter)' : ''}`);
+
+			// Iniciar cron job para actualización automática de tasas de cambio
+			if (!isProduction || process.env.ENABLE_RATE_CRON === 'true') {
+				_startExchangeRateCron();
+			}
 		})
 		.catch((err) => console.error("❌ Error al sincronizar modelos:", err));
 }
 
-export default app;
+/**
+ * Cron job para actualización automática de tasas de cambio.
+ * Se ejecuta cada hora y verifica si es la hora configurada para actualizar.
+ * No requiere librerías externas (usa setInterval nativo).
+ */
+function _startExchangeRateCron() {
+  logger.info('⏰ Cron de tasas de cambio iniciado');
+  
+  const CHECK_INTERVAL_MS = 60 * 60 * 1000; // Verificar cada hora
+
+  const runCheck = async () => {
+    try {
+      const config = await currencyService.getConfig();
+      if (config.mode !== 'auto') return;
+
+      const now = new Date();
+      const currentHour = now.getHours();
+      const targetHour = config.auto_update_hour ?? 8;
+
+      // Verificar si ya se actualizó hoy en esta hora
+      const lastUpdate = config.last_auto_update;
+      const alreadyUpdatedToday = lastUpdate &&
+        lastUpdate.getDate() === now.getDate() &&
+        lastUpdate.getMonth() === now.getMonth() &&
+        lastUpdate.getFullYear() === now.getFullYear();
+
+      if (currentHour === targetHour && !alreadyUpdatedToday) {
+        logger.info('💱 Actualizando tasa de cambio automáticamente...');
+        await currencyService.fetchRateFromAPI();
+      }
+    } catch (error) {
+      logger.error('Error en cron de tasas de cambio', { error: error.message });
+    }
+  };
+
+  // Ejecutar inmediatamente al iniciar (por si el servidor reinició durante la hora target)
+  runCheck();
+  
+  // Luego verificar cada hora
+  setInterval(runCheck, CHECK_INTERVAL_MS);
+}
+
+export default app;

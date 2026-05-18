@@ -12,6 +12,8 @@ import Order from './model_order';
 import OrderStatusHistory from './model_orderStatusHistory';
 import Tax from './model_tax';
 import ProductTax from './model_productTax';
+import ExchangeRate from './model_exchangeRate';
+import ExchangeRateConfig from './model_exchangeRateConfig';
 
 // Crear objeto de modelos
 const db = {
@@ -27,7 +29,9 @@ const db = {
     Order,
     OrderStatusHistory,
     Tax,
-    ProductTax
+    ProductTax,
+    ExchangeRate,
+    ExchangeRateConfig,
 };
 
 // Importar función de asociaciones y ejecutarla con todos los modelos
