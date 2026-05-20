@@ -49,7 +49,7 @@ describe("Auth Routes", () => {
 
   // Test para login
   describe("POST /api/auth/login", () => {
-    let userEmail;
+    let userEmail: string;
 
     beforeAll(async () => {
       // Crear un usuario para probar el login
@@ -80,8 +80,8 @@ describe("Auth Routes", () => {
       expect(res.body).toHaveProperty("message", "Login exitoso");
       expect(res.body).toHaveProperty("user");
       // Verificamos si hay token en la cookie o en el body
-      if (res.headers["set-cookie"] && res.headers["set-cookie"].length > 0) {
-        expect(res.headers["set-cookie"][0]).toContain("token=");
+      if ((res.headers as any)["set-cookie"] && (res.headers as any)["set-cookie"].length > 0) {
+        expect((res.headers as any)["set-cookie"][0]).toContain("token=");
       } else {
         expect(res.body).toHaveProperty("token");
       }
@@ -116,7 +116,7 @@ describe("Auth Routes", () => {
   // Test para verificación de token
   describe("GET /api/auth/verify", () => {
     let token: string;
-    let userEmail;
+    let userEmail: string;
 
     beforeAll(async () => {
       // Crear un usuario y obtener token
@@ -142,8 +142,8 @@ describe("Auth Routes", () => {
       // Intentamos obtener el token de diferentes fuentes
       if (loginRes.body && loginRes.body.token) {
         token = loginRes.body.token;
-      } else if (loginRes.headers["set-cookie"] && loginRes.headers["set-cookie"].length > 0) {
-        const cookieString = loginRes.headers["set-cookie"][0];
+      } else if ((loginRes.headers as any)["set-cookie"] && (loginRes.headers as any)["set-cookie"].length > 0) {
+        const cookieString = (loginRes.headers as any)["set-cookie"][0];
         token = cookieString.split(";")[0].split("=")[1];
       }
     });
@@ -177,7 +177,7 @@ describe("Auth Routes", () => {
 
       if (!success) {
         // Si ningún método funcionó, fallamos el test con un mensaje útil
-        fail("No se pudo verificar el token con ningún método de autenticación");
+        throw new Error("No se pudo verificar el token con ningún método de autenticación");
       }
     });
 

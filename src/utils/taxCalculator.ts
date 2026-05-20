@@ -15,7 +15,7 @@ const getActiveTaxes = async () => {
       order: [['name', 'ASC']]
     });
   } catch (error) {
-    logger.error('Error al obtener impuestos activos', { error: error.message });
+    logger.error('Error al obtener impuestos activos', { error: (error as Error).message });
     throw error;
   }
 };
@@ -35,13 +35,13 @@ const getProductTaxes = async (productId: number) => {
     
     // Si hay relaciones específicas, usarlas
     if (productTaxes.length > 0) {
-      return productTaxes.map(pt => {
+      return productTaxes.map((pt: any) => {
         return {
-          ...pt.Tax.dataValues,
-          isExempt: pt.is_exempt,
-          customRate: pt.custom_rate
+          ...(pt as any).Tax.dataValues,
+          isExempt: (pt as any).is_exempt,
+          customRate: (pt as any).custom_rate
         };
-      }).filter(tax => !tax.isExempt); // Filtrar exentos
+      }).filter((tax: any) => !tax.isExempt); // Filtrar exentos
     }
     
     // Si no hay relaciones específicas, obtener impuestos generales
@@ -51,7 +51,7 @@ const getProductTaxes = async (productId: number) => {
     
     return generalTaxes;
   } catch (error) {
-    logger.error(`Error al obtener impuestos para producto ${productId}`, { error: error.message });
+    logger.error(`Error al obtener impuestos para producto ${productId}`, { error: (error as Error).message });
     throw error;
   }
 };
@@ -64,7 +64,7 @@ const getProductTaxes = async (productId: number) => {
  * @param {number} item.price - Precio unitario
  * @returns {Promise<Object>} Detalles del cálculo de impuestos
  */
-const calculateItemTaxes = async (item) => {
+const calculateItemTaxes = async (item: any) => {
   try {
     const productId = item.productId || item.product.id;
     const price = item.price || item.product.price;
@@ -116,7 +116,7 @@ const calculateItemTaxes = async (item) => {
     };
   } catch (error) {
     logger.error('Error al calcular impuestos para ítem', { 
-      error: error.message,
+      error: (error as Error).message,
       item: {
         productId: item.productId || item.product.id,
         quantity: item.quantity
@@ -136,7 +136,7 @@ const calculateTaxes = async (items: any[]) => {
     let subtotal = 0;
     let totalTaxAmount = 0;
     const allTaxDetails = [];
-    const taxesByType = {}; // Para agrupar impuestos por tipo
+    const taxesByType: any = {}; // Para agrupar impuestos por tipo
     
     // Calcular impuestos para cada ítem
     for (const item of items) {
@@ -179,7 +179,7 @@ const calculateTaxes = async (items: any[]) => {
       total: subtotal + totalTaxAmount
     };
   } catch (error) {
-    logger.error('Error al calcular impuestos para múltiples ítems', { error: error.message });
+    logger.error('Error al calcular impuestos para múltiples ítems', { error: (error as Error).message });
     throw error;
   }
 };

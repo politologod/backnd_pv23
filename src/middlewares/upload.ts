@@ -36,7 +36,7 @@ const storage = multer.diskStorage({
 });
 
 // Filtrar archivos por tipo
-const fileFilter = (req, file, cb) => {
+const fileFilter = (req: any, file: any, cb: any) => {
   // Permitir solo imágenes
   if (file.mimetype.startsWith('image/')) {
     cb(null, true);
@@ -94,7 +94,7 @@ const cleanupTempFiles = (req: Request, res: Response, next: NextFunction) => {
   const originalEnd = res.end;
   
   // Sobrescribir el método end
-  res.end = function(...args) {
+  (res as any).end = function(...args: any[]) {
     // Limpiar archivos temporales si existen
     if (req.file) {
       try {
@@ -103,7 +103,7 @@ const cleanupTempFiles = (req: Request, res: Response, next: NextFunction) => {
         }
       } catch (err) {
         // Solo loguear el error si el archivo existe pero no se puede eliminar
-        if (err.code !== 'ENOENT') {
+        if ((err as any).code !== 'ENOENT') {
           console.error('Error al eliminar archivo temporal', err, req.file.path);
         }
       }
@@ -120,7 +120,7 @@ const cleanupTempFiles = (req: Request, res: Response, next: NextFunction) => {
           }
         } catch (err) {
           // Solo loguear el error si el archivo existe pero no se puede eliminar
-          if (err.code !== 'ENOENT') {
+          if ((err as any).code !== 'ENOENT') {
             console.error('Error al eliminar archivo temporal', err, file.path);
           }
         }

@@ -1,4 +1,4 @@
-import {  http, logWithContext  } from '../configs/logger';
+import logger from '../configs/logger';
 import { v4 as uuidv4 } from 'uuid';
 import { Request, Response, NextFunction } from 'express';
 
@@ -9,26 +9,26 @@ import { Request, Response, NextFunction } from 'express';
  */
 const httpLogger = (req: Request, res: Response, next: NextFunction) => {
   // Generar un ID único para cada solicitud
-  req.id = req.id || uuidv4();
+  (req as any).id = (req as any).id || uuidv4();
   
   // Agregar el ID de solicitud a los encabezados de respuesta
-  res.setHeader('X-Request-ID', req.id);
+  res.setHeader('X-Request-ID', (req as any).id);
   
   // Capturar información de la solicitud
   const requestInfo = {
-    id: req.id,
+    id: (req as any).id,
     method: req.method,
     url: req.originalUrl || req.url,
-    ip: req.ip || req.connection.remoteAddress,
+    ip: req.ip || (req as any).connection.remoteAddress,
     userAgent: req.get('user-agent'),
-    userId: req.user?.id || 'anónimo'
+    userId: (req as any).user?.id || 'anónimo'
   };
   
   // Formatear detalles de la solicitud para el log
   const requestMessage = `${req.method} ${req.originalUrl || req.url}`;
   
   // Registrar la solicitud
-  http(requestMessage, {
+  logger.http(requestMessage, {
     request: requestInfo,
     type: 'REQUEST_RECEIVED'
   });
@@ -38,7 +38,7 @@ const httpLogger = (req: Request, res: Response, next: NextFunction) => {
   
   // Interceptar el método end para capturar información de la respuesta
   const originalEnd = res.end;
-  res.end = function(chunk, encoding) {
+  res.end = function(chunk: any, encoding: any) {
     // Restaurar el método end original
     res.end = originalEnd;
     
@@ -67,14 +67,12 @@ const httpLogger = (req: Request, res: Response, next: NextFunction) => {
     }
     
     // Registrar la respuesta con la misma información de solicitud para contexto
-    logWithContext(level, responseMessage, {
+    logger.log(level, responseMessage, {
       request: requestInfo,
       response: responseInfo,
       type: 'REQUEST_COMPLETED'
     });
-  };
+  } as any;
   
   next();
 };
-
- 

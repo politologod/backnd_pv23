@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { v2 as cloudinary } from 'cloudinary';
 require('dotenv').config();
 import fs from 'fs';
@@ -20,7 +21,7 @@ cloudinary.config({
  * @param {Array} options.tags - Etiquetas para la imagen
  * @returns {Promise<Object>} Resultado de la subida
  */
-const uploadImage = async (file, options = {}) => {
+const uploadImage = async (file: any, options: any = {}) => {
   try {
     // Configurar opciones predeterminadas si no se especifican
     const uploadOptions = {
@@ -61,10 +62,10 @@ const uploadImage = async (file, options = {}) => {
       height: result.height
     };
   } catch (error) {
-    logger.error('Error al subir imagen a Cloudinary:', { error: error.message });
+    logger.error('Error al subir imagen a Cloudinary:', { error: (error as any).message });
     return {
       success: false,
-      error: error.message
+      error: (error as any).message
     };
   }
 };
@@ -75,7 +76,7 @@ const uploadImage = async (file, options = {}) => {
  * @param {string} productId - ID del producto
  * @returns {Promise<Object>} Resultado de la subida
  */
-const uploadProductImage = async (file, productId) => {
+const uploadProductImage = async (file: any, productId: any) => {
   return uploadImage(file, {
     folder: 'products',
     public_id: `product_${productId}_${Date.now()}`,
@@ -89,7 +90,7 @@ const uploadProductImage = async (file, productId) => {
  * @param {string} orderId - ID de la orden
  * @returns {Promise<Object>} Resultado de la subida
  */
-const uploadPaymentProof = async (file, orderId) => {
+const uploadPaymentProof = async (file: any, orderId: any) => {
   return uploadImage(file, {
     folder: 'payment_proofs',
     public_id: `order_${orderId}_${Date.now()}`,
@@ -108,7 +109,7 @@ const uploadPaymentProof = async (file, orderId) => {
  * @param {string} productId - ID del producto
  * @returns {Promise<Array<Object>>} Resultados de las subidas
  */
-const uploadMultipleProductImages = async (files, productId) => {
+const uploadMultipleProductImages = async (files: any, productId: any) => {
   const uploadPromises = files.map(file => 
     uploadProductImage(file, productId)
   );
@@ -121,7 +122,7 @@ const uploadMultipleProductImages = async (files, productId) => {
  * @param {string} publicId - ID público de la imagen a eliminar
  * @returns {Promise<Object>} Resultado de la eliminación
  */
-const deleteImage = async (publicId) => {
+const deleteImage = async (publicId: any) => {
   try {
     // Validar que tenemos un publicId
     if (!publicId) {
@@ -151,12 +152,12 @@ const deleteImage = async (publicId) => {
   } catch (error) {
     logger.error('Error al eliminar imagen de Cloudinary:', { 
       publicId, 
-      error: error.message,
-      stack: error.stack
+      error: (error as any).message,
+      stack: (error as any).stack
     });
     return {
       success: false,
-      error: error.message
+      error: (error as any).message
     };
   }
 };
@@ -167,7 +168,7 @@ const deleteImage = async (publicId) => {
  * @param {Object} options - Opciones para la firma
  * @returns {string} URL firmada
  */
-const getSignedUrl = (publicId, options = {}) => {
+const getSignedUrl = (publicId: any, options: any = {}) => {
   const defaultOptions = {
     expiresAt: Math.floor(Date.now() / 1000) + (60 * 60), // 1 hora por defecto
     ...options

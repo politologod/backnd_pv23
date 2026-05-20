@@ -2,7 +2,7 @@
 
 /** @type {import('sequelize-cli').Migration} */
 export default {
-  async up(queryInterface, Sequelize) {
+  async up(queryInterface: any, Sequelize: any) {
     await queryInterface.addColumn('Products', 'metaTitle', {
       type: Sequelize.STRING(150),
       allowNull: true
@@ -19,7 +19,7 @@ export default {
     });
   },
 
-  async down(queryInterface, Sequelize) {
+  async down(queryInterface: any, Sequelize: any) {
     await queryInterface.removeColumn('Products', 'metaTitle');
     await queryInterface.removeColumn('Products', 'metaDescription');
     await queryInterface.removeColumn('Products', 'seoKeywords');

@@ -15,19 +15,19 @@ const auth = (req: Request, res: Response, next: NextFunction) => {
         }
 
         // Opciones de verificación de JWT
-        const verifyOptions = {
+        const verifyOptions: any = {
             algorithms: ["HS256"],
             ignoreExpiration: false
         };
         
         // Añadir issuer y audience solo en producción
         if (process.env.NODE_ENV === 'production') {
-            verifyOptions.issuer = "puravida-api";
-            verifyOptions.audience = "puravida-client";
+            verifyOptions.issuer = process.env.JWT_ISSUER || "ecommerce-api";
+            verifyOptions.audience = process.env.JWT_AUDIENCE || "ecommerce-client";
         }
 
         // Verificar el token con opciones de seguridad
-        const decoded = jwt.verify(token, process.env.JWT_SECRET, verifyOptions);
+        const decoded: any = jwt.verify(token, process.env.JWT_SECRET as string, verifyOptions);
         
         // Verificar la expiración manualmente como capa adicional de seguridad
         const currentTime = Math.floor(Date.now() / 1000);
@@ -40,12 +40,12 @@ const auth = (req: Request, res: Response, next: NextFunction) => {
         next();
     } catch (error) {
         console.warn('Error de autenticación', { 
-            error: error.message,
+            error: (error as any).message,
             path: req.path,
-            ip: req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress
+            ip: req.ip || req.headers['x-forwarded-for'] || (req as any).connection.remoteAddress
         });
         
-        if (error.name === 'TokenExpiredError') {
+        if ((error as any).name === 'TokenExpiredError') {
             return res.status(401).json({ message: 'Token expirado. Por favor, inicie sesión nuevamente.' });
         }
         
@@ -54,34 +54,34 @@ const auth = (req: Request, res: Response, next: NextFunction) => {
 };
 
 // Middleware más robusto para verificación de roles
-const checkRole = (roles) => {
+const checkRole = (roles: any) => {
     return (req: Request, res: Response, next: NextFunction) => {
         try {
             // Depuración - Registrar el usuario y roles requeridos
             console.debug('Verificando roles de usuario', {
-                user: req.user,
+                user: (req as any).user,
                 requiredRoles: roles
             });
 
             // Asegurar que el usuario existe y tiene un rol válido
-            if (!req.user) {
+            if (!(req as any).user) {
                 throw new UnauthorizedError('Usuario no autenticado');
             }
             
             // Depuración - Verificar el rol específico
             console.debug('Comparando roles', {
-                userRole: req.user.role,
-                userRoleType: typeof req.user.role,
+                userRole: (req as any).user.role,
+                userRoleType: typeof (req as any).user.role,
                 requiredRoles: roles,
-                hasPermission: req.user.role && roles.includes(req.user.role)
+                hasPermission: (req as any).user.role && roles.includes((req as any).user.role)
             });
             
-            if (!req.user.role || !roles.includes(req.user.role)) {
+            if (!(req as any).user.role || !roles.includes((req as any).user.role)) {
                 // Registrar intento de acceso no autorizado
                 console.warn('Intento de acceso no autorizado', {
-                    userId: req.user.id,
+                    userId: (req as any).user.id,
                     requiredRoles: roles,
-                    userRole: req.user.role,
+                    userRole: (req as any).user.role,
                     path: req.originalUrl,
                     method: req.method,
                     ip: req.ip || req.headers['x-forwarded-for']
@@ -91,23 +91,23 @@ const checkRole = (roles) => {
             }
             
             console.debug('Acceso autorizado', {
-                userId: req.user.id,
-                userRole: req.user.role,
+                userId: (req as any).user.id,
+                userRole: (req as any).user.role,
                 path: req.originalUrl
             });
             
             next();
         } catch (error) {
             console.error('Error en verificación de roles', {
-                error: error.message,
-                stack: error.stack
+                error: (error as any).message,
+                stack: (error as any).stack
             });
             
             if (error instanceof UnauthorizedError) {
                 return res.status(401).json({ message: error.message });
             }
             
-            return res.status(403).json({ message: error.message || 'No tienes permisos para acceder a esta ruta' });
+            return res.status(403).json({ message: (error as any).message || 'No tienes permisos para acceder a esta ruta' });
         }
     };
 };

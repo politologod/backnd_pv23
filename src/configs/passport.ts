@@ -1,4 +1,6 @@
+// @ts-ignore
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+// @ts-ignore
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import User from '../models/model_user';
 import jwt from 'jsonwebtoken';
@@ -10,7 +12,7 @@ require("dotenv").config();
  * @param {Object} user - Objeto usuario que se va a incluir en el token
  * @returns {String} Token JWT firmado
  */
-const createToken = (user) => {
+const createToken = (user: any) => {
 	// Función de ayuda para convertir a objeto si no lo es
 	const userObj = typeof user.toObject === 'function' ? user.toObject() : user;
 	
@@ -23,26 +25,26 @@ const createToken = (user) => {
 	};
 	
 	// Configuración JWT 
-	const jwtOptions = {
+	const jwtOptions: any = {
 		expiresIn: process.env.JWT_EXPIRATION || "1d",
 		algorithm: "HS256"
 	};
 	
 	// Añadir issuer y audience solo en producción
 	if (process.env.NODE_ENV === 'production') {
-		jwtOptions.issuer = "puravida-api";
-		jwtOptions.audience = "puravida-client";
+		jwtOptions.issuer = process.env.JWT_ISSUER || "ecommerce-api";
+		jwtOptions.audience = process.env.JWT_AUDIENCE || "ecommerce-client";
 	}
 	
 	return jwt.sign(
 		payload,
-		process.env.JWT_SECRET,
+		process.env.JWT_SECRET as string,
 		jwtOptions
 	);
 };
 
 // Función para configurar las estrategias de Passport
-export default (passport) => {
+export default (passport: any) => {
 	// 🟢 Estrategia de autenticación con Google (exclusivamente para clientes/storefront)
 	passport.use(
 		new GoogleStrategy(
@@ -77,7 +79,7 @@ export default (passport) => {
 					// Actualizar información del usuario si ya existía
 					if (!created) {
 						// Solo actualizar si hay cambios
-						const updates = {};
+						const updates: any = {};
 						if (name && name !== user.name) updates.name = name;
 						if (profilePic && profilePic !== user.profilePic) updates.profilePic = profilePic;
 						
@@ -103,7 +105,7 @@ export default (passport) => {
 					
 					return done(null, user);
 				} catch (err) {
-					logger.error('Error autenticando con Google', { error: err.message });
+					logger.error('Error autenticando con Google', { error: (err as Error).message });
 					return done(err, null);
 				}
 			}
@@ -119,8 +121,8 @@ export default (passport) => {
 				algorithms: ["HS256"],
 				// Solo exigir issuer y audience en producción
 				...(process.env.NODE_ENV === 'production' ? {
-					issuer: "puravida-api",
-					audience: "puravida-client",
+					issuer: process.env.JWT_ISSUER || "ecommerce-api",
+					audience: process.env.JWT_AUDIENCE || "ecommerce-client",
 				} : {}),
 				ignoreExpiration: false
 			},
@@ -151,7 +153,7 @@ export default (passport) => {
 					logger.debug('Usuario autenticado con JWT', { userId: user.id, role: user.role });
 					return done(null, user);
 				} catch (err) {
-					logger.error('Error validando JWT', { error: err.message });
+					logger.error('Error validando JWT', { error: (err as Error).message });
 					return done(err, false);
 				}
 			}

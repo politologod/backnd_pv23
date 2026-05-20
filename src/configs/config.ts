@@ -4,7 +4,7 @@ export default {
   development: {
     username: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || 'postgres',
-    database: process.env.DB_NAME || 'puravida',
+    database: process.env.DB_NAME || 'ecommerce_db',
     host: process.env.DB_HOST || 'localhost',
     dialect: 'postgres',
     logging: console.log
@@ -12,7 +12,7 @@ export default {
   test: {
     username: process.env.TEST_DB_USER || 'postgres',
     password: process.env.TEST_DB_PASSWORD || 'postgres',
-    database: process.env.TEST_DB_NAME || 'puravida_test',
+    database: process.env.TEST_DB_NAME || 'ecommerce_test_db',
     host: process.env.TEST_DB_HOST || 'localhost',
     dialect: 'postgres',
     logging: false

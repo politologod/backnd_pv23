@@ -12,7 +12,7 @@ import OrderStatusHistory from './model_orderStatusHistory';
 import Tax from './model_tax';
 import ProductTax from './model_productTax';
 
-function setupAssociations(db) {
+function setupAssociations(db: any) {
     // Relaciones Producto - Categoría (Many-to-Many)
     // Primero eliminamos la relación incorrecta
     if (Product.associations && Product.associations.Category) {
@@ -26,9 +26,13 @@ function setupAssociations(db) {
     Product.belongsToMany(Category, { through: 'ProductCategories' });
     Category.belongsToMany(Product, { through: 'ProductCategories' });
     
+    // Relación Categoría - Self-referencing (jerarquía)
+    Category.hasMany(Category, { as: 'children', foreignKey: 'parentId' });
+    Category.belongsTo(Category, { as: 'parent', foreignKey: 'parentId' });
+    
     // Relaciones Usuario - Carrito
-    Cart.belongsTo(User);
-    User.hasOne(Cart);
+    Cart.belongsTo(User, { targetKey: 'id_autoincrement', foreignKey: 'UserIdAutoincrement' });
+    User.hasOne(Cart, { foreignKey: 'UserIdAutoincrement' });
     
     // Relaciones Carrito - Items
     CartItem.belongsTo(Cart);
@@ -38,8 +42,8 @@ function setupAssociations(db) {
     Product.hasMany(CartItem);
     
     // Relaciones Usuario - Órdenes
-    Order.belongsTo(User);
-    User.hasMany(Order);
+    Order.belongsTo(User, { targetKey: 'id_autoincrement', foreignKey: 'UserIdAutoincrement' });
+    User.hasMany(Order, { foreignKey: 'UserIdAutoincrement' });
     
     // Relaciones Orden - Items
     OrderItem.belongsTo(Order);
@@ -49,8 +53,8 @@ function setupAssociations(db) {
     Product.hasMany(OrderItem);
     
     // Relaciones Usuario - Favoritos
-    Favorite.belongsTo(User);
-    User.hasMany(Favorite);
+    Favorite.belongsTo(User, { targetKey: 'id_autoincrement', foreignKey: 'UserIdAutoincrement' });
+    User.hasMany(Favorite, { foreignKey: 'UserIdAutoincrement' });
     
     Favorite.belongsTo(Product);
     Product.hasMany(Favorite);
@@ -60,7 +64,7 @@ function setupAssociations(db) {
     Order.hasMany(OrderStatusHistory, { foreignKey: 'orderId' });
     
     // Relaciones Historial de estados - Usuario (opcional)
-    OrderStatusHistory.belongsTo(User, { foreignKey: 'updatedBy', as: 'statusUpdater' });
+    OrderStatusHistory.belongsTo(User, { foreignKey: 'updatedBy', as: 'statusUpdater', targetKey: 'id_autoincrement' });
     
     // Relaciones de Impuestos
     // Relación muchos a muchos entre Productos e Impuestos
@@ -75,8 +79,8 @@ function setupAssociations(db) {
     Tax.hasMany(ProductTax, { foreignKey: 'tax_id' });
     
     // Relación para saber quién creó/modificó un impuesto
-    Tax.belongsTo(User, { foreignKey: 'created_by', as: 'createdBy' });
-    Tax.belongsTo(User, { foreignKey: 'updated_by', as: 'updatedBy' });
+    Tax.belongsTo(User, { foreignKey: 'created_by', as: 'createdBy', targetKey: 'id_autoincrement' });
+    Tax.belongsTo(User, { foreignKey: 'updated_by', as: 'updatedBy', targetKey: 'id_autoincrement' });
 }
 
 export default setupAssociations;

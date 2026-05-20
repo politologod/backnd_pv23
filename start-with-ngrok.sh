@@ -15,7 +15,7 @@ export NODE_ENV=development
 # Reiniciar la aplicación con PM2 si está instalado
 if command -v pm2 &> /dev/null; then
   echo "Reiniciando la aplicación con PM2..."
-  pm2 restart puravida-backend || pm2 start src/app.js --name "puravida-backend" --env-production "USING_NGROK=true"
+  pm2 restart ecommerce-backend || pm2 start src/app.js --name "ecommerce-backend" --env-production "USING_NGROK=true"
 else
   # Iniciar la aplicación normalmente en background
   echo "Iniciando la aplicación con Node..."

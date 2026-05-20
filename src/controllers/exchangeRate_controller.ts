@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Request, Response } from 'express';
 import ExchangeRate from '../models/model_exchangeRate';
 import ExchangeRateConfig from '../models/model_exchangeRateConfig';

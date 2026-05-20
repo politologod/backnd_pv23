@@ -17,7 +17,7 @@ const getMaintenanceMode = () => {
 };
 
 // Función para activar/desactivar el modo de mantenimiento
-const setMaintenanceMode = (active) => {
+const setMaintenanceMode = (active: any) => {
   maintenanceModeActive = active;
   logger.info(`Modo de mantenimiento ${active ? 'activado' : 'desactivado'}`);
   return maintenanceModeActive;
@@ -31,7 +31,7 @@ const maintenanceMiddleware = (req: Request, res: Response, next: NextFunction) 
   }
 
   // Verificar si el usuario es administrador
-  if (req.user && req.user.role === 'admin') {
+  if ((req as any).user && (req as any).user.role === 'admin') {
     // Permitir acceso a los administradores
     return next();
   }

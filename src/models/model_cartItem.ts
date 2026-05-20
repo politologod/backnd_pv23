@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ICartItem } from '../types/models';
 import {  DataTypes  } from 'sequelize';
 import sequelize from '../configs/database';

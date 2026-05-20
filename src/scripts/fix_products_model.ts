@@ -5,7 +5,6 @@
 
 import sequelize from '../configs/database';
 import logger from '../configs/logger';
-import path from 'path';
 
 async function fixProductsModel() {
     const transaction = await sequelize.transaction();
@@ -47,9 +46,9 @@ async function fixProductsModel() {
         
         // 3. Eliminar las restricciones UNIQUE existentes para SKU
         for (const constraint of uniqueConstraints) {
-            logger.info(`Eliminando restricción: ${constraint.constraint_name}`);
+            logger.info(`Eliminando restricción: ${(constraint as any).constraint_name}`);
             await sequelize.query(`
-                ALTER TABLE "Products" DROP CONSTRAINT "${constraint.constraint_name}"
+                ALTER TABLE "Products" DROP CONSTRAINT "${(constraint as any).constraint_name}"
             `, { transaction });
         }
         
@@ -62,9 +61,9 @@ async function fixProductsModel() {
         
         // 5. Eliminar los índices existentes para SKU
         for (const idx of skuIndices) {
-            logger.info(`Eliminando índice: ${idx.indexname}`);
+            logger.info(`Eliminando índice: ${(idx as any).indexname}`);
             await sequelize.query(`
-                DROP INDEX IF EXISTS "${idx.indexname}"
+                DROP INDEX IF EXISTS "${(idx as any).indexname}"
             `, { transaction });
         }
         

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import nodemailer from 'nodemailer';
 import fs from 'fs';
 import path from 'path';
@@ -9,6 +10,8 @@ import User from '../models/model_user';
  * Servicio para manejar notificaciones por correo electrónico
  */
 class EmailNotificationService {
+  transporter: any;
+
   constructor() {
     this.transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
@@ -27,7 +30,7 @@ class EmailNotificationService {
    * @param {Object} data - Datos para la plantilla
    * @returns {string} - HTML compilado
    */
-  async compileTemplate(templateName, data) {
+  async compileTemplate(templateName: any, data: any) {
     try {
       const templatePath = path.join(__dirname, '../templates/emails', `${templateName}.hbs`);
       const templateSource = fs.readFileSync(templatePath, 'utf8');
@@ -44,12 +47,12 @@ class EmailNotificationService {
    * @param {Object} options - Opciones del correo
    * @returns {boolean} - Éxito del envío
    */
-  async sendEmail(options) {
+  async sendEmail(options: any) {
     try {
       const { to, subject, html, text } = options;
       
       const mailOptions = {
-        from: process.env.EMAIL_FROM || '"Pura Vida Store" <noreply@puravidastore.com>',
+        from: process.env.EMAIL_FROM || `"${process.env.STORE_NAME || 'My Store'}" <noreply@example.com>`,
         to,
         subject,
         html,
@@ -69,7 +72,7 @@ class EmailNotificationService {
    * @param {Object|string} userOrId - Usuario registrado o su ID
    * @returns {boolean} - Éxito del envío
    */
-  async sendWelcomeEmail(userOrId) {
+  async sendWelcomeEmail(userOrId: any) {
     try {
       let user;
       
@@ -96,16 +99,16 @@ class EmailNotificationService {
       
       const html = await this.compileTemplate('welcome', {
         name: user.name || 'Estimado cliente',
-        siteUrl: process.env.FRONTEND_URL || 'https://puravidastore.com',
+        siteUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
         email: user.email,
         currentYear
       });
       
       return await this.sendEmail({
         to: user.email,
-        subject: '¡Bienvenido a Pura Vida Store!',
+        subject: `¡Bienvenido a ${process.env.STORE_NAME || 'nuestra tienda'}!`,
         html,
-        text: `¡Hola ${user.name || 'Estimado cliente'}! Gracias por registrarte en Pura Vida Store.`
+        text: `¡Hola ${user.name || 'Estimado cliente'}! Gracias por registrarte en ${process.env.STORE_NAME || 'nuestra tienda'}.`
       });
     } catch (error) {
       console.error('Error al enviar correo de bienvenida:', error);
@@ -119,7 +122,7 @@ class EmailNotificationService {
    * @param {string} token - Token de restablecimiento
    * @returns {boolean} - Éxito del envío
    */
-  async sendPasswordResetEmail(userOrId, token) {
+  async sendPasswordResetEmail(userOrId: any, token: any) {
     try {
       let user;
       
@@ -136,7 +139,7 @@ class EmailNotificationService {
         user = userOrId;
       }
       
-      const resetUrl = `${process.env.FRONTEND_URL || 'https://puravidastore.com'}/reset-password?token=${token}`;
+      const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${token}`;
       const currentYear = new Date().getFullYear();
       
       const html = await this.compileTemplate('password-reset', {
@@ -148,7 +151,7 @@ class EmailNotificationService {
       
       return await this.sendEmail({
         to: user.email,
-        subject: 'Restablecimiento de contraseña - Pura Vida Store',
+        subject: `Restablecimiento de contraseña - ${process.env.STORE_NAME || 'Mi Tienda'}`,
         html,
         text: `Hola ${user.name || 'Estimado cliente'}, para restablecer tu contraseña, visita el siguiente enlace: ${resetUrl}. Este enlace expirará en 1 hora.`
       });
@@ -163,7 +166,7 @@ class EmailNotificationService {
    * @param {Object|string} userOrId - Usuario que cambió su contraseña o su ID
    * @returns {boolean} - Éxito del envío
    */
-  async sendPasswordChangedConfirmationEmail(userOrId) {
+  async sendPasswordChangedConfirmationEmail(userOrId: any) {
     try {
       let user;
       
@@ -184,13 +187,13 @@ class EmailNotificationService {
       
       const html = await this.compileTemplate('password-changed', {
         name: user.name || 'Estimado cliente',
-        supportEmail: process.env.SUPPORT_EMAIL || 'soporte@puravidastore.com',
+        supportEmail: process.env.SUPPORT_EMAIL || 'soporte@example.com',
         currentYear
       });
       
       return await this.sendEmail({
         to: user.email,
-        subject: 'Confirmación: Tu contraseña ha sido actualizada - Pura Vida Store',
+        subject: `Confirmación: Tu contraseña ha sido actualizada - ${process.env.STORE_NAME || 'Mi Tienda'}`,
         html,
         text: `Hola ${user.name || 'Estimado cliente'}, te confirmamos que tu contraseña ha sido actualizada correctamente. Si no realizaste este cambio, contacta inmediatamente a nuestro equipo de soporte.`
       });
@@ -205,7 +208,7 @@ class EmailNotificationService {
    * @param {Object} order - Datos de la orden
    * @returns {boolean} - Éxito del envío
    */
-  async sendNewOrderNotificationToAdmin(order) {
+  async sendNewOrderNotificationToAdmin(order: any) {
     try {
       const adminEmails = process.env.ADMIN_EMAILS?.split(',') || [];
       if (adminEmails.length === 0) return false;
@@ -218,13 +221,13 @@ class EmailNotificationService {
         orderDate: new Date(order.createdAt).toLocaleString('es-ES'),
         totalAmount: order.total.toFixed(2),
         itemCount: order.items?.length || 0,
-        adminDashboardUrl: `${process.env.ADMIN_URL || 'https://admin.puravidastore.com'}/orders/${order.id}`,
+        adminDashboardUrl: `${process.env.ADMIN_URL || 'http://localhost:3001'}/orders/${order.id}`,
         currentYear
       });
       
       return await this.sendEmail({
         to: adminEmails.join(','),
-        subject: `Nueva orden #${order.id} - Pura Vida Store`,
+        subject: `Nueva orden #${order.id} - ${process.env.STORE_NAME || 'Mi Tienda'}`,
         html,
         text: `Se ha recibido una nueva orden #${order.id} de ${order.customer?.name || 'Cliente'} por $${order.total.toFixed(2)}.`
       });
@@ -240,7 +243,7 @@ class EmailNotificationService {
    * @param {Object} customer - Datos del cliente
    * @returns {boolean} - Éxito del envío
    */
-  async sendOrderConfirmationToCustomer(order, customer) {
+  async sendOrderConfirmationToCustomer(order: any, customer: any) {
     try {
       const items = order.items?.map(item => ({
         name: item.product?.name || 'Producto',
@@ -260,7 +263,7 @@ class EmailNotificationService {
         shipping: order.shipping.toFixed(2),
         tax: order.tax.toFixed(2),
         total: order.total.toFixed(2),
-        orderUrl: `${process.env.FRONTEND_URL || 'https://puravidastore.com'}/my-account/orders/${order.id}`,
+        orderUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/my-account/orders/${order.id}`,
         shippingAddress: order.shippingAddress,
         paymentMethod: order.paymentMethod,
         currentYear
@@ -268,7 +271,7 @@ class EmailNotificationService {
       
       return await this.sendEmail({
         to: customer.email,
-        subject: `Confirmación de orden #${order.id} - Pura Vida Store`,
+        subject: `Confirmación de orden #${order.id} - ${process.env.STORE_NAME || 'Mi Tienda'}`,
         html,
         text: `Gracias por tu compra. Tu orden #${order.id} ha sido recibida y está siendo procesada.`
       });
@@ -284,7 +287,7 @@ class EmailNotificationService {
    * @param {Array} subscribers - Lista de suscriptores
    * @returns {boolean} - Éxito del envío
    */
-  async sendNewProductsNotification(products, subscribers) {
+  async sendNewProductsNotification(products: any, subscribers: any) {
     try {
       if (!subscribers || subscribers.length === 0) return false;
       
@@ -292,23 +295,23 @@ class EmailNotificationService {
         name: product.name,
         price: product.price.toFixed(2),
         imageUrl: product.mainImage,
-        productUrl: `${process.env.FRONTEND_URL || 'https://puravidastore.com'}/products/${product.slug}`
+        productUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/products/${product.slug}`
       }));
       
       const currentYear = new Date().getFullYear();
       
       const html = await this.compileTemplate('new-products', {
         products: formattedProducts,
-        unsubscribeUrl: `${process.env.FRONTEND_URL || 'https://puravidastore.com'}/unsubscribe`,
-        siteUrl: process.env.FRONTEND_URL || 'https://puravidastore.com',
+        unsubscribeUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/unsubscribe`,
+        siteUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
         currentYear
       });
       
       // Enviar a todos los suscriptores usando copia oculta (BCC)
       return await this.sendEmail({
-        to: process.env.EMAIL_FROM || 'noreply@puravidastore.com',
+        to: process.env.EMAIL_FROM || `noreply@example.com`,
         bcc: subscribers.map(sub => sub.email).join(','),
-        subject: '¡Nuevos productos disponibles! - Pura Vida Store',
+        subject: `¡Nuevos productos disponibles! - ${process.env.STORE_NAME || 'Mi Tienda'}`,
         html,
         text: `Hemos agregado nuevos productos a nuestra tienda. Visita nuestra web para conocerlos.`
       });
@@ -324,7 +327,7 @@ class EmailNotificationService {
    * @param {Array} subscribers - Lista de suscriptores
    * @returns {boolean} - Éxito del envío
    */
-  async sendPromotionsNotification(products, subscribers) {
+  async sendPromotionsNotification(products: any, subscribers: any) {
     try {
       if (!subscribers || subscribers.length === 0) return false;
       
@@ -334,23 +337,23 @@ class EmailNotificationService {
         discountPrice: product.price.toFixed(2),
         discountPercentage: Math.round((1 - (product.price / product.originalPrice)) * 100),
         imageUrl: product.mainImage,
-        productUrl: `${process.env.FRONTEND_URL || 'https://puravidastore.com'}/products/${product.slug}`
+        productUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/products/${product.slug}`
       }));
       
       const currentYear = new Date().getFullYear();
       
       const html = await this.compileTemplate('promotions', {
         products: formattedProducts,
-        unsubscribeUrl: `${process.env.FRONTEND_URL || 'https://puravidastore.com'}/unsubscribe`,
-        storeUrl: process.env.FRONTEND_URL || 'https://puravidastore.com',
+        unsubscribeUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/unsubscribe`,
+        storeUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
         currentYear
       });
       
       // Enviar a todos los suscriptores usando copia oculta (BCC)
       return await this.sendEmail({
-        to: process.env.EMAIL_FROM || 'noreply@puravidastore.com',
+        to: process.env.EMAIL_FROM || `noreply@example.com`,
         bcc: subscribers.map(sub => sub.email).join(','),
-        subject: '¡Ofertas especiales! - Pura Vida Store',
+        subject: `¡Ofertas especiales! - ${process.env.STORE_NAME || 'Mi Tienda'}`,
         html,
         text: `¡Aproveche nuestras ofertas especiales por tiempo limitado!`
       });

@@ -1,0 +1,338 @@
+﻿src/app.ts(3,22): error TS7016: Could not find a declaration file for module 'passport'. 'C:/Users/hbriceno/Desktop/backnd_pv23/node_modules/passport/lib/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/passport` if it exists or add a new declaration (.d.ts) file containing `declare module 'passport';`
+src/app.ts(5,26): error TS7016: Could not find a declaration file for module 'cookie-parser'. 'C:/Users/hbriceno/Desktop/backnd_pv23/node_modules/cookie-parser/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/cookie-parser` if it exists or add a new declaration (.d.ts) file containing `declare module 'cookie-parser';`
+src/app.ts(11,25): error TS7016: Could not find a declaration file for module 'compression'. 'C:/Users/hbriceno/Desktop/backnd_pv23/node_modules/compression/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/compression` if it exists or add a new declaration (.d.ts) file containing `declare module 'compression';`
+src/configs/logger.ts(45,46): error TS2339: Property 'substring' does not exist on type '{}'.
+src/configs/passport.ts(56,11): error TS7006: Parameter 'accessToken' implicitly has an 'any' type.
+src/configs/passport.ts(56,24): error TS7006: Parameter 'refreshToken' implicitly has an 'any' type.
+src/configs/passport.ts(56,38): error TS7006: Parameter 'profile' implicitly has an 'any' type.
+src/configs/passport.ts(56,47): error TS7006: Parameter 'done' implicitly has an 'any' type.
+src/configs/passport.ts(129,11): error TS7006: Parameter 'jwtPayload' implicitly has an 'any' type.
+src/configs/passport.ts(129,23): error TS7006: Parameter 'done' implicitly has an 'any' type.
+src/controllers/auth_controller.ts(177,58): error TS2345: Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/controllers/auth_controller.ts(249,61): error TS7006: Parameter 'err' implicitly has an 'any' type.
+src/controllers/auth_controller.ts(249,66): error TS7006: Parameter 'decoded' implicitly has an 'any' type.
+src/controllers/cart_controller.ts(7,14): error TS2323: Cannot redeclare exported variable 'addItemToCart'.
+src/controllers/cart_controller.ts(30,50): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(this: ModelStatic<ICart>, options: NonNullFindOptions<CartAttributes>): Promise<ICart>', gave the following error.
+    Object literal may only specify known properties, and 'UserIdAutoincrement' does not exist in type 'WhereOptions<CartAttributes>'.
+  Overload 2 of 2, '(this: ModelStatic<ICart>, options?: FindOptions<CartAttributes> | undefined): Promise<ICart | null>', gave the following error.
+    Object literal may only specify known properties, and 'UserIdAutoincrement' does not exist in type 'WhereOptions<CartAttributes>'.
+src/controllers/cart_controller.ts(32,40): error TS2353: Object literal may only specify known properties, and 'UserIdAutoincrement' does not exist in type 'Optional<CartCreationAttributes, NullishPropertiesOf<CartCreationAttributes>>'.
+src/controllers/cart_controller.ts(69,14): error TS2323: Cannot redeclare exported variable 'removeItemFromCart'.
+src/controllers/cart_controller.ts(76,22): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(this: ModelStatic<ICart>, options: NonNullFindOptions<CartAttributes>): Promise<ICart>', gave the following error.
+    Object literal may only specify known properties, and 'UserIdAutoincrement' does not exist in type 'WhereOptions<CartAttributes>'.
+  Overload 2 of 2, '(this: ModelStatic<ICart>, options?: FindOptions<CartAttributes> | undefined): Promise<ICart | null>', gave the following error.
+    Object literal may only specify known properties, and 'UserIdAutoincrement' does not exist in type 'WhereOptions<CartAttributes>'.
+src/controllers/cart_controller.ts(106,14): error TS2323: Cannot redeclare exported variable 'getCart'.
+src/controllers/cart_controller.ts(112,22): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(this: ModelStatic<ICart>, options: NonNullFindOptions<CartAttributes>): Promise<ICart>', gave the following error.
+    Object literal may only specify known properties, and 'UserIdAutoincrement' does not exist in type 'WhereOptions<CartAttributes>'.
+  Overload 2 of 2, '(this: ModelStatic<ICart>, options?: FindOptions<CartAttributes> | undefined): Promise<ICart | null>', gave the following error.
+    Object literal may only specify known properties, and 'UserIdAutoincrement' does not exist in type 'WhereOptions<CartAttributes>'.
+src/controllers/cart_controller.ts(121,49): error TS2353: Object literal may only specify known properties, and 'UserIdAutoincrement' does not exist in type 'Optional<CartCreationAttributes, NullishPropertiesOf<CartCreationAttributes>>'.
+src/controllers/cart_controller.ts(133,14): error TS2323: Cannot redeclare exported variable 'clearCart'.
+src/controllers/cart_controller.ts(139,22): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(this: ModelStatic<ICart>, options: NonNullFindOptions<CartAttributes>): Promise<ICart>', gave the following error.
+    Object literal may only specify known properties, and 'UserIdAutoincrement' does not exist in type 'WhereOptions<CartAttributes>'.
+  Overload 2 of 2, '(this: ModelStatic<ICart>, options?: FindOptions<CartAttributes> | undefined): Promise<ICart | null>', gave the following error.
+    Object literal may only specify known properties, and 'UserIdAutoincrement' does not exist in type 'WhereOptions<CartAttributes>'.
+src/controllers/cart_controller.ts(157,3): error TS2323: Cannot redeclare exported variable 'addItemToCart'.
+src/controllers/cart_controller.ts(157,3): error TS2484: Export declaration conflicts with exported declaration of 'addItemToCart'.
+src/controllers/cart_controller.ts(158,3): error TS2323: Cannot redeclare exported variable 'removeItemFromCart'.
+src/controllers/cart_controller.ts(158,3): error TS2484: Export declaration conflicts with exported declaration of 'removeItemFromCart'.
+src/controllers/cart_controller.ts(159,3): error TS2323: Cannot redeclare exported variable 'getCart'.
+src/controllers/cart_controller.ts(159,3): error TS2484: Export declaration conflicts with exported declaration of 'getCart'.
+src/controllers/cart_controller.ts(160,3): error TS2323: Cannot redeclare exported variable 'clearCart'.
+src/controllers/cart_controller.ts(160,3): error TS2484: Export declaration conflicts with exported declaration of 'clearCart'.
+src/controllers/category_controller.ts(2,11): error TS2614: Module '"../utils/validator"' has no exported member 'validateCategory'. Did you mean to use 'import validateCategory from "../utils/validator"' instead?
+src/controllers/category_controller.ts(32,50): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(this: ModelStatic<ICategory>, identifier: Identifier, options: Omit<NonNullFindOptions<CategoryAttributes>, "where">): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier'.
+      Type 'string[]' is not assignable to type 'Identifier'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+  Overload 2 of 2, '(this: ModelStatic<ICategory>, identifier?: Identifier | undefined, options?: Omit<FindOptions<CategoryAttributes>, "where"> | undefined): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+      Type 'string[]' is not assignable to type 'Identifier | undefined'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/category_controller.ts(70,42): error TS2554: Expected 0 arguments, but got 1.
+src/controllers/category_controller.ts(106,50): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/category_controller.ts(115,79): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/category_controller.ts(153,57): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/healthcheck.ts(49,13): error TS2322: Type 'string' is not assignable to type 'null'.
+src/controllers/order_controller.ts(122,4): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+src/controllers/order_controller.ts(130,20): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+src/controllers/order_controller.ts(219,20): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+src/controllers/order_controller.ts(273,28): error TS2339: Property 'sendOrderConfirmationEmail' does not exist on type 'EmailNotificationService'.
+src/controllers/order_controller.ts(274,10): error TS7006: Parameter 'emailSent' implicitly has an 'any' type.
+src/controllers/order_controller.ts(279,11): error TS7006: Parameter 'err' implicitly has an 'any' type.
+src/controllers/order_controller.ts(347,38): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(this: ModelStatic<IOrder>, identifier: Identifier, options: Omit<NonNullFindOptions<OrderAttributes>, "where">): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier'.
+      Type 'string[]' is not assignable to type 'Identifier'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+  Overload 2 of 2, '(this: ModelStatic<IOrder>, identifier?: Identifier | undefined, options?: Omit<FindOptions<OrderAttributes>, "where"> | undefined): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+      Type 'string[]' is not assignable to type 'Identifier | undefined'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/order_controller.ts(395,38): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/order_controller.ts(445,38): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(this: ModelStatic<IOrder>, identifier: Identifier, options: Omit<NonNullFindOptions<OrderAttributes>, "where">): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier'.
+      Type 'string[]' is not assignable to type 'Identifier'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+  Overload 2 of 2, '(this: ModelStatic<IOrder>, identifier?: Identifier | undefined, options?: Omit<FindOptions<OrderAttributes>, "where"> | undefined): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+      Type 'string[]' is not assignable to type 'Identifier | undefined'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/order_controller.ts(482,45): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(this: ModelStatic<IOrder>, identifier: Identifier, options: Omit<NonNullFindOptions<OrderAttributes>, "where">): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier'.
+      Type 'string[]' is not assignable to type 'Identifier'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+  Overload 2 of 2, '(this: ModelStatic<IOrder>, identifier?: Identifier | undefined, options?: Omit<FindOptions<OrderAttributes>, "where"> | undefined): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+      Type 'string[]' is not assignable to type 'Identifier | undefined'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/order_controller.ts(518,38): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(this: ModelStatic<IOrder>, identifier: Identifier, options: Omit<NonNullFindOptions<OrderAttributes>, "where">): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier'.
+      Type 'string[]' is not assignable to type 'Identifier'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+  Overload 2 of 2, '(this: ModelStatic<IOrder>, identifier?: Identifier | undefined, options?: Omit<FindOptions<OrderAttributes>, "where"> | undefined): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+      Type 'string[]' is not assignable to type 'Identifier | undefined'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/order_controller.ts(572,32): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(this: ModelStatic<IOrder>, identifier: Identifier, options: Omit<NonNullFindOptions<OrderAttributes>, "where">): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier'.
+      Type 'string[]' is not assignable to type 'Identifier'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+  Overload 2 of 2, '(this: ModelStatic<IOrder>, identifier?: Identifier | undefined, options?: Omit<FindOptions<OrderAttributes>, "where"> | undefined): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+      Type 'string[]' is not assignable to type 'Identifier | undefined'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/order_controller.ts(596,44): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/order_controller.ts(667,55): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(this: ModelStatic<IOrder>, identifier: Identifier, options: Omit<NonNullFindOptions<OrderAttributes>, "where">): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier'.
+      Type 'string[]' is not assignable to type 'Identifier'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+  Overload 2 of 2, '(this: ModelStatic<IOrder>, identifier?: Identifier | undefined, options?: Omit<FindOptions<OrderAttributes>, "where"> | undefined): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+      Type 'string[]' is not assignable to type 'Identifier | undefined'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/order_controller.ts(698,44): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(this: ModelStatic<IOrder>, identifier: Identifier, options: Omit<NonNullFindOptions<OrderAttributes>, "where">): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier'.
+      Type 'string[]' is not assignable to type 'Identifier'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+  Overload 2 of 2, '(this: ModelStatic<IOrder>, identifier?: Identifier | undefined, options?: Omit<FindOptions<OrderAttributes>, "where"> | undefined): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+      Type 'string[]' is not assignable to type 'Identifier | undefined'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/order_controller.ts(742,38): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/order_controller.ts(789,44): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/order_controller.ts(809,55): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(this: ModelStatic<IOrder>, identifier: Identifier, options: Omit<NonNullFindOptions<OrderAttributes>, "where">): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier'.
+      Type 'string[]' is not assignable to type 'Identifier'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+  Overload 2 of 2, '(this: ModelStatic<IOrder>, identifier?: Identifier | undefined, options?: Omit<FindOptions<OrderAttributes>, "where"> | undefined): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+      Type 'string[]' is not assignable to type 'Identifier | undefined'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/order_controller.ts(840,38): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(this: ModelStatic<IOrder>, identifier: Identifier, options: Omit<NonNullFindOptions<OrderAttributes>, "where">): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier'.
+      Type 'string[]' is not assignable to type 'Identifier'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+  Overload 2 of 2, '(this: ModelStatic<IOrder>, identifier?: Identifier | undefined, options?: Omit<FindOptions<OrderAttributes>, "where"> | undefined): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+      Type 'string[]' is not assignable to type 'Identifier | undefined'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/product_controller.ts(4,11): error TS2614: Module '"../utils/validator"' has no exported member 'validateProduct'. Did you mean to use 'import validateProduct from "../utils/validator"' instead?
+src/controllers/product_controller.ts(24,48): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/product_controller.ts(215,34): error TS2345: Argument of type '{ index: number; id: any; name: any; sku: any; }' is not assignable to parameter of type 'never'.
+src/controllers/product_controller.ts(255,33): error TS2345: Argument of type '{ index: number; name: any; sku: any; error: { type: string; message: string; } | { type: string; details: any; }; }' is not assignable to parameter of type 'never'.
+src/controllers/product_controller.ts(346,48): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(this: ModelStatic<IProduct>, identifier: Identifier, options: Omit<NonNullFindOptions<ProductAttributes>, "where">): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier'.
+      Type 'string[]' is not assignable to type 'Identifier'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+  Overload 2 of 2, '(this: ModelStatic<IProduct>, identifier?: Identifier | undefined, options?: Omit<FindOptions<ProductAttributes>, "where"> | undefined): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+      Type 'string[]' is not assignable to type 'Identifier | undefined'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/product_controller.ts(379,48): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/product_controller.ts(403,50): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(this: ModelStatic<ICategory>, identifier: Identifier, options: Omit<NonNullFindOptions<CategoryAttributes>, "where">): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier'.
+      Type 'string[]' is not assignable to type 'Identifier'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+  Overload 2 of 2, '(this: ModelStatic<ICategory>, identifier?: Identifier | undefined, options?: Omit<FindOptions<CategoryAttributes>, "where"> | undefined): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+      Type 'string[]' is not assignable to type 'Identifier | undefined'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/product_controller.ts(485,48): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(this: ModelStatic<IProduct>, identifier: Identifier, options: Omit<NonNullFindOptions<ProductAttributes>, "where">): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier'.
+      Type 'string[]' is not assignable to type 'Identifier'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+  Overload 2 of 2, '(this: ModelStatic<IProduct>, identifier?: Identifier | undefined, options?: Omit<FindOptions<ProductAttributes>, "where"> | undefined): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+      Type 'string[]' is not assignable to type 'Identifier | undefined'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/seo_controller.ts(102,16): error TS2353: Object literal may only specify known properties, and 'active' does not exist in type 'WhereOptions<ProductAttributes>'.
+src/controllers/tax_controller.ts(4,11): error TS2614: Module '"../utils/validator"' has no exported member 'validateString'. Did you mean to use 'import validateString from "../utils/validator"' instead?
+src/controllers/tax_controller.ts(4,27): error TS2614: Module '"../utils/validator"' has no exported member 'validateNumber'. Did you mean to use 'import validateNumber from "../utils/validator"' instead?
+src/controllers/tax_controller.ts(64,36): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(this: ModelStatic<Tax>, identifier: Identifier, options: Omit<NonNullFindOptions<any>, "where">): Promise<Tax>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier'.
+      Type 'string[]' is not assignable to type 'Identifier'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+  Overload 2 of 2, '(this: ModelStatic<Tax>, identifier?: Identifier | undefined, options?: Omit<FindOptions<any>, "where"> | undefined): Promise<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+      Type 'string[]' is not assignable to type 'Identifier | undefined'.
+        Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/tax_controller.ts(185,36): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/tax_controller.ts(234,43): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/tax_controller.ts(262,36): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/tax_controller.ts(307,44): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/tax_controller.ts(316,36): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/tax_controller.ts(432,7): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+src/controllers/tax_controller.ts(438,23): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+src/controllers/tax_controller.ts(486,44): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/tax_controller.ts(495,62): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'number'.
+  Type 'string' is not assignable to type 'number'.
+src/controllers/tax_controller.ts(530,36): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/tax_controller.ts(572,36): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/tax_controller.ts(610,36): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/tax_controller.ts(659,36): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/upload_controller.ts(2,3): error TS2614: Module '"../utils/cloudinaryConfig"' has no exported member 'uploadProductImage'. Did you mean to use 'import uploadProductImage from "../utils/cloudinaryConfig"' instead?
+src/controllers/upload_controller.ts(3,3): error TS2614: Module '"../utils/cloudinaryConfig"' has no exported member 'uploadPaymentProof'. Did you mean to use 'import uploadPaymentProof from "../utils/cloudinaryConfig"' instead?
+src/controllers/upload_controller.ts(4,3): error TS2614: Module '"../utils/cloudinaryConfig"' has no exported member 'uploadMultipleProductImages'. Did you mean to use 'import uploadMultipleProductImages from "../utils/cloudinaryConfig"' instead?
+src/controllers/upload_controller.ts(5,3): error TS2614: Module '"../utils/cloudinaryConfig"' has no exported member 'deleteImage'. Did you mean to use 'import deleteImage from "../utils/cloudinaryConfig"' instead?
+src/controllers/upload_controller.ts(31,44): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/upload_controller.ts(95,44): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/upload_controller.ts(108,46): error TS7006: Parameter 'result' implicitly has an 'any' type.
+src/controllers/upload_controller.ts(109,42): error TS7006: Parameter 'result' implicitly has an 'any' type.
+src/controllers/upload_controller.ts(115,35): error TS7006: Parameter 'result' implicitly has an 'any' type.
+src/controllers/upload_controller.ts(130,45): error TS7006: Parameter 'upload' implicitly has an 'any' type.
+src/controllers/upload_controller.ts(145,37): error TS7006: Parameter 'upload' implicitly has an 'any' type.
+src/controllers/upload_controller.ts(182,40): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/upload_controller.ts(324,44): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/user_controller.ts(8,14): error TS2323: Cannot redeclare exported variable 'getAllUsers'.
+src/controllers/user_controller.ts(67,14): error TS2323: Cannot redeclare exported variable 'getUserById'.
+src/controllers/user_controller.ts(69,42): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/user_controller.ts(79,14): error TS2323: Cannot redeclare exported variable 'updateUser'.
+src/controllers/user_controller.ts(81,42): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/user_controller.ts(92,14): error TS2323: Cannot redeclare exported variable 'deleteUser'.
+src/controllers/user_controller.ts(94,42): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'Identifier | undefined'.
+  Type 'string[]' is not assignable to type 'Identifier | undefined'.
+    Type 'string[]' is missing the following properties from type 'Buffer<ArrayBufferLike>': subarray, write, toJSON, equals, and 73 more.
+src/controllers/user_controller.ts(105,14): error TS2323: Cannot redeclare exported variable 'createUser'.
+src/controllers/user_controller.ts(231,34): error TS2345: Argument of type '{ index: number; id: number; email: string | null | undefined; name: string; role: "admin" | "customer" | "vendor" | "staff"; }' is not assignable to parameter of type 'never'.
+src/controllers/user_controller.ts(249,33): error TS2345: Argument of type '{ index: number; email: any; name: any; error: string; }' is not assignable to parameter of type 'never'.
+src/controllers/user_controller.ts(279,14): error TS2323: Cannot redeclare exported variable 'getCurrentUser'.
+src/controllers/user_controller.ts(318,3): error TS2323: Cannot redeclare exported variable 'getAllUsers'.
+src/controllers/user_controller.ts(318,3): error TS2484: Export declaration conflicts with exported declaration of 'getAllUsers'.
+src/controllers/user_controller.ts(319,3): error TS2323: Cannot redeclare exported variable 'getUserById'.
+src/controllers/user_controller.ts(319,3): error TS2484: Export declaration conflicts with exported declaration of 'getUserById'.
+src/controllers/user_controller.ts(320,3): error TS2323: Cannot redeclare exported variable 'updateUser'.
+src/controllers/user_controller.ts(320,3): error TS2484: Export declaration conflicts with exported declaration of 'updateUser'.
+src/controllers/user_controller.ts(321,3): error TS2323: Cannot redeclare exported variable 'deleteUser'.
+src/controllers/user_controller.ts(321,3): error TS2484: Export declaration conflicts with exported declaration of 'deleteUser'.
+src/controllers/user_controller.ts(322,3): error TS2323: Cannot redeclare exported variable 'createUser'.
+src/controllers/user_controller.ts(322,3): error TS2484: Export declaration conflicts with exported declaration of 'createUser'.
+src/controllers/user_controller.ts(323,3): error TS2323: Cannot redeclare exported variable 'getCurrentUser'.
+src/controllers/user_controller.ts(323,3): error TS2484: Export declaration conflicts with exported declaration of 'getCurrentUser'.
+src/middlewares/logger.middleware.ts(51,38): error TS2345: Argument of type 'any[]' is not assignable to parameter of type '[chunk: any, encoding: BufferEncoding, cb?: (() => void) | undefined]'.
+  Target requires 2 element(s) but source may have fewer.
+src/middlewares/logger.middleware.ts(70,29): error TS2345: Argument of type 'any[]' is not assignable to parameter of type '[chunk: any, encoding: BufferEncoding, cb?: (() => void) | undefined]'.
+  Target requires 2 element(s) but source may have fewer.
+src/middlewares/upload.ts(131,29): error TS2345: Argument of type 'any[]' is not assignable to parameter of type '[chunk: any, encoding: BufferEncoding, cb?: (() => void) | undefined]'.
+  Target requires 2 element(s) but source may have fewer.
+src/models/model_cart.ts(11,2): error TS2353: Object literal may only specify known properties, and 'UserIdAutoincrement' does not exist in type 'ModelAttributes<ICart, CartAttributes>'.
+src/models/model_cartItem.ts(5,58): error TS2345: Argument of type '{ id: { type: DataTypes.IntegerDataTypeConstructor; primaryKey: true; autoIncrement: true; }; quantity: { type: DataTypes.IntegerDataTypeConstructor; defaultValue: number; }; }' is not assignable to parameter of type 'ModelAttributes<ICartItem, CartItemAttributes>'.
+  Type '{ id: { type: IntegerDataTypeConstructor; primaryKey: true; autoIncrement: true; }; quantity: { type: IntegerDataTypeConstructor; defaultValue: number; }; }' is missing the following properties from type 'ModelAttributes<ICartItem, CartItemAttributes>': cartId, productId
+src/models/model_favorite.ts(5,58): error TS2345: Argument of type '{ id: { type: DataTypes.IntegerDataTypeConstructor; primaryKey: true; autoIncrement: true; }; }' is not assignable to parameter of type 'ModelAttributes<IFavorite, FavoriteAttributes>'.
+  Type '{ id: { type: IntegerDataTypeConstructor; primaryKey: true; autoIncrement: true; }; }' is missing the following properties from type 'ModelAttributes<IFavorite, FavoriteAttributes>': userId, productId
+src/models/model_order.ts(5,49): error TS2345: Argument of type '{ id: { type: DataTypes.IntegerDataTypeConstructor; primaryKey: true; autoIncrement: true; }; orderNumber: { type: DataTypes.StringDataType; allowNull: true; unique: true; comment: string; }; ... 24 more ...; transactionLastDigits: { ...; }; }' is not assignable to parameter of type 'ModelAttributes<IOrder, OrderAttributes>'.
+  Property 'userId' is missing in type '{ id: { type: DataTypes.IntegerDataTypeConstructor; primaryKey: true; autoIncrement: true; }; orderNumber: { type: DataTypes.StringDataType; allowNull: true; unique: true; comment: string; }; ... 24 more ...; transactionLastDigits: { ...; }; }' but required in type 'ModelAttributes<IOrder, OrderAttributes>'.
+src/models/model_orderItem.ts(5,61): error TS2345: Argument of type '{ id: { type: DataTypes.IntegerDataTypeConstructor; primaryKey: true; autoIncrement: true; }; productName: { type: DataTypes.StringDataTypeConstructor; allowNull: true; comment: string; }; quantity: { ...; }; priceAtPurchase: { ...; }; total: { ...; }; }' is not assignable to parameter of type 'ModelAttributes<IOrderItem, OrderItemAttributes>'.
+  Type '{ id: { type: IntegerDataTypeConstructor; primaryKey: true; autoIncrement: true; }; productName: { type: StringDataTypeConstructor; allowNull: true; comment: string; }; quantity: { ...; }; priceAtPurchase: { ...; }; total: { ...; }; }' is missing the following properties from type 'ModelAttributes<IOrderItem, OrderItemAttributes>': orderId, productId
+src/routes/auth.ts(2,22): error TS7016: Could not find a declaration file for module 'passport'. 'C:/Users/hbriceno/Desktop/backnd_pv23/node_modules/passport/lib/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/passport` if it exists or add a new declaration (.d.ts) file containing `declare module 'passport';`
+src/services/emailNotificationService.ts(16,7): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Object literal may only specify known properties, and 'host' does not exist in type 'TransportOptions | Transport<unknown, TransportOptions>'.
+src/services/emailNotificationService.ts(247,38): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/services/emailNotificationService.ts(293,46): error TS7006: Parameter 'product' implicitly has an 'any' type.
+src/services/emailNotificationService.ts(312,30): error TS7006: Parameter 'sub' implicitly has an 'any' type.
+src/services/emailNotificationService.ts(333,46): error TS7006: Parameter 'product' implicitly has an 'any' type.
+src/services/emailNotificationService.ts(354,30): error TS7006: Parameter 'sub' implicitly has an 'any' type.
+src/tests/health.test.ts(43,69): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+src/tests/health.test.ts(60,69): error TS2345: Argument of type 'Error' is not assignable to parameter of type 'never'.
+src/tests/upload.test.ts(6,11): error TS2614: Module '"../utils/cloudinaryConfig"' has no exported member 'cloudinary'. Did you mean to use 'import cloudinary from "../utils/cloudinaryConfig"' instead?
+src/utils/cloudinaryConfig.ts(112,36): error TS7006: Parameter 'file' implicitly has an 'any' type.
+src/utils/emailService.ts(6,5): error TS7034: Variable 'transporter' implicitly has type 'any' in some locations where its type cannot be determined.
+src/utils/emailService.ts(13,7): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Object literal may only specify known properties, and 'host' does not exist in type 'TransportOptions | Transport<unknown, TransportOptions>'.
+src/utils/emailService.ts(60,10): error TS7005: Variable 'transporter' implicitly has an 'any' type.
+src/utils/emailService.ts(64,12): error TS7005: Variable 'transporter' implicitly has an 'any' type.
+src/utils/emailService.ts(68,14): error TS7005: Variable 'transporter' implicitly has an 'any' type.
+src/utils/emailTemplates.ts(183,39): error TS7006: Parameter 'item' implicitly has an 'any' type.

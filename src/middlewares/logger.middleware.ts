@@ -35,23 +35,23 @@ const errorLogger = (err: any, req: Request, res: Response, next: NextFunction) 
 // Middleware para añadir información contextual a los logs
 const requestContextLogger = (req: Request, res: Response, next: NextFunction) => {
   // Generar un ID de solicitud si no existe
-  req.id = req.headers['x-request-id'] || `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  (req as any).id = req.headers['x-request-id'] || `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   
   // Solo establecemos el encabezado si no se han enviado ya
   if (!res.headersSent) {
-    res.setHeader('X-Request-ID', req.id);
+    res.setHeader('X-Request-ID', (req as any).id);
   }
   
   // Interceptar el final de la solicitud para loguear la respuesta
   const originalEnd = res.end;
   
-  res.end = function(...args) {
+  (res as any).end = function(...args: any[]) {
     // Asegurarnos de que no interfiere con el flujo normal
     if (this.writableEnded) {
       return originalEnd.apply(this, args);
     }
     
-    const responseTime = Date.now() - (req._startTime || Date.now());
+    const responseTime = Date.now() - ((req as any)._startTime || Date.now());
     const statusCode = res.statusCode;
     
     // Solo logueamos errores o en modo desarrollo
@@ -71,7 +71,7 @@ const requestContextLogger = (req: Request, res: Response, next: NextFunction) =
   };
   
   // Marcar el tiempo de inicio
-  req._startTime = Date.now();
+  (req as any)._startTime = Date.now();
   next();
 };
 

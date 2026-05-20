@@ -11,7 +11,7 @@ import { Request, Response } from 'express';
 
 
 // 🔹 Generar token JWT con más información útil pero excluyendo datos sensibles
-const createToken = (user) => {
+const createToken = (user: any) => {
 	// Función de ayuda para convertir a objeto si no lo es
 	const userObj = typeof user.toObject === 'function' ? user.toObject() : user;
 	
@@ -30,26 +30,26 @@ const createToken = (user) => {
 	});
 	
 	// Configuración JWT con valores adecuados
-	const jwtOptions = {
+	const jwtOptions: any = {
 		expiresIn: process.env.JWT_EXPIRATION || '1d',
 		algorithm: "HS256"
 	};
 	
 	// Añadir issuer y audience solo en producción, evitando undefined
 	if (process.env.NODE_ENV === 'production') {
-		jwtOptions.issuer = "puravida-api";
-		jwtOptions.audience = "puravida-client";
+		jwtOptions.issuer = process.env.JWT_ISSUER || "ecommerce-api";
+		jwtOptions.audience = process.env.JWT_AUDIENCE || "ecommerce-client";
 	}
 	
 	return jwt.sign(
 		payload,
-		process.env.JWT_SECRET,
+		process.env.JWT_SECRET as string,
 		jwtOptions
 	);
 };
 
 // Configuración de cookie segura
-const secureCookieConfig = {
+const secureCookieConfig: any = {
 	httpOnly: true, 
 	secure: process.env.NODE_ENV === "production",
 	sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax", 
@@ -89,17 +89,17 @@ const register = async (req: Request, res: Response) => {
 		
 		if (role && role !== 'customer') {
 			// Sólo un admin puede crear usuarios con roles distintos a customer
-			if (req.user && req.user.role === 'admin') {
+			if ((req as any).user && (req as any).user.role === 'admin') {
 				userRole = role;
 				console.info('Admin creando usuario con rol específico', { 
-					createdBy: req.user.id, 
+					createdBy: (req as any).user.id, 
 					newUserEmail: email, 
 					assignedRole: role 
 				});
 			} else {
 				console.warn('Intento de crear usuario con rol privilegiado sin permisos', { 
 					requestedRole: role,
-					requesterRole: req.user?.role || 'anonymous'
+					requesterRole: (req as any).user?.role || 'anonymous'
 				});
 				// No permitir crear roles privilegiados, pero no dar error (silenciosamente asignar customer)
 			}
@@ -112,7 +112,7 @@ const register = async (req: Request, res: Response) => {
 			email,
 			password,
 			name,
-			role: userRole
+			role: userRole as any
 		});
 
 		console.debug('Usuario creado con éxito', { 
@@ -148,7 +148,7 @@ const register = async (req: Request, res: Response) => {
 			}
 		});
 	} catch (error) {
-		console.error('Error en registro', { error: error.message });
+		console.error('Error en registro', { error: (error as Error).message });
 		
 		if (error instanceof BadRequestError) {
 			return res.status(400).json({ message: error.message });
@@ -210,7 +210,7 @@ const login = async (req: Request, res: Response) => {
 			}
 		});
 	} catch (error) {
-		console.error('Error en login', { error: error.message });
+		console.error('Error en login', { error: (error as Error).message });
 		
 		if (error instanceof BadRequestError || error instanceof UnauthorizedError) {
 			return res.status(error instanceof BadRequestError ? 400 : 401).json({ message: error.message });
@@ -234,7 +234,7 @@ const logout = (req: Request, res: Response) => {
 		
 		res.json({ message: 'Sesión cerrada exitosamente' });
 	} catch (error) {
-		console.error('Error en logout', { error: error.message });
+		console.error('Error en logout', { error: (error as Error).message });
 		res.status(500).json({ message: 'Error al cerrar sesión' });
 	}
 };
@@ -246,13 +246,13 @@ const verifyToken = (req: Request, res: Response) => {
 	  return res.json({ authenticated: false, user: null });
 	}
   
-	jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+	jwt.verify(token, process.env.JWT_SECRET as string, async (err, decoded) => {
 	  if (err) {
 		return res.json({ authenticated: false, user: null });
 	  }
   
 	  try {
-		const user = await User.findByPk(decoded.id, {
+		const user = await User.findByPk((decoded as any).id, {
 		  attributes: ['id', 'email', 'role'],
 		});
   
@@ -314,7 +314,7 @@ const requestPasswordReset = async (req: Request, res: Response) => {
 			message: 'Si la dirección de correo está registrada, recibirás un email con instrucciones para restablecer tu contraseña'
 		});
 	} catch (error) {
-		logger.error('Error al procesar solicitud de restablecimiento de contraseña', { error: error.message });
+		logger.error('Error al procesar solicitud de restablecimiento de contraseña', { error: (error as Error).message });
 		return res.status(500).json({
 			success: false,
 			message: 'Error al procesar la solicitud. Por favor, inténtalo más tarde.'
@@ -376,11 +376,54 @@ const resetPassword = async (req: Request, res: Response) => {
 			message: 'Tu contraseña ha sido actualizada correctamente'
 		});
 	} catch (error) {
-		logger.error('Error al restablecer contraseña', { error: error.message });
+		logger.error('Error al restablecer contraseña', { error: (error as Error).message });
 		return res.status(500).json({
 			success: false,
 			message: 'Error al restablecer la contraseña. Por favor, inténtalo más tarde.'
 		});
+	}
+};
+
+// 🔹 Refrescar token JWT
+const refreshToken = async (req: Request, res: Response) => {
+	try {
+		const token = req.cookies.token;
+
+		if (!token) {
+			return res.status(401).json({ message: 'No token provided' });
+		}
+
+		let decoded;
+		try {
+			decoded = jwt.verify(token, process.env.JWT_SECRET as string);
+		} catch (err) {
+			return res.status(401).json({ message: 'Token inválido o expirado' });
+		}
+
+		const user = await User.findByPk((decoded as any).id);
+
+		if (!user) {
+			return res.status(401).json({ message: 'Usuario no encontrado' });
+		}
+
+		// Generar nuevo token
+		const newToken = createToken(user);
+
+		// Configurar cookie segura
+		res.cookie('token', newToken, secureCookieConfig);
+
+		return res.json({
+			message: 'Token refreshed',
+			user: {
+				id: user.id,
+				email: user.email,
+				name: user.name,
+				role: user.role
+			}
+		});
+	} catch (error) {
+		console.error('Error al refrescar token', { error: (error as Error).message });
+		return res.status(500).json({ message: 'Error al refrescar token' });
 	}
 };
 
@@ -390,5 +433,6 @@ export {
 	logout,
 	verifyToken,
 	requestPasswordReset,
-	resetPassword
+	resetPassword,
+	refreshToken
 };

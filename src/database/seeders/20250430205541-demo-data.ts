@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 
 /** @type {import('sequelize-cli').Migration} */
 export default {
-  async up(queryInterface, Sequelize) {
+  async up(queryInterface: any, Sequelize: any) {
     // Crear usuarios de prueba
     const users = await queryInterface.bulkInsert('Users', [
       {
@@ -110,7 +110,7 @@ export default {
     ]);
   },
 
-  async down(queryInterface, Sequelize) {
+  async down(queryInterface: any, Sequelize: any) {
     // Eliminar datos en orden inverso
     await queryInterface.bulkDelete('CartItems', null, {});
     await queryInterface.bulkDelete('Carts', null, {});

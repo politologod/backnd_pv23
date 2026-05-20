@@ -1,4 +1,4 @@
-import {  error, debug  } from '../configs/logger';
+import logger from '../configs/logger';
 import { Request, Response, NextFunction } from 'express';
 
 
@@ -25,11 +25,11 @@ const errorHandler = (err: any, req: Request, res: Response, next: NextFunction)
   
   // Estructura para el logger
   const logData = {
-    requestId: req.id,
+    requestId: (req as any).id,
     path: req.originalUrl || req.url,
     method: req.method,
-    ip: req.ip || req.connection.remoteAddress,
-    userId: req.user?.id || 'anónimo',
+    ip: req.ip || (req as any).connection.remoteAddress,
+    userId: (req as any).user?.id || 'anónimo',
     statusCode,
     errorName: err.name,
     errorMessage: err.message,
@@ -38,11 +38,11 @@ const errorHandler = (err: any, req: Request, res: Response, next: NextFunction)
   };
   
   // Registrar el error con el nivel adecuado
-  error(`Error en ${req.method} ${req.originalUrl || req.url}: ${err.message}`, logData);
+  logger.error(`Error en ${req.method} ${req.originalUrl || req.url}: ${err.message}`, logData);
   
   // Para errores 500, registrar más detalles a nivel de debug
   if (statusCode === 500) {
-    debug('Detalles del error interno:', {
+    logger.debug('Detalles del error interno:', {
       stack: err.stack,
       error: err
     });
@@ -52,4 +52,4 @@ const errorHandler = (err: any, req: Request, res: Response, next: NextFunction)
   res.status(statusCode).json(errorResponse);
 };
 
-export default errorHandler; 
+export default errorHandler;

@@ -4,7 +4,7 @@
  */
 
 // Validadores comunes
-const validateString = (value, { min = 1, max = 255, required = true } = {}) => {
+const validateString = (value: any, { min = 1, max = 255, required = true }: any = {}) => {
     if (!value && required) {
         return { valid: false, message: 'El valor es requerido' };
     }
@@ -30,7 +30,7 @@ const validateString = (value, { min = 1, max = 255, required = true } = {}) => 
     return { valid: true };
 };
 
-const validateNumber = (value, { min, max, required = true, isInteger = false } = {}) => {
+const validateNumber = (value: any, { min, max, required = true, isInteger = false }: any = {}) => {
     if ((value === undefined || value === null) && required) {
         return { valid: false, message: 'El valor es requerido' };
     }
@@ -60,7 +60,7 @@ const validateNumber = (value, { min, max, required = true, isInteger = false } 
     return { valid: true };
 };
 
-const validateEmail = (email, { required = true } = {}) => {
+const validateEmail = (email: any, { required = true }: any = {}) => {
     if (!email && required) {
         return { valid: false, message: 'El correo electrónico es requerido' };
     }
@@ -77,7 +77,7 @@ const validateEmail = (email, { required = true } = {}) => {
     return { valid: true };
 };
 
-const validateUrl = (url, { required = false } = {}) => {
+const validateUrl = (url: any, { required = false }: any = {}) => {
     if (!url && required) {
         return { valid: false, message: 'La URL es requerida' };
     }
@@ -94,7 +94,7 @@ const validateUrl = (url, { required = false } = {}) => {
     }
 };
 
-const validateArray = (array, { minLength = 0, maxLength, required = true } = {}) => {
+const validateArray = (array: any, { minLength = 0, maxLength, required = true }: any = {}) => {
     if (!array && required) {
         return { valid: false, message: 'El array es requerido' };
     }
@@ -120,7 +120,7 @@ const validateArray = (array, { minLength = 0, maxLength, required = true } = {}
 
 // Validadores para modelos específicos
 const validateProduct = (data: any) => {
-    const errors = {};
+    const errors: any = {};
     
     // Validar nombre
     const nameValidation = validateString(data.name, { min: 3, max: 100 });
@@ -175,7 +175,7 @@ const validateProduct = (data: any) => {
 };
 
 const validateCategory = (data: any) => {
-    const errors = {};
+    const errors: any = {};
     
     // Validar nombre
     const nameValidation = validateString(data.name, { min: 2, max: 50 });
@@ -196,7 +196,7 @@ const validateCategory = (data: any) => {
 };
 
 const validateUser = (data: any, isUpdate = false) => {
-    const errors = {};
+    const errors: any = {};
     
     // Validar nombre
     const nameValidation = validateString(data.name, { min: 2, max: 100 });

@@ -94,7 +94,7 @@ app.use(compression());
 
 // Configuración de CORS más permisiva para desarrollo
 const corsOptions = {
-	origin: function(origin, callback) {
+	origin: function(origin: any, callback: any) {
 		// Para desarrollo o cuando se usa ngrok, ser más permisivo
 		const isNgrok = process.env.USING_NGROK === 'true';
 		
@@ -175,6 +175,10 @@ import uploadRoutes from './routes/upload_routes';
 import taxRoutes from './routes/tax_routes';
 import seoRoutes from './routes/seo_routes';
 import exchangeRateRoutes from './routes/exchangeRate_routes';
+import paymentMethodRoutes from './routes/paymentMethod_routes';
+import shippingMethodRoutes from './routes/shippingMethod_routes';
+import deliveryZoneRoutes from './routes/deliveryZone_routes';
+import statsRoutes from './routes/stats_routes';
 
 // Maintenance middleware - debe estar después de las rutas de auth y antes de otras rutas
 import maintenanceMiddleware from './middlewares/maintenance.middleware';
@@ -187,6 +191,19 @@ app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/site', siteRoutes);
+app.use('/api/store', siteRoutes);  // Alias: /api/store/config → /api/site/config
+
+// Route aliases para compatibilidad con el frontend
+app.use('/api', statsRoutes);  // Registra /api/dashboard/stats, /api/stats/*
+
+// Alias: /api/maintenance → /api/site/maintenance
+import * as siteController from './controllers/site_controller';
+app.get('/api/maintenance', siteController.getMaintenanceStatus);
+app.post('/api/maintenance', siteController.toggleMaintenanceMode);
+
+// Alias: /api/metrics → healthcheck getMetrics
+import * as healthController from './controllers/healthcheck';
+app.get('/api/metrics', healthController.getMetrics);
 
 // Aplicar middleware de mantenimiento a todas las rutas excepto admin, auth, health y site
 app.use(maintenanceMiddleware);
@@ -199,6 +216,9 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/uploads', uploadRoutes);
 app.use('/api/taxes', taxRoutes);
 app.use('/api/exchange-rates', exchangeRateRoutes);
+app.use('/api/payment-methods', paymentMethodRoutes);
+app.use('/api/shipping-methods', shippingMethodRoutes);
+app.use('/api/delivery-zones', deliveryZoneRoutes);
 
 // Headers de seguridad adicionales - Solo en producción
 if (process.env.NODE_ENV === 'production') {
@@ -216,7 +236,7 @@ if (process.env.NODE_ENV === 'production') {
 
 // Middleware para errores 404
 app.use((req, res, next) => {
-	const error = new Error(`Ruta no encontrada: ${req.originalUrl}`);
+	const error: any = new Error(`Ruta no encontrada: ${req.originalUrl}`);
 	error.statusCode = 404;
 	next(error);
 });
@@ -225,7 +245,7 @@ app.use((req, res, next) => {
 app.use(errorLogger);
 
 // Middleware de manejo de errores
-app.use((err, req, res, next) => {
+app.use((err: any, req: any, res: any, next: any) => {
 	// Evitamos enviar múltiples respuestas
 	if (res.headersSent) {
 		return next(err);
@@ -234,7 +254,7 @@ app.use((err, req, res, next) => {
 	const statusCode = err.statusCode || 500;
 	
 	// No revelar detalles de errores internos en producción
-	const errorResponse = {
+	const errorResponse: any = {
 		error: process.env.NODE_ENV === 'production'
 		  ? (statusCode === 500 ? 'Error interno del servidor' : err.message)
 		  : err.message || 'Error interno del servidor',
@@ -287,7 +307,7 @@ if (require.main === module) {
 		.sync({ 
 			force: shouldForceSync,
 			// alter:true en desarrollo agrega columnas nuevas sin borrar datos
-			alter: !isProduction && !shouldForceSync
+			alter: false
 		})
 		.then(async () => {
 			console.log(`✅ Modelos sincronizados ${shouldForceSync ? '(con force)' : !isProduction ? '(con alter)' : ''}`);
@@ -331,7 +351,7 @@ function _startExchangeRateCron() {
         await currencyService.fetchRateFromAPI();
       }
     } catch (error) {
-      logger.error('Error en cron de tasas de cambio', { error: error.message });
+      logger.error('Error en cron de tasas de cambio', { error: (error as Error).message });
     }
   };
 

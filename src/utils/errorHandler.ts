@@ -2,7 +2,13 @@ import {  logger  } from '../configs/logger';
 
 // Clase base para errores de la aplicación
 class AppError extends Error {
-  constructor(message, statusCode, errorCode = null, context = {}) {
+  statusCode: number;
+  errorCode: string;
+  context: any;
+  isOperational: boolean;
+  errors?: any[];
+
+  constructor(message: any, statusCode: any, errorCode: any = null, context: any = {}) {
     super(message);
     this.statusCode = statusCode;
     this.errorCode = errorCode || `ERR_${statusCode}`;
@@ -14,51 +20,51 @@ class AppError extends Error {
 
 // Errores específicos
 class BadRequestError extends AppError {
-  constructor(message = 'Solicitud incorrecta', errorCode = null, context = {}) {
+  constructor(message = 'Solicitud incorrecta', errorCode: any = null, context: any = {}) {
     super(message, 400, errorCode || 'ERR_BAD_REQUEST', context);
   }
 }
 
 class UnauthorizedError extends AppError {
-  constructor(message = 'No autorizado', errorCode = null, context = {}) {
+  constructor(message = 'No autorizado', errorCode: any = null, context: any = {}) {
     super(message, 401, errorCode || 'ERR_UNAUTHORIZED', context);
   }
 }
 
 class ForbiddenError extends AppError {
-  constructor(message = 'Acceso prohibido', errorCode = null, context = {}) {
+  constructor(message = 'Acceso prohibido', errorCode: any = null, context: any = {}) {
     super(message, 403, errorCode || 'ERR_FORBIDDEN', context);
   }
 }
 
 class NotFoundError extends AppError {
-  constructor(message = 'Recurso no encontrado', errorCode = null, context = {}) {
+  constructor(message = 'Recurso no encontrado', errorCode: any = null, context: any = {}) {
     super(message, 404, errorCode || 'ERR_NOT_FOUND', context);
   }
 }
 
 class ConflictError extends AppError {
-  constructor(message = 'Conflicto con el estado actual', errorCode = null, context = {}) {
+  constructor(message = 'Conflicto con el estado actual', errorCode: any = null, context: any = {}) {
     super(message, 409, errorCode || 'ERR_CONFLICT', context);
   }
 }
 
 class ValidationError extends AppError {
-  constructor(message = 'Error de validación', errors = [], context = {}) {
+  constructor(message = 'Error de validación', errors: any[] = [], context: any = {}) {
     super(message, 422, 'ERR_VALIDATION', { ...context, errors });
     this.errors = errors;
   }
 }
 
 class InternalServerError extends AppError {
-  constructor(message = 'Error interno del servidor', errorCode = null, context = {}) {
+  constructor(message = 'Error interno del servidor', errorCode: any = null, context: any = {}) {
     super(message, 500, errorCode || 'ERR_INTERNAL', context);
     this.isOperational = false; // Errores internos no son operacionales
   }
 }
 
 // Manejador global de errores
-const handleError = (err, req = null, res = null) => {
+const handleError = (err: any, req: any = null, res: any = null) => {
   // Si es un error de la aplicación, lo logueamos apropiadamente
   if (err instanceof AppError) {
     const level = err.statusCode >= 500 ? 'error' : err.statusCode >= 400 ? 'warn' : 'info';
@@ -124,7 +130,7 @@ const handleError = (err, req = null, res = null) => {
   if (res && !res.headersSent) {
     const statusCode = err.statusCode || 500;
     
-    const errorResponse = {
+    const errorResponse: any = {
       success: false,
       error: {
         message: err.message || 'Error interno del servidor',
@@ -156,7 +162,7 @@ const handleError = (err, req = null, res = null) => {
 };
 
 // Middleware para manejo centralizado de errores Express
-const errorMiddleware = (err, req, res, next) => {
+const errorMiddleware = (err: any, req: any, res: any, next: any) => {
   handleError(err, req, res);
   // No llamamos a next() para terminar el ciclo de manejo de errores
 };

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, jest, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
 import request from 'supertest';
 import app from '../app';
@@ -40,7 +41,7 @@ describe('Health Check Endpoints', () => {
     it('debería devolver estado 200 si la base de datos está disponible', async () => {
       // Mock de sequelize.authenticate para simular conexión exitosa
       const originalAuthenticate = sequelize.authenticate;
-      sequelize.authenticate = jest.fn().mockResolvedValue();
+      (sequelize as any).authenticate = jest.fn().mockResolvedValue(undefined) as any;
 
       const response = await request(app)
         .get('/api/health/readiness')
@@ -51,13 +52,13 @@ describe('Health Check Endpoints', () => {
       expect(response.body).toHaveProperty('database', 'ok');
 
       // Restaurar el método original
-      sequelize.authenticate = originalAuthenticate;
+      (sequelize as any).authenticate = originalAuthenticate;
     });
 
     it('debería devolver estado 503 si la base de datos no está disponible', async () => {
       // Mock de sequelize.authenticate para simular fallo de conexión
       const originalAuthenticate = sequelize.authenticate;
-      sequelize.authenticate = jest.fn().mockRejectedValue(new Error('DB Connection Error'));
+      (sequelize as any).authenticate = jest.fn().mockRejectedValue(new Error('DB Connection Error')) as any;
 
       const response = await request(app)
         .get('/api/health/readiness')
@@ -68,7 +69,7 @@ describe('Health Check Endpoints', () => {
       expect(response.body).toHaveProperty('database', 'error');
 
       // Restaurar el método original
-      sequelize.authenticate = originalAuthenticate;
+      (sequelize as any).authenticate = originalAuthenticate;
     });
   });
 

@@ -22,7 +22,7 @@ async function checkUniqueConstraints() {
         logger.info(`Tablas encontradas: ${tables.length}`);
         
         for (const table of tables) {
-            const tableName = table.table_name;
+        const tableName = (table as any).table_name;
             logger.info(`Examinando tabla: ${tableName}`);
             
             // 2. Obtener todas las columnas de la tabla
@@ -48,7 +48,7 @@ async function checkUniqueConstraints() {
             
             if (uniqueConstraints.length > 0) {
                 logger.info(`Restricciones UNIQUE en ${tableName}:`);
-                uniqueConstraints.forEach(constraint => {
+                uniqueConstraints.forEach((constraint: any) => {
                     logger.info(`  - ${constraint.constraint_name} en columna ${constraint.column_name}`);
                 });
             } else {
@@ -65,7 +65,7 @@ async function checkUniqueConstraints() {
             
             if (uniqueIndices.length > 0) {
                 logger.info(`Índices UNIQUE en ${tableName}:`);
-                uniqueIndices.forEach(index => {
+                uniqueIndices.forEach((index: any) => {
                     logger.info(`  - ${index.indexname}: ${index.indexdef}`);
                 });
             } else {

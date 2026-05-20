@@ -11,7 +11,7 @@
  * @param {string} options.logoUrl - URL del logo (opcional)
  * @returns {string} - HTML de la plantilla completa
  */
-const baseTemplate = (options) => {
+const baseTemplate = (options: any) => {
   const logoUrl = options.logoUrl || 'https://placehold.co/600x150?text=Pura+Vida+Store';
   const footerText = options.footerText || '© Pura Vida Store. Todos los derechos reservados.';
   
@@ -111,7 +111,7 @@ const baseTemplate = (options) => {
  * @param {string} options.loginUrl - URL para iniciar sesión
  * @returns {string} - HTML de la plantilla
  */
-const welcomeTemplate = (options) => {
+const welcomeTemplate = (options: any) => {
   const content = `
     <h1>¡Bienvenido/a a Pura Vida Store!</h1>
     <p>Hola ${options.name},</p>
@@ -145,7 +145,7 @@ const welcomeTemplate = (options) => {
  * @param {number} options.expiryHours - Horas hasta que expire el enlace
  * @returns {string} - HTML de la plantilla
  */
-const passwordResetTemplate = (options) => {
+const passwordResetTemplate = (options: any) => {
   const content = `
     <h1>Restablecimiento de Contraseña</h1>
     <p>Hola ${options.name},</p>
@@ -178,7 +178,7 @@ const passwordResetTemplate = (options) => {
  * @param {string} options.orderUrl - URL para ver la orden
  * @returns {string} - HTML de la plantilla
  */
-const orderConfirmationTemplate = (options) => {
+const orderConfirmationTemplate = (options: any) => {
   // Generar HTML para los items
   const itemsHtml = options.items.map(item => `
     <tr>
@@ -255,7 +255,7 @@ const orderConfirmationTemplate = (options) => {
  * @param {string} options.productUrl - URL del producto
  * @returns {string} - HTML de la plantilla
  */
-const newProductTemplate = (options) => {
+const newProductTemplate = (options: any) => {
   const content = `
     <h1>¡Nuevo Producto Disponible!</h1>
     <p>Acabamos de añadir un nuevo producto a nuestra tienda:</p>
@@ -294,7 +294,7 @@ const newProductTemplate = (options) => {
  * @param {string} options.expiryDate - Fecha de expiración de la oferta
  * @returns {string} - HTML de la plantilla
  */
-const productSaleTemplate = (options) => {
+const productSaleTemplate = (options: any) => {
   const content = `
     <h1>¡Oferta Especial!</h1>
     <p>Tenemos una oferta especial solo por tiempo limitado:</p>

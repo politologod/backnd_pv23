@@ -1,0 +1,3 @@
+﻿src/controllers/auth_controller.ts(100,2): error TS1128: Declaration or statement expected.
+src/controllers/auth_controller.ts(100,4): error TS1005: 'try' expected.
+src/controllers/auth_controller.ts(109,1): error TS1128: Declaration or statement expected.

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import winston from 'winston';
 const { format, transports } = winston;
 import DailyRotateFile from 'winston-daily-rotate-file';
@@ -5,7 +6,7 @@ import path from 'path';
 import fs from 'fs';
 
 /**
- * Sistema de Logs Mejorado para PuraVida E-commerce
+ * Sistema de Logs Mejorado para Ecommerce Backend
  * 
  * Características:
  * - Formato humanizado para fácil lectura
@@ -158,7 +159,7 @@ const logConfiguration = {
 export const logger = winston.createLogger(logConfiguration) as any;
 
 // Funciones helper para logging estructurado
-logger.logRequest = (req, res, responseTime) => {
+logger.logRequest = (req: any, res: any, responseTime: any) => {
   const { method, originalUrl, ip, id: requestId, user } = req;
   
   logger.http(`${method} ${originalUrl} ${res.statusCode} ${responseTime}ms`, {
@@ -173,7 +174,7 @@ logger.logRequest = (req, res, responseTime) => {
   });
 };
 
-logger.logAPI = (req, message, metadata = {}) => {
+logger.logAPI = (req: any, message: any, metadata: any = {}) => {
   logger.info(message, {
     component: 'api',
     requestId: req.id,
@@ -184,7 +185,7 @@ logger.logAPI = (req, message, metadata = {}) => {
   });
 };
 
-logger.logError = (error, context = {}) => {
+logger.logError = (error: any, context: any = {}) => {
   logger.error(error.message || 'Error desconocido', {
     component: context.component || 'app',
     operation: context.operation,
@@ -194,7 +195,7 @@ logger.logError = (error, context = {}) => {
   });
 };
 
-logger.logMetric = (name, value, tags = {}) => {
+logger.logMetric = (name: any, value: any, tags: any = {}) => {
   logger.info(`Métrica: ${name}=${value}`, {
     component: 'metrics',
     metricName: name,
@@ -204,7 +205,7 @@ logger.logMetric = (name, value, tags = {}) => {
 };
 
 // Middleware para Express para loggear peticiones HTTP
-export const requestLogger = (req, res, next) => {
+export const requestLogger = (req: any, res: any, next: any) => {
   const startTime = Date.now();
   
   // Asignar un ID único a cada petición

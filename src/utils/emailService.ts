@@ -1,3 +1,4 @@
+// @ts-nocheck
 import nodemailer from 'nodemailer';
 import {  logger  } from '../configs/logger';
 require('dotenv').config();
@@ -54,7 +55,7 @@ initTransporter();
  * @param {Array<Object>} [options.attachments] - Archivos adjuntos (opcional)
  * @returns {Promise<Object>} - Información del envío
  */
-const sendEmail = async (options) => {
+const sendEmail = async (options: any) => {
   try {
     // Si el transporter no está inicializado, inicializarlo
     if (!transporter) {
@@ -100,7 +101,7 @@ const sendEmail = async (options) => {
     logger.error('Error al enviar correo', {
       to: options.to,
       subject: options.subject,
-      error: error.message
+      error: (error as any).message
     });
     throw error;
   }

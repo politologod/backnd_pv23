@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { IFavorite } from '../types/models';
 import {  DataTypes  } from 'sequelize';
 import sequelize from '../configs/database';

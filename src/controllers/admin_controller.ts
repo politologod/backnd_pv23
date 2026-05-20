@@ -20,7 +20,7 @@ import { Request, Response } from 'express';
 const setMaintenanceMode = async (req: Request, res: Response) => {
   try {
     const { maintenance_mode, maintenance_message } = req.body;
-    const userId = req.user.id;
+    const userId = (req as any).user.id;
 
     if (maintenance_mode === undefined) {
       return res.status(400).json({
@@ -52,16 +52,16 @@ const setMaintenanceMode = async (req: Request, res: Response) => {
       success: true,
       message: 'Modo de mantenimiento actualizado exitosamente',
       data: {
-        maintenance_mode: config.maintenance_mode,
-        maintenance_message: config.maintenance_message
+        maintenance_mode: (config as any).maintenance_mode,
+        maintenance_message: (config as any).maintenance_message
       }
     });
   } catch (error) {
-    console.error('Error al actualizar el modo de mantenimiento', error.message);
+    console.error('Error al actualizar el modo de mantenimiento', (error as Error).message);
     return res.status(500).json({
       success: false,
       message: 'Error al actualizar el modo de mantenimiento',
-      error: error.message
+      error: (error as Error).message
     });
   }
 };
@@ -88,25 +88,25 @@ const getMaintenanceMode = async (req: Request, res: Response) => {
       config = await SiteConfig.create({
         maintenance_mode: false,
         maintenance_message: null,
-        last_updated_by: req.user.id
+        last_updated_by: (req as any).user.id
       });
     }
 
     return res.status(200).json({
       success: true,
       data: {
-        maintenance_mode: config.maintenance_mode,
-        maintenance_message: config.maintenance_message,
-        last_updated_by: config.lastUpdatedBy,
-        updated_at: config.updatedAt
+        maintenance_mode: (config as any).maintenance_mode,
+        maintenance_message: (config as any).maintenance_message,
+        last_updated_by: (config as any).lastUpdatedBy,
+        updated_at: (config as any).updatedAt
       }
     });
   } catch (error) {
-    console.error(`Error al obtener modo de mantenimiento: ${error.message}`);
+    console.error(`Error al obtener modo de mantenimiento: ${(error as Error).message}`);
     return res.status(500).json({
       success: false,
       message: 'Error al obtener el modo de mantenimiento',
-      error: error.message
+      error: (error as Error).message
     });
   }
 };
@@ -137,11 +137,11 @@ const getGeneralStats = async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    console.error(`Error al obtener estadísticas generales: ${error.message}`);
+    console.error(`Error al obtener estadísticas generales: ${(error as Error).message}`);
     return res.status(500).json({
       success: false,
       message: 'Error al obtener estadísticas generales',
-      error: error.message
+      error: (error as Error).message
     });
   }
 };
@@ -166,7 +166,7 @@ const getSalesByCategory = async (req: Request, res: Response) => {
       WHERE o.status = 'entregado'
       GROUP BY c.id, c.name
       ORDER BY total DESC
-    `, { type: sequelize.QueryTypes.SELECT });
+    `, { type: QueryTypes.SELECT });
 
     if (salesByCategory && salesByCategory.length > 0) {
       return res.status(200).json({
@@ -181,7 +181,7 @@ const getSalesByCategory = async (req: Request, res: Response) => {
       data: []
     });
   } catch (error) {
-    console.error(`Error al obtener ventas por categoría: ${error.message}`);
+    console.error(`Error al obtener ventas por categoría: ${(error as Error).message}`);
     
     // Intento final simplificado sin usar categorías
     try {
@@ -190,7 +190,7 @@ const getSalesByCategory = async (req: Request, res: Response) => {
         FROM "OrderItems" oi
         JOIN "Orders" o ON oi."OrderId" = o.id
         WHERE o.status = 'entregado'
-      `, { type: sequelize.QueryTypes.SELECT });
+      `, { type: QueryTypes.SELECT });
       
       return res.status(200).json({
         success: true,
@@ -198,11 +198,11 @@ const getSalesByCategory = async (req: Request, res: Response) => {
         message: 'Mostrando total general debido a error en consulta detallada'
       });
     } catch (finalError) {
-      console.error(`Error en consulta final: ${finalError.message}`);
+      console.error(`Error en consulta final: ${(finalError as Error).message}`);
       return res.status(500).json({
         success: false,
         message: 'Error al obtener ventas por categoría',
-        error: error.message
+        error: (error as Error).message
       });
     }
   }
@@ -232,7 +232,7 @@ const getOrdersByMonth = async (req: Request, res: Response) => {
       ORDER BY month
     `, {
       replacements: { year },
-      type: sequelize.QueryTypes.SELECT
+      type: QueryTypes.SELECT
     });
 
     return res.status(200).json({
@@ -243,11 +243,11 @@ const getOrdersByMonth = async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    console.error(`Error al obtener órdenes por mes: ${error.message}`);
+    console.error(`Error al obtener órdenes por mes: ${(error as Error).message}`);
     return res.status(500).json({
       success: false,
       message: 'Error al obtener órdenes por mes',
-      error: error.message
+      error: (error as Error).message
     });
   }
 };
@@ -273,7 +273,7 @@ const getCustomersByMonth = async (req: Request, res: Response) => {
       ORDER BY month
     `, {
       replacements: { year },
-      type: sequelize.QueryTypes.SELECT
+      type: QueryTypes.SELECT
     });
 
     return res.status(200).json({
@@ -284,11 +284,11 @@ const getCustomersByMonth = async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    console.error(`Error al obtener clientes por mes: ${error.message}`);
+    console.error(`Error al obtener clientes por mes: ${(error as Error).message}`);
     return res.status(500).json({
       success: false,
       message: 'Error al obtener clientes por mes',
-      error: error.message
+      error: (error as Error).message
     });
   }
 };
@@ -314,7 +314,7 @@ const getSalesByMonth = async (req: Request, res: Response) => {
       ORDER BY month
     `, {
       replacements: { year },
-      type: sequelize.QueryTypes.SELECT
+      type: QueryTypes.SELECT
     });
 
     return res.status(200).json({
@@ -325,11 +325,11 @@ const getSalesByMonth = async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    console.error(`Error al obtener ventas por mes: ${error.message}`);
+    console.error(`Error al obtener ventas por mes: ${(error as Error).message}`);
     return res.status(500).json({
       success: false,
       message: 'Error al obtener ventas por mes',
-      error: error.message
+      error: (error as Error).message
     });
   }
 };
@@ -424,7 +424,7 @@ const getDashboardStats = async (req: Request, res: Response) => {
       GROUP BY p."id", p."name", p."price", p."description", p."imageUrl"
       ORDER BY total_sold DESC
       LIMIT 5
-    `, { type: sequelize.QueryTypes.SELECT });
+    `, { type: QueryTypes.SELECT });
 
     return res.status(200).json({
       success: true,
@@ -448,11 +448,11 @@ const getDashboardStats = async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    console.error(`Error al obtener estadísticas del dashboard: ${error.message}`);
+    console.error(`Error al obtener estadísticas del dashboard: ${(error as Error).message}`);
     return res.status(500).json({
       success: false,
       message: 'Error al obtener estadísticas del dashboard',
-      error: error.message
+      error: (error as Error).message
     });
   }
 };

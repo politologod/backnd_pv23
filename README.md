@@ -1,4 +1,4 @@
-# Backend PuraVida E-commerce
+# Backend Ecommerce
 
 ## 🟢 Estado Actual (2024)
 
@@ -10,7 +10,7 @@
 - El middleware de autenticación (`auth.js`) valida el JWT desde la cookie y expone el usuario en `req.user`.
 - El sistema es robusto, seguro y preparado para producción.
 
-API REST completa y robusta para la aplicación de e-commerce PuraVida.
+API REST completa y robusta para la aplicación de e-commerce.
 
 ## Estado Actual del Proyecto
 
@@ -88,8 +88,8 @@ El backend se encuentra en un estado avanzado (8.5/10) con las siguientes caract
 
 1. Clonar el repositorio:
 ```bash
-git clone https://github.com/usuario/puravida_backend.git
-cd puravida_backend
+git clone https://github.com/usuario/ecommerce-backend.git
+cd ecommerce-backend
 ```
 
 2. Instalar dependencias:
@@ -102,7 +102,7 @@ npm install
 # Variables de entorno para la aplicación
 
 # Configuración de la base de datos
-DATABASE_URL=postgresql://usuario:password@localhost:5432/puravida
+DATABASE_URL=postgresql://usuario:password@localhost:5432/ecommerce_db
 
 # Configuración del servidor
 PORT=2300

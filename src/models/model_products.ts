@@ -16,7 +16,12 @@ const Product = sequelize.define<IProduct>("Product", {
         type: DataTypes.STRING(50),
         allowNull: true,
         comment: 'Código único de producto (Stock Keeping Unit)',
-        unique: true,
+        defaultValue: null
+    },
+    barcode: {
+        type: DataTypes.STRING(50),
+        allowNull: true,
+        comment: 'Código de barras del producto',
         defaultValue: null
     },
     description: {
@@ -25,6 +30,18 @@ const Product = sequelize.define<IProduct>("Product", {
     price: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
+    },
+    compareAtPrice: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        comment: 'Precio de comparación (precio antes del descuento)',
+        defaultValue: null
+    },
+    cost: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        comment: 'Costo del producto (para cálculo de márgenes)',
+        defaultValue: null
     },
     currency: {
         type: DataTypes.ENUM('USD', 'EUR'),
@@ -36,14 +53,51 @@ const Product = sequelize.define<IProduct>("Product", {
         type: DataTypes.INTEGER,
         defaultValue: 0,
     },
+    status: {
+        type: DataTypes.ENUM('active', 'draft', 'archived'),
+        allowNull: false,
+        defaultValue: 'active',
+        comment: 'Estado del producto en el catálogo',
+    },
     imageUrl: {
         type: DataTypes.STRING,
         allowNull: true,
+    },
+    images: {
+        type: DataTypes.JSONB,
+        allowNull: true,
+        defaultValue: [],
+        comment: 'Array de URLs de imágenes del producto',
+    },
+    weight: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        comment: 'Peso del producto en kg',
+        defaultValue: null
+    },
+    dimensions: {
+        type: DataTypes.JSONB,
+        allowNull: true,
+        comment: 'Dimensiones del producto { length, width, height } en cm',
+        defaultValue: null
     },
     metadata: {
         type: DataTypes.JSONB,
         allowNull: true,
     },
+    seo: {
+        type: DataTypes.JSONB,
+        allowNull: true,
+        comment: 'SEO metadata { metaTitle, metaDescription, keywords }',
+        defaultValue: null
+    },
+    tags: {
+        type: DataTypes.JSONB,
+        allowNull: true,
+        comment: 'Array de tags/etiquetas del producto',
+        defaultValue: []
+    },
+    // Legacy SEO fields (kept for backward compatibility, will be migrated to seo JSONB)
     metaTitle: {
         type: DataTypes.STRING(150),
         allowNull: true

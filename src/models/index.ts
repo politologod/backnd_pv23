@@ -14,6 +14,10 @@ import Tax from './model_tax';
 import ProductTax from './model_productTax';
 import ExchangeRate from './model_exchangeRate';
 import ExchangeRateConfig from './model_exchangeRateConfig';
+import SiteConfig from './model_siteConfig';
+import PaymentMethod from './model_paymentMethod';
+import ShippingMethod from './model_shippingMethod';
+import DeliveryZone from './model_deliveryZone';
 
 // Crear objeto de modelos
 const db = {
@@ -32,6 +36,10 @@ const db = {
     ProductTax,
     ExchangeRate,
     ExchangeRateConfig,
+    SiteConfig,
+    PaymentMethod,
+    ShippingMethod,
+    DeliveryZone,
 };
 
 // Importar función de asociaciones y ejecutarla con todos los modelos
@@ -39,3 +47,25 @@ import setupAssociations from './associations';
 setupAssociations(db);
 
 export default db;
+
+// Named exports for direct imports
+export {
+    sequelize,
+    Product,
+    Category,
+    CartItem,
+    OrderItem,
+    User,
+    Cart,
+    Favorite,
+    Order,
+    OrderStatusHistory,
+    Tax,
+    ProductTax,
+    ExchangeRate,
+    ExchangeRateConfig,
+    SiteConfig,
+    PaymentMethod,
+    ShippingMethod,
+    DeliveryZone,
+};

@@ -4,13 +4,13 @@ const options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'Puravida23 Ecommerce Backend',
+            title: 'Ecommerce Backend API',
             version: '1.0.0',
-            description: 'Documentación de la API de Puravida23 Ecommerce',
+            description: 'Documentación de la API REST del backend de ecommerce',
         },
         servers: [
             {
-                url: 'http://localhost:777',
+                url: 'http://localhost:2300',
                 description: 'Servidor de desarrollo',
             },
         ],
@@ -27,7 +27,7 @@ const options = {
             bearerAuth: [],
         }],
     },
-    apis: ['./src/routes/*.js'], // archivos donde buscar anotaciones
+    apis: ['./src/routes/*.ts'], // archivos donde buscar anotaciones
 };
 
 const specs = swaggerJsdoc(options);

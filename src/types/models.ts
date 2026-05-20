@@ -10,7 +10,7 @@ export interface UserAttributes {
   address?: string | null;
   phone?: string | null;
   profilePic?: string | null;
-  role: 'admin' | 'customer' | 'vendor';
+  role: 'admin' | 'customer' | 'vendor' | 'staff';
   resetPasswordToken?: string | null;
   resetPasswordExpires?: Date | null;
   createdAt?: Date;
@@ -28,12 +28,22 @@ export interface ProductAttributes {
   id: number;
   name: string;
   sku?: string | null;
+  barcode?: string | null;
   description?: string | null;
   price: number;
-  currency: 'USD' | 'EUR'; // Moneda base del precio
+  compareAtPrice?: number | null;
+  cost?: number | null;
+  currency: 'USD' | 'EUR';
   stock: number;
+  status: 'active' | 'draft' | 'archived';
   imageUrl?: string | null;
+  images?: string[] | null;       // Array of image URLs (JSONB)
+  weight?: number | null;
+  dimensions?: { length?: number; width?: number; height?: number } | null;
   metadata?: any;
+  seo?: { metaTitle?: string; metaDescription?: string; keywords?: string } | null;
+  tags?: string[] | null;
+  // Legacy SEO fields (kept for backward compatibility)
   metaTitle?: string | null;
   metaDescription?: string | null;
   seoKeywords?: string | null;
@@ -41,7 +51,7 @@ export interface ProductAttributes {
   updatedAt?: Date;
 }
 
-export interface ProductCreationAttributes extends Optional<ProductAttributes, 'id' | 'stock'> {}
+export interface ProductCreationAttributes extends Optional<ProductAttributes, 'id' | 'stock' | 'status'> {}
 
 export interface IProduct extends Model<ProductAttributes, ProductCreationAttributes>, ProductAttributes {
   Categories?: any[];
@@ -52,8 +62,14 @@ export interface IProduct extends Model<ProductAttributes, ProductCreationAttrib
 export interface CategoryAttributes {
   id: number;
   name: string;
+  slug?: string | null;
   description?: string | null;
-  imageUrl?: string | null;
+  image?: string | null;
+  parentId?: number | null;
+  seo?: { metaTitle?: string; metaDescription?: string } | null;
+  active: boolean;
+  sortOrder?: number | null;
+  // Legacy SEO fields
   metaTitle?: string | null;
   metaDescription?: string | null;
   seoKeywords?: string | null;
@@ -61,25 +77,35 @@ export interface CategoryAttributes {
   updatedAt?: Date;
 }
 
-export interface CategoryCreationAttributes extends Optional<CategoryAttributes, 'id'> {}
+export interface CategoryCreationAttributes extends Optional<CategoryAttributes, 'id' | 'active'> {}
 
-export interface ICategory extends Model<CategoryAttributes, CategoryCreationAttributes>, CategoryAttributes {}
+export interface ICategory extends Model<CategoryAttributes, CategoryCreationAttributes>, CategoryAttributes {
+  Products?: any[];
+  countProducts?: () => Promise<number>;
+  children?: ICategory[];
+  parent?: ICategory;
+}
 
 // --- Order ---
 export interface OrderAttributes {
   id: number;
+  orderNumber?: string | null;
   userId: number;
   status: string;
+  paymentStatus: string;
   total: number;
   subtotal?: number;
   taxes_amount?: number;
   taxes_details?: any;
+  shipping?: number;
   shippingAddress: string;
   paymentMethod: string;
-  paymentCurrency?: 'USD' | 'EUR' | 'VES' | 'USDT' | null; // Moneda en que pagó el cliente
-  exchangeRateAtPurchase?: number | null;                    // Tasa VES usada al momento del pago
-  totalInVES?: number | null;                                // Total convertido a VES (si pagó en VES)
+  shippingMethod?: string | null;
+  paymentCurrency?: 'USD' | 'EUR' | 'VES' | 'USDT' | null;
+  exchangeRateAtPurchase?: number | null;
+  totalInVES?: number | null;
   deliveryType: string;
+  notes?: string | null;
   paymentProofUrl?: string | null;
   paymentProofPublicId?: string | null;
   payerCedula?: string | null;
@@ -94,7 +120,7 @@ export interface OrderAttributes {
   updatedAt?: Date;
 }
 
-export interface OrderCreationAttributes extends Optional<OrderAttributes, 'id' | 'status'> {}
+export interface OrderCreationAttributes extends Optional<OrderAttributes, 'id' | 'status' | 'paymentStatus'> {}
 
 export interface IOrder extends Model<OrderAttributes, OrderCreationAttributes>, OrderAttributes {}
 
@@ -103,8 +129,10 @@ export interface OrderItemAttributes {
   id: number;
   orderId: number;
   productId: number;
+  productName?: string | null;
   quantity: number;
   priceAtPurchase: number;
+  total?: number | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -179,9 +207,18 @@ export interface ICartItem extends Model<CartItemAttributes, CartItemCreationAtt
 // --- SiteConfig ---
 export interface SiteConfigAttributes {
   id: number;
-  key: string;
-  value: any;
+  name: string;
   description?: string | null;
+  logoUrl?: string | null;
+  primaryColor?: string | null;
+  paymentMethods?: any;         // JSONB array of payment methods
+  shippingMethods?: any;        // JSONB array of shipping methods
+  currencyConfig?: any;         // JSONB currency configuration
+  schedule?: any;               // JSONB store schedule
+  maintenance_mode: boolean;
+  maintenance_message?: string | null;
+  active: boolean;
+  last_updated_by?: number | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -195,6 +232,7 @@ export interface OrderStatusHistoryAttributes {
   id: number;
   orderId: number;
   status: string;
+  previousStatus?: string | null;
   notes?: string | null;
   updatedBy?: number | null;
   updatedByRole?: string | null;
@@ -251,3 +289,51 @@ export interface ExchangeRateConfigAttributes {
 export interface ExchangeRateConfigCreationAttributes extends Optional<ExchangeRateConfigAttributes, 'id'> {}
 
 export interface IExchangeRateConfig extends Model<ExchangeRateConfigAttributes, ExchangeRateConfigCreationAttributes>, ExchangeRateConfigAttributes {}
+
+// --- PaymentMethod ---
+export interface PaymentMethodAttributes {
+  id: number;
+  slug: string;
+  label: string;
+  enabled: boolean;
+  config?: any;
+  sortOrder?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface PaymentMethodCreationAttributes extends Optional<PaymentMethodAttributes, 'id' | 'enabled'> {}
+
+export interface IPaymentMethod extends Model<PaymentMethodAttributes, PaymentMethodCreationAttributes>, PaymentMethodAttributes {}
+
+// --- ShippingMethod ---
+export interface ShippingMethodAttributes {
+  id: number;
+  slug: string;
+  label: string;
+  enabled: boolean;
+  config?: any;
+  sortOrder?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface ShippingMethodCreationAttributes extends Optional<ShippingMethodAttributes, 'id' | 'enabled'> {}
+
+export interface IShippingMethod extends Model<ShippingMethodAttributes, ShippingMethodCreationAttributes>, ShippingMethodAttributes {}
+
+// --- DeliveryZone ---
+export interface DeliveryZoneAttributes {
+  id: number;
+  name: string;
+  shippingFee: number;
+  minimumOrder?: number | null;
+  estimatedTime?: string | null;
+  enabled: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface DeliveryZoneCreationAttributes extends Optional<DeliveryZoneAttributes, 'id' | 'enabled'> {}
+
+export interface IDeliveryZone extends Model<DeliveryZoneAttributes, DeliveryZoneCreationAttributes>, DeliveryZoneAttributes {}

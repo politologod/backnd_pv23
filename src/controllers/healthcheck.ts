@@ -27,7 +27,7 @@ const startTime = Date.now();
 const getStatus = async (req: Request, res: Response) => {
     try {
         const serviceStatus = {
-            service: 'PuraVida Backend API',
+            service: process.env.APP_NAME || 'Ecommerce Backend API',
             status: 'operational',
             timestamp: new Date().toISOString(),
             uptime: formatUptime(process.uptime()),
@@ -46,9 +46,9 @@ const getStatus = async (req: Request, res: Response) => {
         } catch (dbError) {
             serviceStatus.status = 'degraded';
             serviceStatus.dependencies.database.status = 'down';
-            serviceStatus.dependencies.database.details = dbError.message;
+            serviceStatus.dependencies.database.details = (dbError as Error).message;
             
-            console.error('Error de conexión a la base de datos durante health check:', dbError.message);
+            console.error('Error de conexión a la base de datos durante health check:', (dbError as Error).message);
         }
 
         // Establecer código de estado según el estado del servicio
@@ -60,10 +60,10 @@ const getStatus = async (req: Request, res: Response) => {
 
         return res.status(statusCode).json(serviceStatus);
     } catch (error) {
-        console.error('Error al verificar el estado del servicio:', error.message);
+        console.error('Error al verificar el estado del servicio:', (error as Error).message);
         
         return res.status(500).json({
-            service: 'PuraVida Backend API',
+            service: process.env.APP_NAME || 'Ecommerce Backend API',
             status: 'critical',
             timestamp: new Date().toISOString(),
             error: 'Error interno al verificar el estado'
@@ -81,11 +81,11 @@ const getLiveness = (req: Request, res: Response) => {
     logger.debug('Liveness check solicitado', {
         component: 'healthcheck',
         operation: 'getLiveness',
-        requestId: req.id
+        requestId: (req as any).id
     });
     
     return res.status(200).json({
-        service: 'PuraVida Backend API',
+        service: process.env.APP_NAME || 'Ecommerce Backend API',
         status: 'alive',
         timestamp: new Date().toISOString()
     });
@@ -103,11 +103,11 @@ const getReadiness = async (req: Request, res: Response) => {
         logger.debug('Readiness check exitoso', {
             component: 'healthcheck',
             operation: 'getReadiness',
-            requestId: req.id
+            requestId: (req as any).id
         });
         
         return res.status(200).json({
-            service: 'PuraVida Backend API',
+            service: process.env.APP_NAME || 'Ecommerce Backend API',
             status: 'ready',
             timestamp: new Date().toISOString()
         });
@@ -115,12 +115,12 @@ const getReadiness = async (req: Request, res: Response) => {
         logger.warn('Servicio no está listo - Problema con la base de datos', {
             component: 'healthcheck',
             operation: 'getReadiness',
-            error: error.message,
-            requestId: req.id
+            error: (error as Error).message,
+            requestId: (req as any).id
         });
         
         return res.status(503).json({
-            service: 'PuraVida Backend API',
+            service: process.env.APP_NAME || 'Ecommerce Backend API',
             status: 'not_ready',
             details: 'Database connection issues',
             timestamp: new Date().toISOString()
@@ -166,9 +166,9 @@ const getMetrics = (req: Request, res: Response) => {
 
     // Detalles extendidos solo en desarrollo
     if (process.env.NODE_ENV !== 'production') {
-        systemInfo.env = process.env.NODE_ENV;
-        systemInfo.process.resourceUsage = process.resourceUsage();
-        systemInfo.process.memoryUsageDetails = process.memoryUsage();
+        (systemInfo as any).env = process.env.NODE_ENV;
+        (systemInfo as any).process.resourceUsage = process.resourceUsage();
+        (systemInfo as any).process.memoryUsageDetails = process.memoryUsage();
     }
 
     logger.info('Métricas del sistema solicitadas', {
@@ -181,11 +181,11 @@ const getMetrics = (req: Request, res: Response) => {
             heapUsedPercent: systemInfo.process.memory.heapUsedPercentage,
             uptime: systemInfo.process.uptime
         },
-        requestId: req.id
+        requestId: (req as any).id
     });
 
     return res.status(200).json({
-        service: 'PuraVida Backend API',
+        service: process.env.APP_NAME || 'Ecommerce Backend API',
         timestamp: new Date().toISOString(),
         metrics: systemInfo
     });
@@ -196,7 +196,7 @@ const getMetrics = (req: Request, res: Response) => {
  * @param {Number} bytes - Tamaño en bytes
  * @returns {String} Representación formateada
  */
-function formatBytes(bytes) {
+function formatBytes(bytes: any) {
     if (bytes === 0) return '0 Bytes';
     
     const k = 1024;
@@ -211,7 +211,7 @@ function formatBytes(bytes) {
  * @param {Number} seconds - Tiempo en segundos
  * @returns {String} Representación formateada
  */
-function formatUptime(seconds) {
+function formatUptime(seconds: any) {
     const days = Math.floor(seconds / 86400);
     const hours = Math.floor((seconds % 86400) / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);

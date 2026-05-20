@@ -3,7 +3,8 @@
  * Este script migra los datos existentes para usar el nuevo modelo de impuestos
  */
 require('dotenv').config();
-import {  Order, sequelize  } from '../models';
+import {  Order  } from '../models';
+import sequelize from '../configs/database';
 import logger from '../configs/logger';
 
 async function updateExistingOrders() {
@@ -19,7 +20,7 @@ async function updateExistingOrders() {
     // Para cada orden, actualizar los campos de impuestos
     for (const order of orders) {
       // Establecer subtotal igual al total (asumiendo que no había impuestos antes)
-      const subtotal = parseFloat(order.total) || 0;
+      const subtotal = parseFloat((order as any).total) || 0;
       
       // Actualizar la orden
       await order.update({
@@ -28,7 +29,7 @@ async function updateExistingOrders() {
         taxes_details: [] // Sin detalles de impuestos previos
       }, { transaction: t });
       
-      console.log(`✅ Orden ID ${order.id} actualizada: subtotal=${subtotal}, total=${order.total}`);
+      console.log(`✅ Orden ID ${(order as any).id} actualizada: subtotal=${subtotal}, total=${(order as any).total}`);
     }
     
     // Confirmar transacción
@@ -42,7 +43,7 @@ async function updateExistingOrders() {
     // Revertir cambios en caso de error
     await t.rollback();
     console.error('❌ Error durante la actualización de órdenes:', error);
-    logger.error('Error en actualización de órdenes', { error: error.message });
+    logger.error('Error en actualización de órdenes', { error: (error as Error).message });
   } finally {
     // Cerrar conexión
     await sequelize.close();
