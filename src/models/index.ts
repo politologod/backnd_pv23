@@ -18,6 +18,11 @@ import SiteConfig from './model_siteConfig';
 import PaymentMethod from './model_paymentMethod';
 import ShippingMethod from './model_shippingMethod';
 import DeliveryZone from './model_deliveryZone';
+import ThemeConfig from './model_themeConfig';
+import StorefrontPage from './model_storefrontPage';
+import PageSection from './model_pageSection';
+import Banner from './model_banner';
+import MediaAsset from './model_mediaAsset';
 
 // Crear objeto de modelos
 const db = {
@@ -40,6 +45,11 @@ const db = {
     PaymentMethod,
     ShippingMethod,
     DeliveryZone,
+    ThemeConfig,
+    StorefrontPage,
+    PageSection,
+    Banner,
+    MediaAsset,
 };
 
 // Importar función de asociaciones y ejecutarla con todos los modelos
@@ -68,4 +78,9 @@ export {
     PaymentMethod,
     ShippingMethod,
     DeliveryZone,
+    ThemeConfig,
+    StorefrontPage,
+    PageSection,
+    Banner,
+    MediaAsset,
 };

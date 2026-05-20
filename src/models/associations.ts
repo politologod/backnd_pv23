@@ -11,6 +11,9 @@ import Favorite from './model_favorite';
 import OrderStatusHistory from './model_orderStatusHistory';
 import Tax from './model_tax';
 import ProductTax from './model_productTax';
+import StorefrontPage from './model_storefrontPage';
+import PageSection from './model_pageSection';
+import MediaAsset from './model_mediaAsset';
 
 function setupAssociations(db: any) {
     // Relaciones Producto - Categoría (Many-to-Many)
@@ -81,6 +84,13 @@ function setupAssociations(db: any) {
     // Relación para saber quién creó/modificó un impuesto
     Tax.belongsTo(User, { foreignKey: 'created_by', as: 'createdBy', targetKey: 'id_autoincrement' });
     Tax.belongsTo(User, { foreignKey: 'updated_by', as: 'updatedBy', targetKey: 'id_autoincrement' });
+
+    // Storefront: Page → Sections (1:N)
+    StorefrontPage.hasMany(PageSection, { foreignKey: 'pageId', as: 'sections', onDelete: 'CASCADE' });
+    PageSection.belongsTo(StorefrontPage, { foreignKey: 'pageId', as: 'page' });
+
+    // Media: Asset → User (uploadedBy)
+    MediaAsset.belongsTo(User, { foreignKey: 'uploadedBy', as: 'uploader', targetKey: 'id_autoincrement' });
 }
 
 export default setupAssociations;

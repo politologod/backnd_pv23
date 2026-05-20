@@ -179,6 +179,8 @@ import paymentMethodRoutes from './routes/paymentMethod_routes';
 import shippingMethodRoutes from './routes/shippingMethod_routes';
 import deliveryZoneRoutes from './routes/deliveryZone_routes';
 import statsRoutes from './routes/stats_routes';
+import storefrontRoutes from './routes/storefront_routes';
+import storefrontAdminRoutes from './routes/storefrontAdmin_routes';
 
 // Maintenance middleware - debe estar después de las rutas de auth y antes de otras rutas
 import maintenanceMiddleware from './middlewares/maintenance.middleware';
@@ -192,6 +194,12 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/site', siteRoutes);
 app.use('/api/store', siteRoutes);  // Alias: /api/store/config → /api/site/config
+
+// Storefront public routes (no auth required)
+app.use('/api/storefront', storefrontRoutes);
+
+// Storefront admin routes (requires admin/staff role)
+app.use('/api/admin/storefront', storefrontAdminRoutes);
 
 // Route aliases para compatibilidad con el frontend
 app.use('/api', statsRoutes);  // Registra /api/dashboard/stats, /api/stats/*
