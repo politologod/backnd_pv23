@@ -12,7 +12,7 @@ COOKIE_DOMAIN=localhost
 COOKIE_SECURE=false # Cambiar a true en producción
 
 # Configuración de la base de datos
-DATABASE_URL=postgresql://YOUR_USER:YOUR_PASSWORD_HERE@YOUR_HOST.neon.tech/neondb?sslmode=require
+DATABASE_URL=postgresql://your_user:your_password@your_host.neon.tech/your_database?sslmode=require
 DB_SSL=true
 
 # Configuración de Google OAuth
